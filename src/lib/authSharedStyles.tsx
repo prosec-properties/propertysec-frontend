@@ -1,0 +1,1 @@
+export const formStyle = "p-10 w-full md:max-w-[600px] bg-white  md:basis-[80%]"
