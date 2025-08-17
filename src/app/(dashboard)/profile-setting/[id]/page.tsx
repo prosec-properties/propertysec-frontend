@@ -2,6 +2,8 @@ import { $requestWithoutToken } from "@/api/general";
 import { authConfig } from "@/authConfig";
 import AffiliateProfileForm from "@/components/forms/AffiliateForm";
 import LandlordProfileForm from "@/components/forms/LandlordProfile";
+import BuyerProfileForm from "@/components/forms/BuyerProfile";
+import AdminProfileForm from "@/components/forms/AdminProfile";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import { NIGERIAN_COUNTRY_ID } from "@/constants/general";
 import { SIGN_IN_ROUTE } from "@/constants/routes";
@@ -30,11 +32,7 @@ export default async function Page({ params }: { params: IParams }) {
 
   const userRole = session.user.role;
 
-  // const countries = await fetchCountries();
   const country = await fetchACountry(NIGERIAN_COUNTRY_ID);
-
-
-  // console.log("countries", countries);
 
   if (!country?.success) {
     return <ErrorDisplay message="Error Fetching Countries" />;
@@ -42,6 +40,8 @@ export default async function Page({ params }: { params: IParams }) {
 
   switch (userRole) {
     case USER_ROLE.LANDLORD:
+    case USER_ROLE.DEVELOPER:
+    case USER_ROLE.LAWYER:
       return (
         <LandlordProfileForm
           token={session.accessToken}
@@ -55,6 +55,10 @@ export default async function Page({ params }: { params: IParams }) {
           country={country?.data || {}}
         />
       );
+    case USER_ROLE.BUYER:
+      return <BuyerProfileForm />;
+    case USER_ROLE.ADMIN:
+  return <AdminProfileForm token={session.accessToken} />;
 
     default:
       return <div>Role is not assigned yet</div>;

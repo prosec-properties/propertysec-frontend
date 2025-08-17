@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import PasswordInput from "../inputs/PasswordInput";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
