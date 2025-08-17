@@ -4,11 +4,15 @@
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat"],
   "env": {
-    "NEXT_PUBLIC_PRO_SEC_URL": "https://propertysec-backend.onrender.com/api/v1",
-    "NEXTAUTH_URL": "https://prosec-frontend.livebuystore.workers.dev/auth/callback",
-    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "371862489277-c0dn1o237h49k6qckj463q41gmgbfv8h.apps.googleusercontent.com",
-    "NEXT_PUBLIC_GOOGLE_CALLBACK_URL": "https://prosec-frontend.livebuystore.workers.dev/auth/google/callback",
-    "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY": "pk_test_affde3ad169b37402102fd5fc96aa881dcad150c"
+    "production": {
+      "vars": {
+        "NEXT_PUBLIC_PRO_SEC_URL": "https://propertysec-backend.onrender.com/api/v1",
+        "NEXTAUTH_URL": "https://prosec-frontend.livebuystore.workers.dev/auth/callback",
+        "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "371862489277-c0dn1o237h49k6qckj463q41gmgbfv8h.apps.googleusercontent.com",
+        "NEXT_PUBLIC_GOOGLE_CALLBACK_URL": "https://prosec-frontend.livebuystore.workers.dev/auth/google/callback",
+        "NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY": "pk_test_affde3ad169b37402102fd5fc96aa881dcad150c"
+      }
+    }
   },
   "assets": {
     "directory": ".open-next/assets",

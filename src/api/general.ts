@@ -10,6 +10,7 @@ type ICachedRequest =
 
 export function getApiUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_PRO_SEC_URL}${path}`;
+  // return `https://propertysec-backend.onrender.com/api/v1${path}`;
 }
 
 class BaseRequest {
