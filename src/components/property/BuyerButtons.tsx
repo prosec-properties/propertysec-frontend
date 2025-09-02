@@ -35,37 +35,35 @@ const BuyerButtons: React.FC<BuyerButtonsProps> = ({ user, property }) => {
   return (
     <div>
       {/* Property Purchase Button */}
-      {user?.buyerApproved ? (
+      {/* {user?.buyerApproved ? ( */}
         <CustomButton
           className="w-full mb-4"
           onClick={() => setShowPropertyModal(true)}
         >
           Buy Property
         </CustomButton>
-      ) : (
-        <Dialog>
-          <DialogTrigger asChild>
-            <CustomButton className="w-full mb-4">
-              Buy Property
-            </CustomButton>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Account Verification</DialogTitle>
-              <DialogDescription>
-                Your account is not yet verified. Please contact us for
-                details on how to get verified. Only verified accounts can
-                purchase properties.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <DialogClose>
-                <CustomButton variant="secondary">Okay</CustomButton>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* // ) : (
+      //   <Dialog>
+      //     <DialogTrigger asChild>
+      //       <CustomButton className="w-full mb-4">Buy Property</CustomButton>
+      //     </DialogTrigger>
+      //     <DialogContent>
+      //       <DialogHeader>
+      //         <DialogTitle>Account Verification</DialogTitle>
+      //         <DialogDescription>
+      //           Your account is not yet verified. Please contact us for details
+      //           on how to get verified. Only verified accounts can purchase
+      //           properties.
+      //         </DialogDescription>
+      //       </DialogHeader>
+      //       <DialogFooter>
+      //         <DialogClose>
+      //           <CustomButton variant="secondary">Okay</CustomButton>
+      //         </DialogClose>
+      //       </DialogFooter>
+      //     </DialogContent>
+      //   </Dialog>
+      // )} */}
 
       {/* Inspection Button */}
       {userHasInspection ? (

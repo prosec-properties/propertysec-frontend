@@ -9,8 +9,13 @@ type ICachedRequest =
   | "only-if-cached";
 
 export function getApiUrl(path: string): string {
-  return `${process.env.NEXT_PUBLIC_PRO_SEC_URL}${path}`;
-  // return `https://propertysec-backend.onrender.com/api/v1${path}`;
+  const serverBaseUrl =
+    process.env.NODE_ENV === "production"
+      ? "https://propertysec-backend.onrender.com/api/v1"
+      : process.env.NEXT_PUBLIC_PRO_SEC_URL;
+
+  // console.log("API Base URL:", serverBaseUrl);
+  return `${serverBaseUrl}${path}`;
 }
 
 class BaseRequest {
