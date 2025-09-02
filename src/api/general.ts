@@ -1,3 +1,4 @@
+import { apiBaseUrl } from "@/constants/env";
 import { IApiResponse } from "@/interface/general";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -9,13 +10,7 @@ type ICachedRequest =
   | "only-if-cached";
 
 export function getApiUrl(path: string): string {
-  const serverBaseUrl =
-    process.env.NODE_ENV === "production"
-      ? "https://propertysec-backend.onrender.com/api/v1"
-      : process.env.NEXT_PUBLIC_PRO_SEC_URL;
-
-  // console.log("API Base URL:", serverBaseUrl);
-  return `${serverBaseUrl}${path}`;
+  return `${apiBaseUrl}${path}`;
 }
 
 class BaseRequest {
