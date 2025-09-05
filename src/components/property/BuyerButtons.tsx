@@ -9,16 +9,6 @@ import InspectionDetails from "./InspectionDetails";
 import PropertyPaymentDetails from "./PropertyPaymentDetails";
 import ActionButton from "../buttons/ActionButton";
 import { handleCallSeller, handleWhatsAppSeller } from "./propertyHelpers";
-import {
-  Dialog,
-  DialogHeader,
-  DialogTrigger,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogFooter,
-} from "../ui/dialog";
-import { DialogClose } from "@radix-ui/react-dialog";
 
 interface BuyerButtonsProps {
   user?: IUser;
@@ -34,74 +24,25 @@ const BuyerButtons: React.FC<BuyerButtonsProps> = ({ user, property }) => {
 
   return (
     <div>
-      {/* Property Purchase Button */}
-      {/* {user?.buyerApproved ? ( */}
-        <CustomButton
-          className="w-full mb-4"
-          onClick={() => setShowPropertyModal(true)}
-        >
-          Buy Property
-        </CustomButton>
-      {/* // ) : (
-      //   <Dialog>
-      //     <DialogTrigger asChild>
-      //       <CustomButton className="w-full mb-4">Buy Property</CustomButton>
-      //     </DialogTrigger>
-      //     <DialogContent>
-      //       <DialogHeader>
-      //         <DialogTitle>Account Verification</DialogTitle>
-      //         <DialogDescription>
-      //           Your account is not yet verified. Please contact us for details
-      //           on how to get verified. Only verified accounts can purchase
-      //           properties.
-      //         </DialogDescription>
-      //       </DialogHeader>
-      //       <DialogFooter>
-      //         <DialogClose>
-      //           <CustomButton variant="secondary">Okay</CustomButton>
-      //         </DialogClose>
-      //       </DialogFooter>
-      //     </DialogContent>
-      //   </Dialog>
-      // )} */}
+      <CustomButton
+        className="w-full mb-4"
+        onClick={() => setShowPropertyModal(true)}
+      >
+        Buy Property
+      </CustomButton>
 
       {/* Inspection Button */}
       {userHasInspection ? (
         <div className="border py-2 px-2 mb-5">Inspection Paid</div>
       ) : (
         <>
-          {user?.buyerApproved ? (
-            <CustomButton
-              className="w-full mb-4"
-              variant="secondary"
-              onClick={() => setShowInspectionModal(true)}
-            >
-              Proceed for Inspection
-            </CustomButton>
-          ) : (
-            <Dialog>
-              <DialogTrigger asChild>
-                <CustomButton className="w-full mb-4" variant="secondary">
-                  Proceed for Inspection
-                </CustomButton>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Account Verification</DialogTitle>
-                  <DialogDescription>
-                    Your account is not yet verified. Please contact us for
-                    details on how to get verified. Only verified accounts can
-                    proceed for inspection.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose>
-                    <CustomButton variant="secondary">Okay</CustomButton>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
+          <CustomButton
+            className="w-full mb-4"
+            variant="secondary"
+            onClick={() => setShowInspectionModal(true)}
+          >
+            Proceed for Inspection
+          </CustomButton>
         </>
       )}
 

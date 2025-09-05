@@ -25,6 +25,7 @@ import Notifications from "../profiles/Notification";
 import UploadWithImageDisplay from "../files/UploadWithImageDisplay";
 import Title from "../misc/Title";
 import UploadedDocDisplay from "../files/UploadedDocDisplay";
+import { appendFiles } from "@/lib/files";
 
 interface LandlordProfileFormProps {
   token: string;
@@ -37,7 +38,7 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
   token,
   country,
 }) => {
-  const { user, updateUser } = useUser();
+  const { user, refetchUser } = useUser();
 
   const [contractApprovalFile, setContractApprovalFile] = useState<File[]>();
   const [idCardFile, setIdCardFile] = useState<File[]>();
@@ -89,7 +90,7 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
   const mutation = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: (data) => {
-      updateUser(data?.data as IUser, token);
+      refetchUser(token);
       showToaster("Profile updated successfully", "success");
     },
     onError: (error) => {
@@ -163,15 +164,9 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
       if (value) formData.append(key, value);
     });
 
-    const appendFiles = (files: File[] | undefined, fieldName: string) => {
-      if (files) {
-        files.forEach((file) => formData.append(`${fieldName}[]`, file));
-      }
-    };
-
-    appendFiles(contractApprovalFile, "approvalAgreement");
-    appendFiles(idCardFile, "identificationCard");
-    appendFiles(powerOfAttorneyFile, "powerOfAttorney");
+    appendFiles(formData, contractApprovalFile, "approvalAgreement");
+    appendFiles(formData, idCardFile, "identificationCard");
+    appendFiles(formData, powerOfAttorneyFile, "powerOfAttorney");
 
     try {
       await mutation.mutateAsync({ token, formData });

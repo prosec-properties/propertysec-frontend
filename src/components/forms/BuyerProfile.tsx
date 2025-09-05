@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PasswordInput from "../inputs/PasswordInput";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import CustomInput from "../inputs/CustomInput";
 import TitleWithHR from "../misc/TitleWithHR";
 import UploadFile from "../files/UploadFile";
 import SelectInput from "../inputs/SelectInput";
-import { userRoles } from "@/store/data/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BuyerProfileSchema } from "@/store/schema/buyerProfileSchema";
 import TextArea from "../inputs/TextArea";
@@ -15,17 +14,24 @@ import Title from "../misc/Title";
 import Notifications from "../profiles/Notification";
 import CustomButton from "../buttons/CustomButton";
 import UploadWithImageDisplay from "../files/UploadWithImageDisplay";
-import { $requestWithToken } from "@/api/general";
-import { useSession } from "next-auth/react";
-import { showToaster } from "@/lib/general";
+import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import { z } from "zod";
 import { SelectedImagePreview } from "../../../interface/image";
+import { useUser } from "@/hooks/useUser";
+import { useMutation } from "@tanstack/react-query";
+import { updateUserProfile } from "@/services/user.service";
+import { appendFiles } from "@/lib/files";
+import { ICountry } from "@/interface/location";
 
-const BuyerProfileForm = () => {
-  const { data, update: updateSession } = useSession();
+interface Props {
+  country: ICountry;
+}
+const BuyerProfileForm = ({ country }: Props) => {
+  const { user, token, updateUser, refetchUser } = useUser();
   const [files, setFiles] = useState<File[]>();
   const [IdCardFile, setIdCardFile] = useState<File[]>();
-  const [selectedPhoto, setSelectedPhoto] = useState<SelectedImagePreview | null>(null);
+  const [selectedPhoto, setSelectedPhoto] =
+    useState<SelectedImagePreview | null>(null);
 
   const {
     control,
@@ -41,7 +47,6 @@ const BuyerProfileForm = () => {
       phoneNumber: "",
       confirmPassword: "",
       fullName: "",
-
       nationality: "",
       stateOfResidence: "",
       cityOfResidence: "",
@@ -49,45 +54,54 @@ const BuyerProfileForm = () => {
     },
   });
 
+  console.log({ user });
+
+  useEffect(() => {
+    setValue("email", user?.email || "");
+    setValue("fullName", user?.fullName || "");
+    setValue("phoneNumber", user?.phoneNumber || "");
+    setValue("nationality", user?.nationality || "");
+    setValue("stateOfResidence", user?.stateOfResidence || "");
+    setValue("cityOfResidence", user?.cityOfResidence || "");
+    setValue("homeAddress", user?.homeAddress || "");
+  }, [user, setValue]);
+
+  const mutation = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: (data) => {
+      refetchUser(token);
+      showToaster("Profile updated successfully", "success");
+    },
+    onError: (error) => {
+      console.log("error", error);
+      const errorMessage =
+        extractServerErrorMessage(error) || "An error occurred";
+
+      showToaster(errorMessage, "destructive");
+    },
+  });
+
   const onSubmit: SubmitHandler<z.infer<typeof BuyerProfileSchema>> = async (
     payload
   ) => {
-    if (!data || !data?.user || !data?.accessToken) return;
-
-    if (!files || files.length === 0) {
-      showToaster(
-        "Please add at least one image of the property",
-        "destructive"
-      );
-      return;
-    }
+    if (!user || !user?.id || !token) return;
 
     const formData = new FormData();
 
-    // Append other form fields
     Object.keys(payload).forEach((key) => {
       formData.append(key, payload[key]);
     });
 
-    // Append files to the FormData as an array
-    files.forEach((file) => {
-      formData.append("files[]", file);
-    });
-
-    console.log("formData", formData.getAll("files[]"));
+    appendFiles(formData, IdCardFile, "identificationCard");
+    appendFiles(formData, files, "profileImage");
 
     try {
-      const response = await $requestWithToken.postFormData(
-        "/properties",
-        data.accessToken,
-        formData
-      );
-
-      console.log("response", response);
+      await mutation.mutateAsync({ token, formData });
     } catch (error) {
       console.log("error", error);
     }
   };
+
   return (
     <>
       <h1 className="font-medium text-xl text-black mb-6">Profile</h1>
@@ -124,7 +138,11 @@ const BuyerProfileForm = () => {
                 formLabel="Nationality"
                 placeholder="Select your country"
                 value={field.value || ""}
-                options={userRoles}
+                // options={userRoles}
+                options={[country].map((country) => ({
+                  label: country.name,
+                  value: String(country.id),
+                }))}
                 onValueChange={(value) => {
                   console.log("value", value);
                   field.onChange(value);

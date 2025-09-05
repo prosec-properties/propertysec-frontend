@@ -1,4 +1,7 @@
-import { ACCEPTED_VIDEO_EXTENSIONS, ACCEPTED_VIDEO_TYPES } from "@/constants/files";
+import {
+  ACCEPTED_VIDEO_EXTENSIONS,
+  ACCEPTED_VIDEO_TYPES,
+} from "@/constants/files";
 import { IPropertyFileRecord } from "@/interface/property";
 
 /**
@@ -116,8 +119,6 @@ export function generateInvoicePdfName({
 }
 
 export const isVideoFile = (file: IPropertyFileRecord): boolean => {
-
-
   if (file.fileType === "video") return true;
 
   const fileExtension = file.fileName.toLowerCase().split(".").pop();
@@ -136,4 +137,14 @@ export const isVideoFile = (file: IPropertyFileRecord): boolean => {
   }
 
   return false;
+};
+
+export const appendFiles = (
+  formData: FormData,
+  files: File[] | undefined,
+  fieldName: string
+) => {
+  if (files) {
+    files.forEach((file) => formData.append(`${fieldName}[]`, file));
+  }
 };

@@ -238,7 +238,7 @@ const SubscriptionCard: React.FC<Props> = ({
             Please choose your preferred payment method:
           </p>
           <div className="flex gap-4">
-            <CustomButton
+            {/* <CustomButton
               variant={
                 selectedPaymentMethod === "transfer" ? "default" : "outline"
               }
@@ -246,7 +246,7 @@ const SubscriptionCard: React.FC<Props> = ({
               className="flex-1"
             >
               Bank Transfer
-            </CustomButton>
+            </CustomButton> */}
             <CustomButton
               variant={
                 selectedPaymentMethod === "paystack" ? "default" : "outline"

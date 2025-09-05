@@ -56,9 +56,9 @@ export default async function Page({ params }: { params: IParams }) {
         />
       );
     case USER_ROLE.BUYER:
-      return <BuyerProfileForm />;
+      return <BuyerProfileForm country={country?.data || {}} />;
     case USER_ROLE.ADMIN:
-  return <AdminProfileForm token={session.accessToken} />;
+      return <AdminProfileForm token={session.accessToken} />;
 
     default:
       return <div>Role is not assigned yet</div>;
