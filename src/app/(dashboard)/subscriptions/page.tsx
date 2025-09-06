@@ -3,7 +3,6 @@ import { authConfig } from "@/authConfig";
 import EmptyState from "@/components/misc/Empty";
 import SubscriptionCard from "@/components/subscription/SubscriptionCard";
 import { Plan } from "@/interface/payment";
-import { IApiResponse } from "@/interface/general";
 import { isNotAnEmptyArray } from "@/lib/general";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
@@ -27,14 +26,6 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
     redirect("/");
   }
 
-  // const [subscriptionPlans, subsriptions] = await Promise.all([
-  //   $requestWithToken.get<Plan[]>(
-  //     `/plans?duration=${activeTab}`,
-  //     session.user.token
-  //   ),
-  //   $requestWithToken.get<Plan[]>("/subscriptions", session.user.token),
-  // ]);
-
   const subscriptionPlans = await $requestWithToken.get<Plan[]>(
     `/plans?duration=${activeTab}`,
     session.user.token
@@ -43,7 +34,6 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   console.log("subscriptionPlans", subscriptionPlans);
 
   if (!subscriptionPlans?.success) {
-    console.log("didn't go as planned");
     return;
   }
 

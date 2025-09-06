@@ -1,5 +1,7 @@
 export type Status = "ACTIVE" | "INACTIVE" | "PENDING" | "CANCELLED";
 
+export type IPaymentMethod = "paystack" | "transfer"
+
 export type PlanName =
   | "Free"
   | "Premium"

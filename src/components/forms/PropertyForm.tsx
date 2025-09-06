@@ -74,13 +74,17 @@ const PropertyForm = (props: Props) => {
     onError: (error: any) => {
       console.error("Create property error:", error);
       let errorMessage = "Failed to create property";
-      
-      if (error?.message?.includes("timed out") || error?.message?.includes("aborted")) {
-        errorMessage = "Upload timed out. Please try with smaller files or check your internet connection.";
+
+      if (
+        error?.message?.includes("timed out") ||
+        error?.message?.includes("aborted")
+      ) {
+        errorMessage =
+          "Upload timed out. Please try with smaller files or check your internet connection.";
       } else {
         errorMessage = extractServerErrorMessage(error) || errorMessage;
       }
-      
+
       showToaster(errorMessage, "destructive");
     },
   });
@@ -91,13 +95,17 @@ const PropertyForm = (props: Props) => {
     onError: (error: any) => {
       console.error("Update property error:", error);
       let errorMessage = "Failed to update property";
-      
-      if (error?.message?.includes("timed out") || error?.message?.includes("aborted")) {
-        errorMessage = "Upload timed out. Please try with smaller files or check your internet connection.";
+
+      if (
+        error?.message?.includes("timed out") ||
+        error?.message?.includes("aborted")
+      ) {
+        errorMessage =
+          "Upload timed out. Please try with smaller files or check your internet connection.";
       } else {
         errorMessage = extractServerErrorMessage(error) || errorMessage;
       }
-      
+
       showToaster(errorMessage, "destructive");
     },
   });
@@ -144,7 +152,7 @@ const PropertyForm = (props: Props) => {
 
     // For create mode, check if files exist
     // For edit mode, allow submission even without new files (since existing images may be sufficient)
-    if (props.mode !== "edit" && (!files?.length && !newFiles?.length)) {
+    if (props.mode !== "edit" && !files?.length && !newFiles?.length) {
       showToaster(
         "Please add at least one image of the property",
         "destructive"
@@ -165,20 +173,26 @@ const PropertyForm = (props: Props) => {
     });
 
     // Only append new files to avoid re-uploading existing ones
-    const filesToUpload = props.mode === "edit" ? (newFiles || []) : (files || []);
-    
-    console.log(`Uploading ${filesToUpload.length} files in ${props.mode} mode`);
-    
+    const filesToUpload = props.mode === "edit" ? newFiles || [] : files || [];
+
+    console.log(
+      `Uploading ${filesToUpload.length} files in ${props.mode} mode`
+    );
+
     // Check for large files and warn user
     const totalSize = filesToUpload.reduce((acc, file) => acc + file.size, 0);
     const totalSizeMB = totalSize / 1024 / 1024;
-    
+
     if (totalSizeMB > 50) {
       console.warn(`Large upload detected: ${totalSizeMB.toFixed(2)}MB total`);
     }
-    
+
     filesToUpload.forEach((file, index) => {
-      console.log(`File ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+      console.log(
+        `File ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(
+          2
+        )}MB)`
+      );
       formData.append("files[]", file);
     });
 
@@ -237,9 +251,13 @@ const PropertyForm = (props: Props) => {
 
           if (defaultImage) {
             // Create a minimal dummy file for the interface requirement
-            const dummyFile = new File([], defaultImage.fileName || `image-${defaultImage.id}`, {
-              type: defaultImage.fileType || "image/jpeg",
-            });
+            const dummyFile = new File(
+              [],
+              defaultImage.fileName || `image-${defaultImage.id}`,
+              {
+                type: defaultImage.fileType || "image/jpeg",
+              }
+            );
 
             setSelectedPhoto({
               image: {
@@ -494,7 +512,7 @@ const PropertyForm = (props: Props) => {
         <TitleWithHR title="Price details" className="mb-6" />
 
         <article className="md:flex md:items-center gap-6">
-          <Controller
+          {/* <Controller
             name="currency"
             control={control}
             render={({ field }) => (
@@ -516,7 +534,7 @@ const PropertyForm = (props: Props) => {
                 errorMessage={errors.currency?.message}
               />
             )}
-          />
+          /> */}
           <Controller
             name="price"
             control={control}
@@ -527,7 +545,8 @@ const PropertyForm = (props: Props) => {
                 prefix={getCurrency()}
                 name={field.name}
                 placeholder="eg 1,000,000"
-                wrapperClassName="mb-6 md:w-1/2"
+                // wrapperClassName="mb-6 md:w-1/2"
+                wrapperClassName="mb-6 w-full"
                 errorMessage={errors.price?.message}
                 thousandSeparator={true}
                 customInput={CustomInput}
