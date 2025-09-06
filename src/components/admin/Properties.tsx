@@ -25,7 +25,7 @@ const AdminProperties = (props: Props) => {
       items={props.properties}
       title="Properties"
       titleStyle="solid"
-      tabs={["draft", "published", "closed", "rejected"]}
+      tabs={["draft", "published", "rejected"]}
       tabDescription="These are properties under review waiting to be published."
       emptyStateMessage="You have no listing yet."
       renderItem={(property: IProperty, index: number) => (

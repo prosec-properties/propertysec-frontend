@@ -20,7 +20,7 @@ const Landlord = (props: { properties: IProperty[] }) => {
     <TabbedListingView
       items={props.properties}
       title="My Listing"
-      tabs={["draft", "published", "closed", "rejected"]}
+      tabs={["draft", "published", "rejected"]}
       tabDescription="This are properties under review waiting to be published."
       emptyStateMessage="You have no listing yet."
       renderItem={(property: IProperty, index: number) => (
