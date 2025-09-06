@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogOut, ShoppingCart } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { USER_ROLE } from "@/constants/user";
 import { IUser } from "@/interface/user";
 import {
@@ -40,12 +40,6 @@ const UserActionButtons = ({ user, isMobile }: UserActionButtonsProps) => (
       <Link href={`${PROFILE_SETTING_ROUTE}/${user?.slug}`}>
         <UserGearIcon />
       </Link>
-
-      {user?.role === USER_ROLE.BUYER && (
-        <Link href={`${PROFILE_SETTING_ROUTE}/${user?.slug}`}>
-          <ShoppingCart />
-        </Link>
-      )}
 
       <Link href={SIGN_OUT_ROUTE}>
         <LogOut />
