@@ -92,90 +92,38 @@ export function createFormData(data: Record<string, any>): FormData {
 export const extractServerErrorMessage = (error: any): string => {
   const defaultErrorMessage = "Something went wrong. Please try again.";
 
-  // Handle string errors (could be JSON string)
-  if (typeof error === "string") {
-    try {
-      error = JSON.parse(error);
-    } catch {
-      // If it's not valid JSON, return the string as is (but check if it looks like stringified JSON)
-      if (error.includes('{') && error.includes('}')) {
-        return defaultErrorMessage; // Don't show stringified JSON to user
-      }
-      return error || defaultErrorMessage;
-    }
-  }
-
-  // Handle null/undefined
   if (!error) return defaultErrorMessage;
 
-  // Handle your specific error format from backend
-  if (error.errorData?.code === "23505") {
-    // Unique constraint violation
-    const constraint = error.errorData.constraint || "";
-    const detail = error.errorData.detail || "";
-
-    // Phone number conflict
-    if (
-      constraint.includes("phone_number") ||
-      detail.includes("phone_number")
-    ) {
-      return "This phone number is already registered. Please use a different one.";
-    }
-    // Email conflict (if you have similar cases)
-    if (constraint.includes("email") || detail.includes("email")) {
-      return "This email address is already registered. Please use a different one.";
-    }
-    // Generic unique constraint
-    return "This information is already in use. Please provide different details.";
+  if (typeof error === "string") {
+    return error || defaultErrorMessage;
   }
 
-  // Handle errorInfo text if errorData isn't available and it's a clean message
-  if (typeof error.errorInfo === "string" && 
-      error.errorInfo !== "ERROR: Something went wrong" &&
-      !error.errorInfo.includes('{') && 
-      !error.errorInfo.includes('}')) {
-    return error.errorInfo;
-  }
-
-  // Check for direct message that isn't a generic error or stringified object
-  if (error.message && 
-      error.message !== "ERROR: Something went wrong" &&
-      typeof error.message === "string" &&
-      !error.message.includes('{') && 
-      !error.message.includes('}')) {
-    return error.message;
-  }
-
-  // Handle API response errors
-  if (error.response?.data?.message && 
-      typeof error.response.data.message === "string" &&
-      !error.response.data.message.includes('{') && 
-      !error.response.data.message.includes('}')) {
+  if (error.response?.data?.message) {
     return error.response.data.message;
   }
 
-  // Handle validation errors array
   if (Array.isArray(error.errors)) {
     const firstError = error.errors[0];
-    if (firstError?.message && typeof firstError.message === "string") {
+    if (firstError?.message) {
       return firstError.message;
     }
-    return defaultErrorMessage;
   }
 
-  // Handle object validation errors
   if (error.errors && typeof error.errors === "object") {
     const firstErrorKey = Object.keys(error.errors)[0];
     const firstError = error.errors[firstErrorKey];
     if (Array.isArray(firstError) && firstError[0]) {
-      return typeof firstError[0] === "string" ? firstError[0] : defaultErrorMessage;
+      return firstError[0];
     }
     if (typeof firstError === "string") {
       return firstError;
     }
   }
 
-  // Handle network/fetch errors
+  if (error.message && typeof error.message === "string") {
+    return error.message;
+  }
+
   if (error.name === "AbortError") {
     return "Request timed out. Please try again.";
   }
@@ -184,7 +132,6 @@ export const extractServerErrorMessage = (error: any): string => {
     return "Network error. Please check your connection and try again.";
   }
 
-  // Handle server response status codes
   if (error.status) {
     switch (error.status) {
       case 400:
@@ -196,7 +143,7 @@ export const extractServerErrorMessage = (error: any): string => {
       case 404:
         return "The requested resource was not found.";
       case 409:
-        return "There was a conflict with your request. The resource may already exist.";
+        return "There was a conflict with your request.";
       case 422:
         return "Invalid data provided. Please check your input.";
       case 429:

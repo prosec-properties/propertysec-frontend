@@ -82,7 +82,12 @@ const PropertyForm = (props: Props) => {
         errorMessage =
           "Upload timed out. Please try with smaller files or check your internet connection.";
       } else {
-        errorMessage = extractServerErrorMessage(error) || errorMessage;
+        const serverMessage = extractServerErrorMessage(error);
+        if (serverMessage.includes("property upload limit")) {
+          errorMessage = serverMessage;
+        } else {
+          errorMessage = serverMessage || errorMessage;
+        }
       }
 
       showToaster(errorMessage, "destructive");

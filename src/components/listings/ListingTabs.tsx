@@ -14,7 +14,7 @@ interface Props {
 const ListingTabs = ({ text, tabs }: Props) => {
   const { getQueryParam, setQueryParam } = useQueryString();
 
-  const param = getQueryParam("status");
+  const param = getQueryParam("status") || tabs[0]; // Default to first tab if no status
 
   return (
     <div className="text-grey6 text-lg font-medium">
