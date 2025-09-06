@@ -6,18 +6,44 @@ import { USER_ROLE } from "@/constants/user";
 import { useUser } from "@/hooks/useUser";
 import { IProduct } from "@/interface/product";
 import { useRouter } from "next/navigation";
-// import { EDIT_PRODUCT_ROUTE } from "@/constants/routes";
 import CustomModal from "../modal/CustomModal";
 import { formatPrice } from "@/lib/payment";
+import { useMutation } from "@tanstack/react-query";
+import { deleteProperty } from "@/services/properties.service";
+import { useToast } from "../ui/use-toast";
+import { extractServerErrorMessage } from "@/lib/general";
 
 interface Props {
   product: IProduct;
 }
 
 const ProductDetails: React.FC<Props> = ({ product }) => {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { toast } = useToast();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProperty,
+    onSuccess: (data) => {
+      toast({
+        title: "Property deleted successfully",
+        variant: "success",
+      });
+      setShowDeleteModal(false);
+      router.back();
+    },
+    onError: (error) => {
+      extractServerErrorMessage(error);
+    },
+  });
+
+  const onDelete = () => {
+    deleteMutation.mutate({
+      accessToken: token,
+      propertyId: product.id,
+    });
+  };
 
   const roleButtons = {
     [USER_ROLE.LANDLORD]: (
@@ -119,12 +145,9 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
             <CustomButton
               variant="destructive"
               className="flex-1"
-              onClick={() => {
-                // TODO: Implement delete functionality
-                setShowDeleteModal(false);
-              }}
+              onClick={onDelete}
             >
-              Delete
+              Deleteee
             </CustomButton>
           </div>
         </div>

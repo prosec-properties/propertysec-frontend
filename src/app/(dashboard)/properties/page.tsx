@@ -34,7 +34,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   };
 
   const [properties, country, categories] = await Promise.all([
-    fetchAllProperties(filterParams), 
+    fetchAllProperties(filterParams),
     fetchACountry("161"),
     fetchCategories("property"),
   ]);
@@ -52,9 +52,14 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     return <EmptyState title="No properties found" />;
   }
 
+  const publishedProperties =
+    properties?.data?.data?.filter(
+      (property) => property.status === "published"
+    ) || [];
+
   return (
     <AllProperties
-      properties={properties?.data?.data || []}
+      properties={publishedProperties}
       country={country?.data as ICountry}
       categories={categories?.data as ICategory[]}
     />

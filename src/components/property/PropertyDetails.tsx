@@ -15,6 +15,7 @@ import AdminButtons from "./AdminButtons";
 import AffiliateButtons from "./AffiliateButtons";
 import PreviewButtons from "./PreviewButtons";
 import GuestButtons from "./GuestButtons";
+import { formatPrice } from "@/lib/payment";
 
 interface Props {
   property: IProperty;
@@ -29,7 +30,7 @@ const PropertyDetails: React.FC<Props> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const ref = useRef<HTMLDivElement | null>(null);
-  const { user } = useUser();
+  const { user, token } = useUser();
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index);
@@ -37,9 +38,16 @@ const PropertyDetails: React.FC<Props> = ({
   };
 
   // Determine if user should see buyer buttons (buyers or sellers viewing other properties)
-  const sellerRoles = [USER_ROLE.LANDLORD, USER_ROLE.DEVELOPER, USER_ROLE.LAWYER];
-  const shouldShowBuyerButtons = user?.role === USER_ROLE.BUYER || 
-    (user?.role && sellerRoles.includes(user.role as any) && user.id !== property.userId);
+  const sellerRoles = [
+    USER_ROLE.LANDLORD,
+    USER_ROLE.DEVELOPER,
+    USER_ROLE.LAWYER,
+  ];
+  const shouldShowBuyerButtons =
+    user?.role === USER_ROLE.BUYER ||
+    (user?.role &&
+      sellerRoles.includes(user.role as any) &&
+      user.id !== property.userId);
 
   // If user is not logged in, show guest buttons
   if (!user) {
@@ -60,7 +68,9 @@ const PropertyDetails: React.FC<Props> = ({
 
           <div>
             <dt className="sr-only">Price</dt>
-            <dd className="text-sm text-grey10 font-medium">{property?.price}</dd>
+            <dd className="text-sm text-grey10 font-medium">
+              {formatPrice(property?.price)}
+            </dd>
           </div>
         </dl>
 
@@ -89,15 +99,21 @@ const PropertyDetails: React.FC<Props> = ({
   }
 
   const roleButtons = {
-    [USER_ROLE.LANDLORD]: shouldShowBuyerButtons ? 
-      <BuyerButtons user={user} property={property} /> : 
-      <SellerButtons user={user} property={property} />,
-    [USER_ROLE.DEVELOPER]: shouldShowBuyerButtons ? 
-      <BuyerButtons user={user} property={property} /> : 
-      <SellerButtons user={user} property={property} />,
-    [USER_ROLE.LAWYER]: shouldShowBuyerButtons ? 
-      <BuyerButtons user={user} property={property} /> : 
-      <SellerButtons user={user} property={property} />,
+    [USER_ROLE.LANDLORD]: shouldShowBuyerButtons ? (
+      <BuyerButtons user={user} property={property} />
+    ) : (
+      <SellerButtons user={user} token={token} property={property} />
+    ),
+    [USER_ROLE.DEVELOPER]: shouldShowBuyerButtons ? (
+      <BuyerButtons user={user} property={property} />
+    ) : (
+      <SellerButtons user={user} token={token} property={property} />
+    ),
+    [USER_ROLE.LAWYER]: shouldShowBuyerButtons ? (
+      <BuyerButtons user={user} property={property} />
+    ) : (
+      <SellerButtons user={user} token={token} property={property} />
+    ),
     [USER_ROLE.BUYER]: <BuyerButtons user={user} property={property} />,
     [USER_ROLE.AFFILIATE]: (
       <AffiliateButtons
@@ -127,7 +143,9 @@ const PropertyDetails: React.FC<Props> = ({
 
         <div>
           <dt className="sr-only">Price</dt>
-          <dd className="text-sm text-grey10 font-medium">{property?.price}</dd>
+          <dd className="text-sm text-grey10 font-medium">
+            {formatPrice(property?.price)}
+          </dd>
         </div>
       </dl>
 

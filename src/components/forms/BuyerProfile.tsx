@@ -27,7 +27,7 @@ interface Props {
   country: ICountry;
 }
 const BuyerProfileForm = ({ country }: Props) => {
-  const { user, token, updateUser, refetchUser } = useUser();
+  const { user, token, refetchUser } = useUser();
   const [files, setFiles] = useState<File[]>();
   const [IdCardFile, setIdCardFile] = useState<File[]>();
   const [selectedPhoto, setSelectedPhoto] =
@@ -54,8 +54,6 @@ const BuyerProfileForm = ({ country }: Props) => {
     },
   });
 
-  console.log({ user });
-
   useEffect(() => {
     setValue("email", user?.email || "");
     setValue("fullName", user?.fullName || "");
@@ -64,6 +62,33 @@ const BuyerProfileForm = ({ country }: Props) => {
     setValue("stateOfResidence", user?.stateOfResidence || "");
     setValue("cityOfResidence", user?.cityOfResidence || "");
     setValue("homeAddress", user?.homeAddress || "");
+
+    const idCards = user?.profileFiles?.filter(
+      (file) => file.fileCategory === "id_card"
+    );
+    setIdCardFile(
+      idCards?.map((file) => {
+        const f = JSON.parse(file?.meta || "{}");
+        console.log("f", f);
+        return new File([], f.clientName, { type: f.type });
+      }) || []
+    );
+
+    const profileImage = user?.profileFiles?.find(
+      (file) => file.fileCategory === "profile_image"
+    );
+
+    const meta = JSON.parse(profileImage?.meta || "{}");
+    if (profileImage) {
+      setSelectedPhoto({
+        image: {
+          url: profileImage.fileUrl,
+          name: meta.clientName,
+          file: new File([], meta.clientName, { type: meta.type }),
+        },
+        fileName: meta.clientName,
+      });
+    }
   }, [user, setValue]);
 
   const mutation = useMutation({
@@ -92,8 +117,13 @@ const BuyerProfileForm = ({ country }: Props) => {
       formData.append(key, payload[key]);
     });
 
-    appendFiles(formData, IdCardFile, "identificationCard");
-    appendFiles(formData, files, "profileImage");
+    if (IdCardFile && IdCardFile.length > 0) {
+      appendFiles(formData, IdCardFile, "identificationCard");
+    }
+
+    if (files && files.length > 0) {
+      appendFiles(formData, files, "profileImage");
+    }
 
     try {
       await mutation.mutateAsync({ token, formData });
@@ -138,7 +168,6 @@ const BuyerProfileForm = ({ country }: Props) => {
                 formLabel="Nationality"
                 placeholder="Select your country"
                 value={field.value || ""}
-                // options={userRoles}
                 options={[country].map((country) => ({
                   label: country.name,
                   value: String(country.id),

@@ -42,6 +42,7 @@ const AdminButtons: React.FC<AdminButtonsProps> = ({ property }) => {
   const rejectStatus: IPropertyStatus[] = ["published", "draft", "pending"];
 
   const handlePublish = async () => {
+    console.log("published clicked");
     try {
       setLoading(true);
       const data = await updatePropertyStatus(property.id, "published");
@@ -127,26 +128,11 @@ const AdminButtons: React.FC<AdminButtonsProps> = ({ property }) => {
       {!showRejectArea && (
         <div className="flex gap-4 items-center">
           {publishStatus.includes(property.status) && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <ActionButton text="Publish" loading={loading} />
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handlePublish}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <ActionButton
+              text="Publish"
+              loading={loading}
+              onClick={handlePublish}
+            />
           )}
           {rejectStatus.includes(property.status) && (
             <Dialog>
