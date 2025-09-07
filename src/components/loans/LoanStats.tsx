@@ -13,29 +13,22 @@ interface ILoanStats {
 
 interface Props {
   stats?: ILoanStats;
-  loans?: ILoan[];
 }
 
 const LoanStats = ({ stats }: Props) => {
-  // Calculate interest (assuming 10% for demonstration)
-  const interestAmount = stats ? stats.approvedAmount * 0.1 : 0;
-  // Calculate amount paid (assuming 60% for demonstration)
+  const interestAmount = stats ? stats.totalAmount * 0.1 : 0;
+
   const amountPaid = stats ? stats.approvedAmount * 0.6 : 0;
-  // Calculate balance
+
   const balance = stats
     ? stats.approvedAmount + interestAmount - amountPaid
     : 0;
-  // Calculate duration (assuming 6 months for active loans)
-  const activeLoansDuration = stats && stats.totalLoans > 0 ? "6 months" : "-";
 
-  console.log({ stats, interestAmount, amountPaid, balance });
+  const activeLoansDuration = stats && stats.totalLoans > 0 ? "6 months" : "-";
 
   return (
     <StatsWrapper>
-      <Stat
-        title="Loan Amount"
-        value={stats ? formatPrice(stats.totalAmount) : formatPrice(0)}
-      />
+      <Stat title="Loan Amount" value={formatPrice(stats?.totalAmount || 0)} />
       <Stat title="Interest (10%)" value={formatPrice(interestAmount)} />
       <Stat title="Amount Paid" value={formatPrice(amountPaid)} />
       <Stat title="Balance" value={formatPrice(balance)} />

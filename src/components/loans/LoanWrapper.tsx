@@ -45,10 +45,7 @@ const LoanWrapper = (props: Props) => {
         />
       </div>
       <div className="mb-6">
-        <LoanStats
-          stats={props.loanData?.stats}
-          loans={props.loanData?.loans?.data}
-        />
+        <LoanStats stats={props.loanData?.stats} />
       </div>
 
       <div>
