@@ -41,8 +41,9 @@ interface Props {
 }
 
 const UploadFile = (props: Props) => {
+  const { files, setFiles } = props;
   const removeFile = (filename: string) => {
-    props.setFiles((prevFiles) => {
+    setFiles((prevFiles) => {
       return prevFiles?.filter((item) => item.name !== filename);
     });
   };
@@ -63,16 +64,17 @@ const UploadFile = (props: Props) => {
 
       if (newFiles.length === 0) return;
 
-      if (newFiles.length > 3) {
-        showToaster("You can only upload a maximum of 3 files", "destructive");
+      const totalFiles = (files?.length || 0) + newFiles.length;
+      if (totalFiles > 3) {
+        showToaster("You can only have a maximum of 3 files uploaded", "destructive");
         return;
       }
 
-      props.setFiles((prevFiles) =>
+      setFiles((prevFiles) =>
         prevFiles ? [...prevFiles, ...newFiles] : newFiles
       );
     },
-    [props.setFiles]
+    [setFiles, files]
   );
 
   const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
@@ -106,14 +108,14 @@ const UploadFile = (props: Props) => {
       </label>
       <input {...getInputProps()} />
 
-      {props.files && props.files.length > 0 && (
+      {files && files.length > 0 && (
         <div>
           <ScrollArea className="h-40">
             <p className="font-medium my-2 mt-6 text-muted-foreground text-sm">
               Files to upload
             </p>
             <div className="space-y-2 pr-3">
-              {props.files.map((selectedFile, index) => {
+              {files.map((selectedFile, index) => {
                 return (
                   <UploadedDoc
                     key={selectedFile.name + index}

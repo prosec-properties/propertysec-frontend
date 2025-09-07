@@ -12,6 +12,7 @@ import UploadImg from "../images/UploadImg";
 import UploadImageArea from "../images/UploadImageArea";
 import { ImagePreview, UploadImageFormat } from "@/interface/image";
 import { IExistingImage } from "./NewImagePreview";
+import { MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from "@/constants/general";
 
 export interface SelectedImagePreview {
   image: ImagePreview;
@@ -37,11 +38,10 @@ interface Props {
   fileType: "image" | "video" | "both";
   maxFileNumber?: number;
   existingImages: IExistingImage[] | null;
-  isVideoUploadAllowed?: boolean; // Add new prop
+  isVideoUploadAllowed?: boolean; 
 }
 
-const MAX_IMAGE_SIZE_MB = 5;
-const MAX_VIDEO_SIZE_MB = 10;
+
 
 const UploadWithImageDisplay = (props: Props) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<ImagePreview[]>([]);
@@ -180,7 +180,7 @@ const UploadWithImageDisplay = (props: Props) => {
 
   useEffect(() => {
     if (!props.selectedPhoto) return;
-    if (propsMaxFileNumber && imagePreviewUrls.length >= propsMaxFileNumber) {
+    if (propsMaxFileNumber && imagePreviewUrls.length > propsMaxFileNumber) {
       setImagePreviewUrls((prev) => prev.slice(0, propsMaxFileNumber));
       showToaster(
         `You can only upload a maximum of ${propsMaxFileNumber} files. The rest have been removed`,
