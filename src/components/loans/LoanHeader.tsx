@@ -40,6 +40,12 @@ const LoanHeader = ({ onFilterChange, activeFilter = "all" }: Props) => {
           Disbursed Loans
         </CustomButton>
         <CustomButton 
+          variant={selectedFilter === "overdue" ? "default" : "secondary"}
+          onClick={() => handleFilterClick("overdue")}
+        >
+          Due Loans
+        </CustomButton>
+        <CustomButton 
           variant={selectedFilter === "all" ? "default" : "secondary"}
           onClick={() => handleFilterClick("all")}
         >

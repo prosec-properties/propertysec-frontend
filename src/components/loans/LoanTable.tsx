@@ -18,6 +18,7 @@ interface ILoanTableData {
 interface Props {
   loans: ILoan[];
   onRowClick?: (row: any) => void;
+  activeFilter?: string;
 }
 
 const badgeVariant = (status: string) => {
@@ -35,7 +36,7 @@ const badgeVariant = (status: string) => {
   }
 };
 
-const LoanTable = ({ loans, onRowClick }: Props) => {
+const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
   const router = useRouter();
   
   const tableData = useMemo(() => {
@@ -58,12 +59,53 @@ const LoanTable = ({ loans, onRowClick }: Props) => {
     }
   };
 
+  const getEmptyMessage = () => {
+    switch (activeFilter) {
+      case "all":
+        return {
+          title: "No loans found",
+          description: "You haven't applied for any loans yet."
+        };
+      case "pending":
+        return {
+          title: "No pending loans",
+          description: "You don't have any pending loan requests."
+        };
+      case "approved":
+        return {
+          title: "No approved loans",
+          description: "You don't have any approved loans waiting for disbursement."
+        };
+      case "disbursed":
+        return {
+          title: "No disbursed loans",
+          description: "You don't have any disbursed loans."
+        };
+      case "overdue":
+        return {
+          title: "No overdue loans",
+          description: "You don't have any overdue loans."
+        };
+      case "rejected":
+        return {
+          title: "No rejected loans",
+          description: "You don't have any rejected loan applications."
+        };
+      default:
+        return {
+          title: "No loans found",
+          description: "You haven't applied for any loans yet."
+        };
+    }
+  };
+
   if (loans.length === 0) {
+    const { title, description } = getEmptyMessage();
     return (
       <div className="bg-white rounded-lg border p-8 text-center">
         <div className="text-gray-500">
-          <h3 className="text-lg font-medium mb-2">No loans found</h3>
-          <p>You haven&apos;t applied for any loans yet.</p>
+          <h3 className="text-lg font-medium mb-2">{title}</h3>
+          <p>{description}</p>
         </div>
       </div>
     );
