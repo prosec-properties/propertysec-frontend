@@ -154,3 +154,128 @@ export interface ILoanWithDetails extends ILoan {
   landlord?: ILandlord;
   loanRequest?: ILoanRequest;
 }
+
+// Loan Repayment Interfaces
+export type IRepaymentType = "PARTIAL" | "FULL" | "INTEREST" | "PRINCIPAL";
+export type IPaymentMethod = "CARD" | "BANK_TRANSFER" | "WALLET" | "CASH";
+
+export interface IInitializeLoanRepaymentData {
+  repaymentAmount: number;
+  repaymentType?: IRepaymentType;
+  paymentMethod?: IPaymentMethod;
+}
+
+export interface IPaystackConfig {
+  publicKey: string;
+  amount: number;
+  email: string;
+  reference: string;
+  currency: string;
+  metadata: any;
+}
+
+export interface IInitializeLoanRepaymentResponseData {
+  repaymentId: string;
+  loanId: string;
+  repaymentAmount: number;
+  outstandingBalance: number;
+  paymentReference: string;
+  paystackConfig: IPaystackConfig;
+}
+
+export interface IInitializeLoanRepaymentResponse {
+  success: boolean;
+  message: string;
+  data?: IInitializeLoanRepaymentResponseData;
+}
+
+export interface IVerifyLoanRepaymentData {
+  paymentReference: string;
+  providerResponse?: any;
+}
+
+export interface IVerifyLoanRepaymentResponseData {
+  repaymentId: string;
+  amount: number;
+  status: string;
+  outstandingBalance: number;
+  loanStatus: string;
+  isLoanCompleted: boolean;
+}
+
+export interface IVerifyLoanRepaymentResponse {
+  success: boolean;
+  message: string;
+  data?: IVerifyLoanRepaymentResponseData;
+}
+
+export interface IRepaymentLoan {
+  id: string;
+  loanAmount: string;
+  interestRate: number;
+  loanDuration: string;
+  loanStatus: string;
+}
+
+export interface IRepaymentDetails {
+  totalAmount: number;
+  totalPaid: number;
+  outstandingBalance: number;
+  monthlyPayment: number;
+  totalInterest: number;
+  principalRemaining: number;
+  interestRemaining: number;
+  penaltyAmount: number;
+}
+
+export interface IRepaymentHistory {
+  id: string;
+  amount: number;
+  type: string;
+  status: string;
+  date: string;
+  paymentMethod: string;
+  reference: string;
+}
+
+export interface ILoanRepaymentDetailsResponseData {
+  loan: IRepaymentLoan;
+  repaymentDetails: IRepaymentDetails;
+  repaymentHistory: IRepaymentHistory[];
+}
+
+export interface ILoanRepaymentDetailsResponse {
+  success: boolean;
+  message: string;
+  data?: ILoanRepaymentDetailsResponseData;
+}
+
+export interface IUserLoanRepayment {
+  id: string;
+  repaymentAmount: number;
+  repaymentType: string;
+  repaymentStatus: string;
+  paymentMethod: string;
+  paymentReference: string;
+  repaymentDate?: string;
+  createdAt: string;
+  loan: IRepaymentLoan;
+}
+
+export interface IUserLoanRepaymentsMeta {
+  total: number;
+  perPage: number;
+  currentPage: number;
+  lastPage: number;
+}
+
+export interface IUserLoanRepaymentsResponseData {
+  data: IUserLoanRepayment[];
+  meta: IUserLoanRepaymentsMeta;
+}
+
+export interface IUserLoanRepaymentsResponse {
+  success: boolean;
+  message: string;
+  data?: IUserLoanRepaymentsResponseData;
+}

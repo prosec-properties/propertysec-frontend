@@ -1,10 +1,15 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import TableWithRowGaps from "../tables/CustomTable";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import CustomModal from "../modal/CustomModal";
 import { ILoan } from "@/interface/loan";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/payment";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import LoanRepayment from "./LoanRepayment";
+import { useUser } from "@/hooks/useUser";
 
 interface ILoanTableData {
   name: string;
@@ -13,6 +18,7 @@ interface ILoanTableData {
   duration: string;
   userType: string;
   status: string;
+  actions?: React.ReactNode;
 }
 
 interface Props {
@@ -38,7 +44,12 @@ const badgeVariant = (status: string) => {
 
 const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
   const router = useRouter();
-  
+  const { user } = useUser();
+  const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isAdmin = user?.role === "admin";
+
   const tableData = useMemo(() => {
     return loans.map((loan) => ({
       id: loan.id,
@@ -46,10 +57,30 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
       date: formatDate(loan.createdAt),
       amount: formatPrice(Number(loan.loanAmount)),
       duration: loan.loanDuration,
-      userType: loan.user?.role ? loan.user.role.charAt(0).toUpperCase() + loan.user.role.slice(1) : "User",
-      status: <Badge variant={badgeVariant(loan.loanStatus)}>{loan.loanStatus.charAt(0).toUpperCase() + loan.loanStatus.slice(1)}</Badge>,
+      userType: loan.user?.role
+        ? loan.user.role.charAt(0).toUpperCase() + loan.user.role.slice(1)
+        : "User",
+      status: (
+        <Badge variant={badgeVariant(loan.loanStatus)}>
+          {loan.loanStatus.charAt(0).toUpperCase() + loan.loanStatus.slice(1)}
+        </Badge>
+      ),
+      actions:
+        (loan.loanStatus === "disbursed" || loan.loanStatus === "overdue") &&
+        !isAdmin ? (
+          <Button
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedLoanId(loan.id);
+              setIsModalOpen(true);
+            }}
+          >
+            Repay
+          </Button>
+        ) : null,
     }));
-  }, [loans]);
+  }, [loans, isAdmin]);
 
   const handleRowClick = (row: any) => {
     if (onRowClick) {
@@ -64,37 +95,38 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
       case "all":
         return {
           title: "No loans found",
-          description: "You haven't applied for any loans yet."
+          description: "You haven't applied for any loans yet.",
         };
       case "pending":
         return {
           title: "No pending loans",
-          description: "You don't have any pending loan requests."
+          description: "You don't have any pending loan requests.",
         };
       case "approved":
         return {
           title: "No approved loans",
-          description: "You don't have any approved loans waiting for disbursement."
+          description:
+            "You don't have any approved loans waiting for disbursement.",
         };
       case "disbursed":
         return {
           title: "No disbursed loans",
-          description: "You don't have any disbursed loans."
+          description: "You don't have any disbursed loans.",
         };
       case "overdue":
         return {
           title: "No overdue loans",
-          description: "You don't have any overdue loans."
+          description: "You don't have any overdue loans.",
         };
       case "rejected":
         return {
           title: "No rejected loans",
-          description: "You don't have any rejected loan applications."
+          description: "You don't have any rejected loan applications.",
         };
       default:
         return {
           title: "No loans found",
-          description: "You haven't applied for any loans yet."
+          description: "You haven't applied for any loans yet.",
         };
     }
   };
@@ -116,9 +148,9 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
       <div className="hidden md:block">
         {" "}
         {/* Hidden on Mobile */}
-        <TableWithRowGaps 
-          tableData={tableData} 
-          hiddenColumns={["id"]}
+        <TableWithRowGaps
+          tableData={tableData}
+          hiddenColumns={isAdmin ? ["id", "actions"] : ["id"]}
           isClickable={true}
           onRowClick={handleRowClick}
         />
@@ -127,8 +159,8 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
       <div className="md:hidden">
         {/* Hidden on Desktop */}
         {loans.map((loan, i) => (
-          <div 
-            key={loan.id || i} 
+          <div
+            key={loan.id || i}
             className="mb-6 cursor-pointer"
             onClick={() => handleRowClick({ id: loan.id })}
           >
@@ -138,11 +170,48 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
               amount={formatPrice(Number(loan.loanAmount))}
               date={formatDate(loan.createdAt)}
               duration={loan.loanDuration}
-              userType={loan.user?.role ? loan.user.role.charAt(0).toUpperCase() + loan.user.role.slice(1) : "User"}
+              userType={
+                loan.user?.role
+                  ? loan.user.role.charAt(0).toUpperCase() +
+                    loan.user.role.slice(1)
+                  : "User"
+              }
+              actions={
+                (loan.loanStatus === "disbursed" ||
+                  loan.loanStatus === "overdue") &&
+                !isAdmin ? (
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedLoanId(loan.id);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    Repay
+                  </Button>
+                ) : null
+              }
             />
           </div>
         ))}
       </div>
+
+      <CustomModal
+        isShown={isModalOpen}
+        setIsShown={setIsModalOpen}
+        title="Loan Repayment"
+        contentClass="max-w-4xl"
+      >
+        {selectedLoanId && (
+          <LoanRepayment
+            loanId={selectedLoanId}
+            loanStatus={
+              loans.find((loan) => loan.id === selectedLoanId)?.loanStatus || ""
+            }
+          />
+        )}
+      </CustomModal>
     </div>
   );
 };
@@ -175,6 +244,12 @@ const LoanTableMobile = (props: ILoanTableData) => {
         <p className="text-grey8">Amount</p>
         <p className="text-grey600 text-right">{props.amount}</p>
       </article>
+
+      {props.actions && (
+        <article className="flex justify-end gap-6 items-center text-xs font-semibold mb-3">
+          {props.actions}
+        </article>
+      )}
     </div>
   );
 };

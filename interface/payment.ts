@@ -1,6 +1,9 @@
+import { string } from "zod";
+import { IApiResponse } from "./general";
+
 export type Status = "ACTIVE" | "INACTIVE" | "PENDING" | "CANCELLED";
 
-export type IPaymentMethod = "paystack" | "transfer"
+export type IPaymentMethod = "paystack" | "transfer";
 
 export type PlanName =
   | "Free"
@@ -212,4 +215,15 @@ export interface IPaymentInit {
   paymentMethod: PaymentMethod;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IPaystackAuthorizationData {
+  access_code: string;
+  authorization_url: string;
+  reference: string;
+}
+export interface IPaystackAuthorizationResponse {
+  data: IPaystackAuthorizationData;
+  message: string;
+  status: boolean;
 }

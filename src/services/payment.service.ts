@@ -1,6 +1,7 @@
 import { $requestWithToken } from "@/api/general";
 import {
   IPaymentMethod,
+  IPaystackAuthorizationResponse,
   PaymentCredentials,
   Transaction,
 } from "@/interface/payment";
@@ -51,6 +52,31 @@ export async function verifyPaymentApi(
 ) {
   try {
     await $requestWithToken.post("/transactions", token, payload);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getAuthorizationUrlApi({
+  token,
+  email,
+  callbackUrl,
+  amount,
+}: {
+  token: string;
+  email: string;
+  callbackUrl: string;
+  amount: number;
+}) {
+  const payload = { email, callbackUrl, amount };
+  try {
+    const response =
+      await $requestWithToken.post<IPaystackAuthorizationResponse>(
+        "/payment/authorization-url",
+        token,
+        payload
+      );
+    return response;
   } catch (error) {
     throw error;
   }
