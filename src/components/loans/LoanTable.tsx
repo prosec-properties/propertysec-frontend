@@ -17,6 +17,7 @@ interface ILoanTableData {
 
 interface Props {
   loans: ILoan[];
+  onRowClick?: (row: any) => void;
 }
 
 const badgeVariant = (status: string) => {
@@ -34,7 +35,7 @@ const badgeVariant = (status: string) => {
   }
 };
 
-const LoanTable = ({ loans }: Props) => {
+const LoanTable = ({ loans, onRowClick }: Props) => {
   const router = useRouter();
   
   const tableData = useMemo(() => {
@@ -50,7 +51,11 @@ const LoanTable = ({ loans }: Props) => {
   }, [loans]);
 
   const handleRowClick = (row: any) => {
-    router.push(`/loans/${row.id}`);
+    if (onRowClick) {
+      onRowClick(row);
+    } else {
+      router.push(`/loans/${row.id}`);
+    }
   };
 
   if (loans.length === 0) {
@@ -83,7 +88,7 @@ const LoanTable = ({ loans }: Props) => {
           <div 
             key={loan.id || i} 
             className="mb-6 cursor-pointer"
-            onClick={() => router.push(`/loans/${loan.id}`)}
+            onClick={() => handleRowClick({ id: loan.id })}
           >
             <LoanTableMobile
               status={loan.loanStatus}
