@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
@@ -12,7 +12,8 @@ export default function VerifyTransactionPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
-  const { token } = useUser();
+  const { token, status } = useUser();
+  const hasAttemptedRef = useRef(false);
 
   const verifyMutation = useMutation({
     mutationFn: verifyTransactionApi,
@@ -22,7 +23,7 @@ export default function VerifyTransactionPage() {
         title: "Success",
         description: "Transaction verified successfully!",
       });
-      // router.push("/loans");
+      router.push("/loans");
     },
     onError: (error) => {
       toast({
@@ -30,11 +31,13 @@ export default function VerifyTransactionPage() {
         description: "Error verifying transaction",
         variant: "destructive",
       });
-      // router.push("/loans");
+      router.push("/loans");
     },
   });
 
   useEffect(() => {
+    if (hasAttemptedRef.current || status === "loading") return;
+
     const reference = searchParams.get("reference");
     const trxref = searchParams.get("trxref");
 
@@ -44,30 +47,19 @@ export default function VerifyTransactionPage() {
         description: "Invalid transaction parameters",
         variant: "destructive",
       });
-      // router.push("/loans");
+      router.push("/loans");
       console.log("Invalid transaction parameters");
+      hasAttemptedRef.current = true;
       return;
     }
 
-    const transactionId = searchParams.get("reference");
-
-    if (!transactionId) {
-      toast({
-        title: "Error",
-        description: "Transaction ID not found",
-        variant: "destructive",
-      });
-      // router.push("/loans");
-      console.log("Transaction ID not found");
-      return;
-    }
-
+    hasAttemptedRef.current = true;
     verifyMutation.mutate({
       token,
-      transactionId,
+      transactionId: reference,
       paymentReference: reference,
     });
-  }, [searchParams, router]);
+  }, [searchParams, router, token, verifyMutation, status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
