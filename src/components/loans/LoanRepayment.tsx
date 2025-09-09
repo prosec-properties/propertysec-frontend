@@ -7,7 +7,6 @@ import { CreditCard, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/payment";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getAuthorizationUrlApi } from "@/services/payment.service";
 import { useUser } from "@/hooks/useUser";
 import { getLoanById } from "@/services/loan.service";
 import { frontendUrl } from "@/constants/env";
