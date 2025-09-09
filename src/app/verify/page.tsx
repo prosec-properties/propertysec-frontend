@@ -19,19 +19,41 @@ export default function VerifyTransactionPage() {
     mutationFn: verifyTransactionApi,
     onSuccess: (response) => {
       console.log("Verification response:", response);
+
+      const transactionType =
+        (response?.data as any)?.metadata?.type || searchParams.get("type");
+
       toast({
         title: "Success",
         description: "Transaction verified successfully!",
       });
-      router.push("/loans");
+
+      switch (transactionType) {
+        case "subscription":
+          router.push("/subscriptions");
+          break;
+        case "inspection":
+          router.push("/properties");
+          break;
+        case "property_purchase":
+          router.push("/properties");
+          break;
+        case "loan_repayment":
+          router.push("/loans");
+          break;
+        default:
+          router.push("/dashboard");
+      }
     },
     onError: (error) => {
+      console.error("Verification error:", error);
       toast({
         title: "Error",
         description: "Error verifying transaction",
         variant: "destructive",
       });
-      router.push("/loans");
+
+      router.push("/dashboard");
     },
   });
 
@@ -47,7 +69,7 @@ export default function VerifyTransactionPage() {
         description: "Invalid transaction parameters",
         variant: "destructive",
       });
-      router.push("/loans");
+      router.push("/dashboard");
       console.log("Invalid transaction parameters");
       hasAttemptedRef.current = true;
       return;

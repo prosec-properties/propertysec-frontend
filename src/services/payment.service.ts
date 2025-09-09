@@ -93,12 +93,33 @@ export async function verifyTransactionApi({
 }) {
   try {
     const response = await $requestWithToken.post(
-      "/payment/verify-transaction",
+      "/transactions/verify",
       token,
       {
-        transactionId,
+        reference: paymentReference,
         paymentReference,
       }
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function initializeTransactionApi(
+  token: string,
+  payload: {
+    type: string;
+    amount: number;
+    callbackUrl: string;
+    metadata?: Record<string, any>;
+  }
+) {
+  try {
+    const response = await $requestWithToken.post(
+      "/transactions/initialize",
+      token,
+      payload
     );
     return response;
   } catch (error) {

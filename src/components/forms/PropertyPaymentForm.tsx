@@ -10,10 +10,12 @@ import CustomButton from "../buttons/CustomButton";
 import TitleWithHR from "../misc/TitleWithHR";
 import { IUser } from "@/interface/user";
 import { IProperty } from "@/interface/property";
-import { usePaystackPayment } from "react-paystack";
-import { PaystackSuccessResponse } from "@/interface/payment";
-import { showToaster, verifyServerResponse } from "@/lib/general";
-import { verifyTransaction } from "@/actions/transaction";
+import { showToaster } from "@/lib/general";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { initializeTransactionApi } from "@/services/payment.service";
+import { frontendUrl } from "@/constants/env";
 
 interface Props {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,13 +26,8 @@ interface Props {
 
 const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props) => {
   const affiliateSlug = new URLSearchParams(window.location.search).get("aff");
-  
-  const paystackConfig = {
-    reference: "",
-    email: "",
-    amount: property.price * 100, // Convert to kobo
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
-  };
+  const { token } = useUser();
+  const router = useRouter();
 
   const {
     control,
@@ -45,27 +42,39 @@ const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props
     },
   });
 
-  const initializePayment = usePaystackPayment(paystackConfig);
+  const initializeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await initializeTransactionApi(token, {
+        type: "property_purchase",
+        amount: property.price, 
+        callbackUrl: `${frontendUrl}/verify`,
+        metadata: {
+          propertyId,
+          propertyTitle: property.title,
+          currency: property.currency,
+          fullName: data.fullName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          ...(affiliateSlug && { affiliateSlug }),
+          userId: user?.id,
+        },
+      });
+    },
+    onSuccess: (response) => {
+      console.log("Payment init response", response);
+      if (response?.data && (response.data as any)?.authorization_url) {
+        router.push((response.data as any).authorization_url);
+      } else {
+        showToaster("Failed to initialize payment", "destructive");
+      }
+    },
+    onError: (error) => {
+      console.error("Payment initialization error:", error);
+      showToaster("Failed to initialize payment. Please try again.", "destructive");
+    },
+  });
 
-  const onSuccess = async (response: PaystackSuccessResponse) => {
-    try {
-      showToaster("Verifying Payment, please wait!", "success");
-
-      const payload = {
-        reference: response.reference!,
-      };
-
-      const verifyPayment = await verifyTransaction(payload, "getAProperty");
-
-      verifyServerResponse(verifyPayment);
-
-      showToaster("Property purchase completed successfully!", "success");
-      setShowModal(false);
-    } catch (error) {
-      console.log(error);
-      showToaster("Payment verification failed!", "destructive");
-    }
-  };  const onSubmit: SubmitHandler<
+  const onSubmit: SubmitHandler<
     z.infer<typeof InspectionDetailsSchema>
   > = async (payload) => {
     try {
@@ -75,33 +84,7 @@ const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props
         return;
       }
 
-      initializePayment({
-        onSuccess: (response) => {
-          console.log(response);
-          onSuccess(response);
-        },
-        onClose: () => {
-          showToaster("Payment cancelled", "warning");
-        },
-        config: {
-          metadata: {
-            type: "property_purchase",
-            fullName: payload.fullName,
-            email: payload.email,
-            phoneNumber: payload.phoneNumber,
-            propertyId,
-            propertyTitle: property.title,
-            propertyPrice: property.price,
-            currency: property.currency,
-            ...(affiliateSlug && { affiliateSlug }),
-            userId: user?.id,
-            custom_fields: [],
-          },
-          reference: `PROP_${new Date().getTime()}_${Math.random().toString(36).substring(2, 15)}`,
-          email: payload.email,
-          amount: paystackConfig.amount,
-        },
-      });
+      initializeMutation.mutate(payload);
     } catch (error) {
       console.error("Payment initialization error:", error);
       showToaster("Failed to initialize payment. Please try again.", "destructive");
@@ -168,8 +151,8 @@ const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props
           >
             Cancel
           </CustomButton>
-          <CustomButton type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Processing..." : "Complete Purchase"}
+          <CustomButton type="submit" disabled={isSubmitting || initializeMutation.isPending}>
+            {initializeMutation.isPending ? "Processing..." : "Complete Purchase"}
           </CustomButton>
         </div>
       </form>

@@ -4,18 +4,14 @@ import React from "react";
 import CustomButton from "../buttons/CustomButton";
 import { Check } from "lucide-react";
 import SubscriptionsTabsList from "./SubscriptionsTabsList";
-import { usePaystackPayment } from "react-paystack";
 import { showToaster } from "@/lib/general";
-import {
-  IPaymentMethod,
-  PaystackSuccessResponse,
-  Plan,
-} from "@/interface/payment";
-import { $requestWithToken } from "@/api/general";
+import { Plan } from "@/interface/payment";
 import { formatPrice } from "@/lib/payment";
-import { initializPaymentApi } from "@/services/payment.service";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
+import { useMutation } from "@tanstack/react-query";
+import { initializeTransactionApi } from "@/services/payment.service";
+import { frontendUrl } from "@/constants/env";
 
 interface Props {
   activeTab: string;
@@ -29,89 +25,39 @@ const SubscriptionCard: React.FC<Props> = ({
   token,
 }) => {
   const router = useRouter();
-  const { user, refetchUser } = useUser();
+  const { user } = useUser();
 
-  const paystackConfig = {
-    reference: "",
-    email: "",
-    amount: 0,
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
-  };
-
-  const onSuccess =
-    (planId: string) => async (response: PaystackSuccessResponse) => {
-      try {
-        showToaster("Verifying Payment, please wait!", "success");
-
-        const payload = {
-          reference: response.reference,
-          planId,
-        };
-
-        const verifyPayment = await $requestWithToken.post(
-          "/transactions",
-          token,
-          payload
-        );
-
-        if (!verifyPayment?.success) {
-          showToaster("Payment verification failed!", "destructive");
-          return;
-        }
-
-        showToaster("Payment verified successfully!", "success");
-        if (response.reference) {
-          await refetchUser(token);
-          router.push(`/subscriptions/receipt/${response.reference}`);
-        } else {
-          showToaster(
-            "Transaction reference not found, cannot display receipt.",
-            "warning"
-          );
-        }
-      } catch (error) {
-        showToaster("Payment verification failed!", "destructive");
+  const initializeMutation = useMutation({
+    mutationFn: async (data: { plan: Plan; amount: number }) => {
+      return await initializeTransactionApi(token, {
+        type: "subscription",
+        amount: data.amount,
+        callbackUrl: `${frontendUrl}/verify`,
+        metadata: {
+          planId: data.plan.id,
+        },
+      });
+    },
+    onSuccess: (response) => {
+      console.log("Payment init response", response);
+      if (response?.data && (response.data as any)?.authorization_url) {
+        router.push((response.data as any).authorization_url);
+      } else {
+        showToaster("Failed to initialize payment", "destructive");
       }
-    };
-
-  const initializePayment = usePaystackPayment(paystackConfig);
-
-  const handlePlanSelection = async (plan: Plan) => {
-    const payload = {
-      planId: plan.id,
-      type: "paystack" as IPaymentMethod,
-    };
-
-    try {
-      const paymentInit = await initializPaymentApi(token, payload);
-
-      if (!paymentInit?.success) {
-        showToaster(
-          paymentInit?.message || "Payment initialization failed!",
-          "destructive"
-        );
-        return;
-      }
-
-      if (paymentInit.data?.paystackConfig) {
-        const { paystackConfig: paystackDetails, reference } = paymentInit.data;
-
-        initializePayment({
-          onSuccess: onSuccess(plan.id),
-          // onClose,
-          config: {
-            ...(paystackDetails as any),
-            reference,
-          },
-        });
-      }
-    } catch (error) {
-      console.error("Error during payment method selection:", error);
+    },
+    onError: (error) => {
+      console.error("Payment initialization error:", error);
       showToaster(
-        "An error occurred during payment method selection.",
+        "Failed to initialize payment. Please try again.",
         "destructive"
       );
-    }
+    },
+  });
+
+  const handlePlanSelection = async (plan: Plan) => {
+    const amount = plan.price;
+    initializeMutation.mutate({ plan, amount });
   };
 
   return (
@@ -167,10 +113,13 @@ const SubscriptionCard: React.FC<Props> = ({
                 onClick={() => handlePlanSelection(plan)}
                 disabled={
                   !!user?.subscription?.plan?.id ||
-                  plan.name?.toLowerCase() === "free"
+                  plan.name?.toLowerCase() === "free" ||
+                  initializeMutation.isPending
                 }
               >
-                {user?.subscription?.plan?.id === plan.id
+                {initializeMutation.isPending
+                  ? "Processing..."
+                  : user?.subscription?.plan?.id === plan.id
                   ? "Subscribed"
                   : "Select Plan"}
               </CustomButton>

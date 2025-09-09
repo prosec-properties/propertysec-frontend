@@ -9,10 +9,12 @@ import CustomInput from "../inputs/CustomInput";
 import CustomButton from "../buttons/CustomButton";
 import TitleWithHR from "../misc/TitleWithHR";
 import { IUser } from "@/interface/user";
-import { usePaystackPayment } from "react-paystack";
-import { PaystackSuccessResponse } from "@/interface/payment";
-import { showToaster, verifyServerResponse } from "@/lib/general";
-import { verifyTransaction } from "@/actions/transaction";
+import { showToaster } from "@/lib/general";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { initializeTransactionApi } from "@/services/payment.service";
+import { frontendUrl } from "@/constants/env";
 
 interface Props {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,15 +22,11 @@ interface Props {
   propertyId: string;
 }
 
-const paystackConfig = {
-  reference: "",
-  email: "",
-  amount: 500000,
-  publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || "",
-};
-
 const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
   const affiliateSlug = new URLSearchParams(window.location.search).get("aff");
+  const { token } = useUser();
+  const router = useRouter();
+
   const {
     control,
     handleSubmit,
@@ -42,53 +40,40 @@ const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
     },
   });
 
-  const initializePayment = usePaystackPayment(paystackConfig);
-
-  const onSuccess = async (response: PaystackSuccessResponse) => {
-    try {
-      showToaster("Verifying Payment, please wait!", "success");
-
-      const payload = {
-        reference: response.reference!,
-      };
-
-      const verifyPayment = await verifyTransaction(payload, "getAProperty");
-
-      verifyServerResponse(verifyPayment);
-
-      showToaster("Payment verified successfully!", "success");
-    } catch (error) {
-      console.log(error);
-      showToaster("Payment verification failed!", "destructive");
-    }
-  };
+  const initializeMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await initializeTransactionApi(token, {
+        type: "inspection",
+        amount: 5000, 
+        callbackUrl: `${frontendUrl}/verify`,
+        metadata: {
+          propertyId,
+          fullName: data.fullName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          ...(affiliateSlug && { affiliateSlug }),
+          userId: user?.id,
+        },
+      });
+    },
+    onSuccess: (response) => {
+      console.log("Payment init response", response);
+      if (response?.data && (response.data as any)?.authorization_url) {
+        router.push((response.data as any).authorization_url);
+      } else {
+        showToaster("Failed to initialize payment", "destructive");
+      }
+    },
+    onError: (error) => {
+      console.error("Payment initialization error:", error);
+      showToaster("Failed to initialize payment. Please try again.", "destructive");
+    },
+  });
 
   const onSubmit: SubmitHandler<
     z.infer<typeof InspectionDetailsSchema>
   > = async (payload) => {
-
-    initializePayment({
-      onSuccess: (response) => {
-        console.log(response);
-        onSuccess(response);
-      },
-      onClose: () => {},
-      config: {
-        metadata: {
-          type: "inspection",
-          fullName: payload.fullName,
-          email: payload.email,
-          phoneNumber: payload.phoneNumber,
-          propertyId,
-          ...(affiliateSlug && { affiliateSlug }),
-          userId: user?.id,
-          custom_fields: [],
-        },
-        reference: `${new Date().getTime()}_${Math.random().toString(36).substring(2, 15)}`,
-        email: payload.email,
-        amount: paystackConfig.amount,
-      },
-    });
+    initializeMutation.mutate(payload);
     setShowModal(false);
   };
 
@@ -151,7 +136,9 @@ const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
           >
             Cancel
           </CustomButton>
-          <CustomButton>Next</CustomButton>
+          <CustomButton type="submit" disabled={isSubmitting || initializeMutation.isPending}>
+            {initializeMutation.isPending ? "Processing..." : "Next"}
+          </CustomButton>
         </div>
       </form>
     </div>
