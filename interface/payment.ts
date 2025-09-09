@@ -156,7 +156,8 @@ export type TransactionType =
   | "wallet:credit"
   | "wallet:debit"
   | "inspection"
-  | "property_purchase";
+  | "property_purchase"
+  | "loan_repayment";
 
 type PaymentChannels =
   | "bank"

@@ -12,6 +12,7 @@ import { getLoanById } from "@/services/loan.service";
 import { frontendUrl } from "@/constants/env";
 import { useRouter } from "next/navigation";
 import { initializeLoanRepayment } from "@/services/loan-repayment.service";
+import { $requestWithToken } from "@/api/general";
 
 interface LoanRepaymentProps {
   loanId: string;
@@ -35,10 +36,26 @@ export default function LoanRepayment({
   console.log("loan", loan?.data?.data);
 
   const mutation = useMutation({
-    mutationFn: initializeLoanRepayment,
+    mutationFn: async (data: any) => {
+      const response = await $requestWithToken.post(
+        "/transactions/initialize",
+        token,
+        {
+          type: 'loan_repayment',
+          amount: data.amount,
+          callbackUrl: data.callbackUrl,
+          metadata: {
+            loanId: data.loanId,
+            repaymentAmount: data.repaymentAmount,
+            repaymentType: 'FULL'
+          }
+        }
+      );
+      return response;
+    },
     onSuccess: (data) => {
-      console.log("auth url", data?.data?.data);
-      router.replace(data?.data?.data?.authorization_url || "");
+      console.log("auth url", data?.data);
+      router.replace(data?.data?.authorization_url || "");
     },
     onError: (error) => {
       console.error(error);

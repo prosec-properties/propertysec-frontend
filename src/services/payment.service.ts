@@ -81,3 +81,27 @@ export async function getAuthorizationUrlApi({
     throw error;
   }
 }
+
+export async function verifyTransactionApi({
+  token,
+  transactionId,
+  paymentReference,
+}: {
+  token: string;
+  transactionId: string;
+  paymentReference: string;
+}) {
+  try {
+    const response = await $requestWithToken.post(
+      "/payment/verify-transaction",
+      token,
+      {
+        transactionId,
+        paymentReference,
+      }
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
