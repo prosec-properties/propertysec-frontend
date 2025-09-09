@@ -13,6 +13,11 @@ import { useMutation } from "@tanstack/react-query";
 import { initializeTransactionApi } from "@/services/payment.service";
 import { frontendUrl } from "@/constants/env";
 
+interface SubscriptionPlanData {
+  plan: Plan;
+  amount: number;
+}
+
 interface Props {
   activeTab: string;
   token: string;
@@ -28,7 +33,7 @@ const SubscriptionCard: React.FC<Props> = ({
   const { user } = useUser();
 
   const initializeMutation = useMutation({
-    mutationFn: async (data: { plan: Plan; amount: number }) => {
+    mutationFn: async (data: SubscriptionPlanData) => {
       return await initializeTransactionApi(token, {
         type: "subscription",
         amount: data.amount,
@@ -40,8 +45,8 @@ const SubscriptionCard: React.FC<Props> = ({
     },
     onSuccess: (response) => {
       console.log("Payment init response", response);
-      if (response?.data && (response.data as any)?.authorization_url) {
-        router.push((response.data as any).authorization_url);
+      if (response?.data?.data && response.data.data.authorization_url) {
+        router.push(response.data.data.authorization_url);
       } else {
         showToaster("Failed to initialize payment", "destructive");
       }

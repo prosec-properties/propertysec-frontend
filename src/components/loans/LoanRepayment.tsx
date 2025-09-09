@@ -11,8 +11,15 @@ import { useUser } from "@/hooks/useUser";
 import { getLoanById } from "@/services/loan.service";
 import { frontendUrl } from "@/constants/env";
 import { useRouter } from "next/navigation";
-import { initializeLoanRepayment } from "@/services/loan-repayment.service";
+import { initializeTransactionApi } from "@/services/payment.service";
 import { $requestWithToken } from "@/api/general";
+
+interface LoanRepaymentData {
+  amount: number;
+  callbackUrl: string;
+  loanId: string;
+  repaymentAmount: number;
+}
 
 interface LoanRepaymentProps {
   loanId: string;
@@ -36,26 +43,21 @@ export default function LoanRepayment({
   console.log("loan", loan?.data?.data);
 
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await $requestWithToken.post(
-        "/transactions/initialize",
-        token,
-        {
-          type: 'loan_repayment',
-          amount: data.amount,
-          callbackUrl: data.callbackUrl,
-          metadata: {
-            loanId: data.loanId,
-            repaymentAmount: data.repaymentAmount,
-            repaymentType: 'FULL'
-          }
-        }
-      );
-      return response;
+    mutationFn: async (data: LoanRepaymentData) => {
+      return await initializeTransactionApi(token, {
+        type: 'loan_repayment',
+        amount: data.amount,
+        callbackUrl: data.callbackUrl,
+        metadata: {
+          loanId: data.loanId,
+          repaymentAmount: data.repaymentAmount,
+          repaymentType: 'FULL'
+        },
+      });
     },
     onSuccess: (data) => {
-      console.log("auth url", data?.data);
-      router.replace(data?.data?.authorization_url || "");
+      console.log("auth url", data?.data?.data);
+      router.replace(data?.data?.data?.authorization_url || "");
     },
     onError: (error) => {
       console.error(error);
@@ -76,9 +78,7 @@ export default function LoanRepayment({
 
     mutation.mutate({
       amount: totalAmount,
-      email: user?.email || "",
       callbackUrl: `${frontendUrl}/verify`,
-      token,
       loanId,
       repaymentAmount: totalAmount,
     });

@@ -7,6 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { verifyTransactionApi } from "@/services/payment.service";
+import { ITransactionVerificationResponse } from "@/interface/payment";
 
 export default function VerifyTransactionPage() {
   const searchParams = useSearchParams();
@@ -21,7 +22,7 @@ export default function VerifyTransactionPage() {
       console.log("Verification response:", response);
 
       const transactionType =
-        (response?.data as any)?.metadata?.type || searchParams.get("type");
+        (response?.data?.data as ITransactionVerificationResponse['data'])?.metadata?.type || searchParams.get("type");
 
       toast({
         title: "Success",
@@ -49,11 +50,9 @@ export default function VerifyTransactionPage() {
       console.error("Verification error:", error);
       toast({
         title: "Error",
-        description: "Error verifying transaction",
+        description: "Failed to verify transaction. Please contact support.",
         variant: "destructive",
       });
-
-      router.push("/dashboard");
     },
   });
 

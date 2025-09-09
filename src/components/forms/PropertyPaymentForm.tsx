@@ -17,6 +17,8 @@ import { useMutation } from "@tanstack/react-query";
 import { initializeTransactionApi } from "@/services/payment.service";
 import { frontendUrl } from "@/constants/env";
 
+type PropertyPaymentFormData = z.infer<typeof InspectionDetailsSchema>;
+
 interface Props {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   user?: IUser;
@@ -43,7 +45,7 @@ const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props
   });
 
   const initializeMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: PropertyPaymentFormData) => {
       return await initializeTransactionApi(token, {
         type: "property_purchase",
         amount: property.price, 
@@ -62,8 +64,8 @@ const PropertyPaymentForm = ({ setShowModal, user, propertyId, property }: Props
     },
     onSuccess: (response) => {
       console.log("Payment init response", response);
-      if (response?.data && (response.data as any)?.authorization_url) {
-        router.push((response.data as any).authorization_url);
+      if (response?.data?.data && response.data.data.authorization_url) {
+        router.push(response.data.data.authorization_url);
       } else {
         showToaster("Failed to initialize payment", "destructive");
       }

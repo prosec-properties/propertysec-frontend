@@ -4,6 +4,10 @@ import {
   IPaystackAuthorizationResponse,
   PaymentCredentials,
   Transaction,
+  ITransactionInitializationPayload,
+  ITransactionInitializationResponse,
+  ITransactionVerificationPayload,
+  ITransactionVerificationResponse,
 } from "@/interface/payment";
 
 interface IPaymentPayload {
@@ -92,7 +96,7 @@ export async function verifyTransactionApi({
   paymentReference: string;
 }) {
   try {
-    const response = await $requestWithToken.post(
+    const response = await $requestWithToken.post<ITransactionVerificationResponse>(
       "/transactions/verify",
       token,
       {
@@ -108,15 +112,10 @@ export async function verifyTransactionApi({
 
 export async function initializeTransactionApi(
   token: string,
-  payload: {
-    type: string;
-    amount: number;
-    callbackUrl: string;
-    metadata?: Record<string, any>;
-  }
+  payload: ITransactionInitializationPayload
 ) {
   try {
-    const response = await $requestWithToken.post(
+    const response = await $requestWithToken.post<ITransactionInitializationResponse>(
       "/transactions/initialize",
       token,
       payload

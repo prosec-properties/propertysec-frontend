@@ -228,3 +228,38 @@ export interface IPaystackAuthorizationResponse {
   message: string;
   status: boolean;
 }
+
+export interface ITransactionInitializationPayload {
+  type: TransactionType;
+  amount: number;
+  callbackUrl: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ITransactionInitializationResponse {
+  status: boolean;
+  message: string;
+  data: {
+    authorization_url: string;
+    access_code: string;
+    reference: string;
+  };
+}
+
+export interface ITransactionVerificationPayload {
+  reference: string;
+  paymentReference: string;
+}
+
+export interface ITransactionVerificationResponse {
+  status: boolean;
+  message: string;
+  data: {
+    id: string;
+    reference: string;
+    status: string;
+    type: TransactionType;
+    amount: number;
+    metadata?: Record<string, any>;
+  };
+}
