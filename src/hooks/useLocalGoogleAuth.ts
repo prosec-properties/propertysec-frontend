@@ -41,28 +41,38 @@ export const useLocalGoogleAuth = () => {
 
         const params = new URLSearchParams(paramObject);
 
-        const res = await $requestWithoutToken.get(
+        const data: any = await $requestWithoutToken.get(
           `/auth/google/callback?${params.toString()}`
         );
 
-        if (!res.ok) {
+        console.log("Google callback response data:", data);
+
+        if (!data || !data.success) {
+          console.log("Google callback failed or returned unsuccessful response");
+          showToaster("Google login failed", "destructive");
           handleError();
           return;
         }
-        const data = await res.json();
 
         if (!data.user) {
+          console.log("No user in response data");
           showToaster("User not found", "destructive");
           return;
         }
 
         const user = data.user as IUser;
+        console.log("User found:", user);
+        console.log("isNew:", data.isNew);
+        console.log("hasCompletedRegistration:", user.hasCompletedRegistration);
 
         const queries = new URLSearchParams({
           email: user.email,
         });
 
-        if (data.isNew || !data.user.hasCompletedRegistration) {
+        console.log("Checking condition: data.isNew =", data.isNew, "|| !data.user.hasCompletedRegistration =", !user.hasCompletedRegistration);
+
+        if (data.isNew || !user.hasCompletedRegistration) {
+          console.log("Redirecting to complete profile");
           push(`${COMPLETE_PROFILE_ROUTE}?${queries.toString()}`);
           return;
         }
@@ -84,7 +94,7 @@ export const useLocalGoogleAuth = () => {
         handleError();
       }
     },
-    [handleError]
+    [handleError, login, push, setUser]
   );
 
   return { handleSuccess, handleError };
