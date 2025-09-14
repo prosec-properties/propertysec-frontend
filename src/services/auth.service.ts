@@ -48,6 +48,13 @@ export interface ILoginResponse {
   success: boolean;
   token: AccessToken;
 }
+
+export interface IGoogleAuthCallbackResponse {
+  success: boolean;
+  isNew: boolean;
+  user: IUser;
+  token: AccessToken | null;
+}
 export const loginApi = async (payload: {
   email: string;
   password: string;
@@ -140,6 +147,18 @@ export const resendOtpApi = async (payload: { email: string }) => {
       "/auth/resend-otp",
       payload
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const googleAuthCallbackApi = async (params: string) => {
+  try {
+    const response =
+      await $requestWithoutToken.get<IGoogleAuthCallbackResponse>(
+        `/auth/google/callback?${params}`
+      );
     return response;
   } catch (error) {
     throw error;

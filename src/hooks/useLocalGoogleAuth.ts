@@ -4,22 +4,21 @@ import { $requestWithoutToken } from "@/app/api";
 import { COMPLETE_PROFILE_ROUTE } from "@/constants/routes";
 import { showToaster } from "@/lib/general";
 import { CredentialResponse, TokenResponse } from "@react-oauth/google";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useAuth } from "./useAuth";
 import { useLocalStore } from "@/store/state/localStore";
 import { IUser } from "@/interface/user";
 import { AccessToken } from "@/interface/auth";
+import { googleAuthCallbackApi } from "@/services/auth.service";
 
 export const useLocalGoogleAuth = () => {
   const { push } = useRouter();
   const { login } = useAuth();
-  const pathname = usePathname();
   const { setUser } = useLocalStore();
   const [loading, setLoading] = useState(false);
 
   const handleError = useCallback(async () => {
-    console.log("error");
     setLoading(false);
   }, []);
 
@@ -41,61 +40,45 @@ export const useLocalGoogleAuth = () => {
 
         const params = new URLSearchParams(paramObject);
 
-        const data: any = await $requestWithoutToken.get(
-          `/auth/google/callback?${params.toString()}`
-        );
-
-        console.log("Google callback response data:", data);
+        const data = await googleAuthCallbackApi(params.toString());
 
         if (!data || !data.success) {
-          console.log("Google callback failed or returned unsuccessful response");
           showToaster("Google login failed", "destructive");
           handleError();
           return;
         }
 
-        if (!data.user) {
-          console.log("No user in response data");
+        if (!data?.data?.user) {
           showToaster("User not found", "destructive");
           return;
         }
 
-        const user = data.user as IUser;
-        console.log("User found:", user);
-        console.log("isNew:", data.isNew);
-        console.log("hasCompletedRegistration:", user.hasCompletedRegistration);
-
+        const user = data?.data?.user as IUser;
         const queries = new URLSearchParams({
           email: user.email,
         });
 
-        console.log("Checking condition: data.isNew =", data.isNew, "|| !data.user.hasCompletedRegistration =", !user.hasCompletedRegistration);
-
-        if (data.isNew || !user.hasCompletedRegistration) {
-          console.log("Redirecting to complete profile");
+        if (data?.data?.isNew || !user.hasCompletedRegistration) {
           push(`${COMPLETE_PROFILE_ROUTE}?${queries.toString()}`);
           return;
         }
 
         setUser(user);
 
-        console.log('token at 72', data)
-
-        if (!data.token) {
+        if (!data?.data?.token) {
           showToaster("Token not found", "destructive");
           return;
         }
 
-        console.log("token", data);
-
-        await login(data?.token as AccessToken);
+        await login(data?.data?.token as AccessToken);
+        setLoading(false);
       } catch (error) {
-        console.log(error);
+        console.log("errorr", error);
         handleError();
       }
     },
     [handleError, login, push, setUser]
   );
 
-  return { handleSuccess, handleError };
+  return { handleSuccess, handleError, loading };
 };

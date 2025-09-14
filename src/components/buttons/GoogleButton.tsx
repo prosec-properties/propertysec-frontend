@@ -1,23 +1,26 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
 import GoogleIcon from "@/components/icons/Google";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useLocalGoogleAuth } from "@/hooks/useLocalGoogleAuth";
 import CustomButton from "./CustomButton";
-import { useAuth } from "@/hooks/useAuth";
+import Spinner from "../misc/Spinner";
 
 interface Props {
   text: string;
 }
 const GoogleButton = (props: Props) => {
-  const { handleError, handleSuccess } = useLocalGoogleAuth();
+  const { handleError, handleSuccess, loading } = useLocalGoogleAuth();
 
   const login = useGoogleLogin({
     onSuccess: handleSuccess,
     onError: handleError,
   });
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <CustomButton
