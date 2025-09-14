@@ -1,6 +1,5 @@
 "use client";
 
-import { $requestWithoutToken } from "@/app/api";
 import { COMPLETE_PROFILE_ROUTE } from "@/constants/routes";
 import { showToaster } from "@/lib/general";
 import { CredentialResponse, TokenResponse } from "@react-oauth/google";
