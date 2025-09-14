@@ -410,6 +410,7 @@ const FileDisplayByCategory: React.FC<FileDisplayProps> = ({
             key={file.id}
             fileName={file.fileName}
             fileSize={file.meta ? JSON.parse(file.meta)?.size : 0}
+            viewFile={() => window.open(file.fileUrl, '_blank')}
           />
         ))}
       </div>

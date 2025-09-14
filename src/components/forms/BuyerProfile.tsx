@@ -24,9 +24,9 @@ import { appendFiles } from "@/lib/files";
 import { ICountry } from "@/interface/location";
 
 interface Props {
-  country: ICountry;
+  countries: ICountry[];
 }
-const BuyerProfileForm = ({ country }: Props) => {
+const BuyerProfileForm = ({ countries }: Props) => {
   const { user, token, refetchUser } = useUser();
   const [files, setFiles] = useState<File[]>();
   const [IdCardFile, setIdCardFile] = useState<File[]>();
@@ -168,7 +168,7 @@ const BuyerProfileForm = ({ country }: Props) => {
                 formLabel="Nationality"
                 placeholder="Select your country"
                 value={field.value || ""}
-                options={[country].map((country) => ({
+                options={countries.map((country) => ({
                   label: country.name,
                   value: String(country.id),
                 }))}

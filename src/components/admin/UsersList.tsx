@@ -14,8 +14,8 @@ import RegisterUserModal from "./RegisterUserModal";
 
 interface Props {
   initialUsers?: IUser[];
-  initialTotalUsers?: number | string;
-  initialActiveUsers?: number | string;
+  totalUsers?: number | string;
+  subscribedUsers?: number | string;
   showOnlyPaid?: boolean;
 }
 
@@ -23,8 +23,8 @@ const UsersList = (props: Props) => {
   const router = useRouter();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const users = props.initialUsers || [];
-  const totalUsers = props.initialTotalUsers || 0;
-  const activeUsers = props.initialActiveUsers || 0;
+  const totalUsers = props.totalUsers || 0;
+  const subscribedUsers = props.subscribedUsers || 0;
 
   const subscriptionStatus = (status: IStatus) => {
     if (status === "active") {
@@ -58,8 +58,8 @@ const UsersList = (props: Props) => {
               className="basis-[45%]"
             />
             <Stat
-              title="Active Users"
-              value={String(activeUsers)}
+              title="Subscribed Users"
+              value={String(subscribedUsers)}
               className="basis-[45%]"
             />
           </StatsWrapper>

@@ -4,10 +4,9 @@ import LandlordProfileForm from "@/components/forms/LandlordProfile";
 import BuyerProfileForm from "@/components/forms/BuyerProfile";
 import AdminProfileForm from "@/components/forms/AdminProfile";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
-import { NIGERIAN_COUNTRY_ID } from "@/constants/general";
 import { SIGN_IN_ROUTE } from "@/constants/routes";
 import { USER_ROLE } from "@/constants/user";
-import { fetchACountry, fetchCountries } from "@/services/location.service";
+import { fetchCountries } from "@/services/location.service";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -30,12 +29,11 @@ export default async function Page({ params }: { params: IParams }) {
 
   const userRole = session.user.role;
 
-  const country = await fetchACountry(NIGERIAN_COUNTRY_ID);
   const countries = await fetchCountries();
 
   // console.log("Fetched countries:", countries?.data?.);
 
-  if (!country?.success) {
+  if (!countries?.success) {
     return <ErrorDisplay message="Error Fetching Countries" />;
   }
 
@@ -46,18 +44,18 @@ export default async function Page({ params }: { params: IParams }) {
       return (
         <LandlordProfileForm
           token={session.accessToken}
-          country={country?.data || {}}
+          countries={countries?.data || []}
         />
       );
     case USER_ROLE.AFFILIATE:
       return (
         <AffiliateProfileForm
           token={session.accessToken}
-          country={country?.data || {}}
+          countries={countries?.data || []}
         />
       );
     case USER_ROLE.BUYER:
-      return <BuyerProfileForm country={country?.data || {}} />;
+      return <BuyerProfileForm countries={countries?.data || []} />;
     case USER_ROLE.ADMIN:
       return <AdminProfileForm token={session.accessToken} />;
 

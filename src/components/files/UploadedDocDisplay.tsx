@@ -53,6 +53,10 @@ const UploadedDocDisplay: React.FC<UploadedDocDisplayProps> = ({
     }
   };
 
+  const handleViewFile = (file: IProfileFileInterface) => {
+    window.open(file.fileUrl, '_blank');
+  };
+
   return (
     <div className="mb-6">
       {uploadedFiles.length > 0 ? (
@@ -63,6 +67,7 @@ const UploadedDocDisplay: React.FC<UploadedDocDisplayProps> = ({
             fileSize={JSON.parse(file.meta as string)?.size}
             wrapperClass="mb-6"
             deleteUploadedFile={() => handleDeleteFile(file)}
+            viewFile={() => handleViewFile(file)}
           />
         ))
       ) : (

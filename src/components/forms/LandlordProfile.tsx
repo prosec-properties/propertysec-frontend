@@ -28,14 +28,14 @@ import { appendFiles } from "@/lib/files";
 
 interface LandlordProfileFormProps {
   token: string;
-  country: ICountry;
+  countries: ICountry[];
 }
 
 type FormData = z.infer<typeof LandlordProfileSchema>;
 
 const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
   token,
-  country,
+  countries,
 }) => {
   const { user, refetchUser } = useUser();
 
@@ -103,14 +103,14 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
 
   const statesOfOrigin = useMemo(() => {
     if (!nationalityValue) return [];
-    const ctry = [country].find((c) => String(c.id) === nationalityValue);
+    const ctry = countries.find((c) => String(c.id) === nationalityValue);
     return ctry?.states || [];
-  }, [nationalityValue, country]);
+  }, [nationalityValue, countries]);
 
   const statesOfResidence = useMemo(() => {
-    const nigeria = [country].find((c) => c.name.includes("Nigeria"));
+    const nigeria = countries.find((c) => c.name.includes("Nigeria"));
     return nigeria?.states || [];
-  }, [country]);
+  }, [countries]);
 
   const citiesOfResidence = useMemo(() => {
     if (!stateOfResidence) return [];
@@ -257,7 +257,7 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
                     formLabel="Nationality"
                     placeholder="Select your country"
                     value={field.value || ""}
-                    options={[country].map((country) => ({
+                    options={countries.map((country) => ({
                       label: country.name,
                       value: String(country.id),
                     }))}

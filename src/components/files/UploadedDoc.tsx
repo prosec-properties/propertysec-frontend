@@ -10,6 +10,7 @@ interface Props {
   fileName: string;
   hideDelete?: boolean;
   wrapperClass?: string;
+  viewFile?: () => void;
 }
 
 const UploadedDoc = (props: Props) => {
@@ -34,7 +35,12 @@ const UploadedDoc = (props: Props) => {
 
         <div className="w-full ml-2 space-y-1">
           <div className="text-sm">
-            <p className="text-muted-foreground mb-2">{handleFileName()}</p>
+            <p 
+              className="text-muted-foreground mb-2 cursor-pointer hover:text-blue-600 hover:underline"
+              onClick={props.viewFile}
+            >
+              {handleFileName()}
+            </p>
             <p className="text-muted-foreground text-xs">
               {convertBytesToMB(props.fileSize)}
             </p>

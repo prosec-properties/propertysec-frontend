@@ -8,7 +8,7 @@ interface IResponse {
   users: IUser[];
   meta?: IMeta;
   totalUsers: number | string;
-  activeUsers: number | string;
+  subscribedUsers: number | string;
 }
 export const fetchAllUsers = async (token: string, searchParams?: { search?: string; page?: number; per_page?: number }) => {
   try {

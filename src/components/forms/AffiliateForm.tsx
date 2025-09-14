@@ -27,7 +27,7 @@ import UploadedDocDisplay from "../files/UploadedDocDisplay";
 
 interface Props {
   token: string;
-  country: ICountry;
+  countries: ICountry[];
 }
 
 type FormData = z.infer<typeof AffiliateProfileSchema>;
