@@ -7,7 +7,12 @@ import { useUser } from "@/hooks/useUser";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { verifyTransactionApi } from "@/services/payment.service";
-import { ITransactionVerificationResponse } from "@/interface/payment";
+import {
+  DASHBOARD_LOAN_ROUTE,
+  DASHBOARD_ROUTE,
+  PROPERTIES_ROUTE,
+  SUBSCRIPRION_ROUTE,
+} from "@/constants/routes";
 
 export default function VerifyTransactionPage() {
   const searchParams = useSearchParams();
@@ -22,7 +27,7 @@ export default function VerifyTransactionPage() {
       console.log("Verification response:", response);
 
       const transactionType =
-        (response?.data?.data as ITransactionVerificationResponse['data'])?.metadata?.type || searchParams.get("type");
+        response?.data?.metadata?.type || searchParams.get("type");
 
       toast({
         title: "Success",
@@ -31,19 +36,20 @@ export default function VerifyTransactionPage() {
 
       switch (transactionType) {
         case "subscription":
-          router.push("/subscriptions");
+          router.push(SUBSCRIPRION_ROUTE);
           break;
         case "inspection":
-          router.push("/properties");
+          console.log("inspection verified, redirecting to properties");
+          router.push(PROPERTIES_ROUTE);
           break;
         case "property_purchase":
-          router.push("/properties");
+          router.push(PROPERTIES_ROUTE);
           break;
         case "loan_repayment":
-          router.push("/loans");
+          router.push(DASHBOARD_LOAN_ROUTE);
           break;
         default:
-          router.push("/dashboard");
+          router.push(DASHBOARD_ROUTE);
       }
     },
     onError: (error) => {

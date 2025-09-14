@@ -44,9 +44,8 @@ const SubscriptionCard: React.FC<Props> = ({
       });
     },
     onSuccess: (response) => {
-      console.log("Payment init response", response);
-      if (response?.data?.data && response.data.data.authorization_url) {
-        router.push(response.data.data.authorization_url);
+      if (response?.data && response.data.authorization_url) {
+        router.replace(response.data.authorization_url);
       } else {
         showToaster("Failed to initialize payment", "destructive");
       }

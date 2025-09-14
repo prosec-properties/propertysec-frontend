@@ -5,7 +5,7 @@ import {
   PaymentCredentials,
   Transaction,
   ITransactionInitializationPayload,
-  ITransactionVerificationResponse,
+  ITransactionVerificationData,
   ITransactionInitializationData,
 } from "@/interface/payment";
 
@@ -95,7 +95,7 @@ export async function verifyTransactionApi({
   paymentReference: string;
 }) {
   try {
-    const response = await $requestWithToken.post<ITransactionVerificationResponse>(
+    const response = await $requestWithToken.post<ITransactionVerificationData>(
       "/transactions/verify",
       token,
       {

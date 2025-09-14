@@ -12,7 +12,6 @@ import { getLoanById } from "@/services/loan.service";
 import { frontendUrl } from "@/constants/env";
 import { useRouter } from "next/navigation";
 import { initializeTransactionApi } from "@/services/payment.service";
-import { $requestWithToken } from "@/api/general";
 
 interface LoanRepaymentData {
   amount: number;
@@ -56,8 +55,7 @@ export default function LoanRepayment({
       });
     },
     onSuccess: (data) => {
-      console.log("auth url", data?.data?.data);
-      router.replace(data?.data?.data?.authorization_url || "");
+      router.replace(data?.data?.authorization_url || "");
     },
     onError: (error) => {
       console.error(error);

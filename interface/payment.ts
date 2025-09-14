@@ -247,15 +247,11 @@ export interface ITransactionVerificationPayload {
   paymentReference: string;
 }
 
-export interface ITransactionVerificationResponse {
-  status: boolean;
-  message: string;
-  data: {
-    id: string;
-    reference: string;
-    status: string;
-    type: TransactionType;
-    amount: number;
-    metadata?: Record<string, any>;
-  };
+export interface ITransactionVerificationData {
+  id: string;
+  reference: string;
+  status: string;
+  type: TransactionType;
+  amount: number;
+  metadata?: Record<string, any>;
 }
