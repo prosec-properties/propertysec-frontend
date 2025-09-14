@@ -66,7 +66,8 @@ export const getUserLoans = async (token: string): Promise<IApiResponse<IUserLoa
   try {
     const response = await $requestWithToken.get<IUserLoansResponse>(
       `/loans/me`,
-      token
+      token,
+      "no-cache"
     );
     return response;
   } catch (error) {

@@ -37,6 +37,8 @@ const badgeVariant = (status: string) => {
       return "destructive";
     case "disbursed":
       return "success";
+    case "completed":
+      return "success"; 
     default:
       return "secondary";
   }
@@ -51,35 +53,49 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
   const isAdmin = user?.role === "admin";
 
   const tableData = useMemo(() => {
-    return loans.map((loan) => ({
-      id: loan.id,
-      name: loan.user?.fullName || "N/A",
-      date: formatDate(loan.createdAt),
-      amount: formatPrice(Number(loan.loanAmount)),
-      duration: loan.loanDuration,
-      userType: loan.user?.role
-        ? loan.user.role.charAt(0).toUpperCase() + loan.user.role.slice(1)
-        : "User",
-      status: (
-        <Badge variant={badgeVariant(loan.loanStatus)}>
-          {loan.loanStatus.charAt(0).toUpperCase() + loan.loanStatus.slice(1)}
-        </Badge>
-      ),
-      actions:
-        (loan.loanStatus === "disbursed" || loan.loanStatus === "overdue") &&
-        !isAdmin ? (
-          <Button
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedLoanId(loan.id);
-              setIsModalOpen(true);
-            }}
-          >
-            Repay
-          </Button>
-        ) : null,
-    }));
+    return loans.map((loan) => {
+      let amountPaid = Number(loan.loanAmount);
+      if (loan.meta) {
+        try {
+          const metaData = JSON.parse(loan.meta);
+          if (metaData.disbursement?.disbursementAmount) {
+            amountPaid = Number(metaData.disbursement.disbursementAmount);
+          }
+        } catch (error) {
+          console.warn("Failed to parse loan meta:", error);
+        }
+      }
+
+      return {
+        id: loan.id,
+        name: loan.user?.fullName || "N/A",
+        date: formatDate(loan.createdAt),
+        amount: formatPrice(amountPaid),
+        duration: loan.loanDuration,
+        userType: loan.user?.role
+          ? loan.user.role.charAt(0).toUpperCase() + loan.user.role.slice(1)
+          : "User",
+        status: (
+          <Badge variant={badgeVariant(loan.loanStatus)}>
+            {loan.loanStatus.charAt(0).toUpperCase() + loan.loanStatus.slice(1)}
+          </Badge>
+        ),
+        actions:
+          (loan.loanStatus === "disbursed" || loan.loanStatus === "overdue") &&
+          !isAdmin ? (
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedLoanId(loan.id);
+                setIsModalOpen(true);
+              }}
+            >
+              Repay
+            </Button>
+          ) : null,
+      };
+    });
   }, [loans, isAdmin]);
 
   const handleRowClick = (row: any) => {

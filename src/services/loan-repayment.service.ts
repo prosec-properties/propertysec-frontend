@@ -1,18 +1,10 @@
 import { $requestWithToken } from "@/api/general";
-import { IApiResponse } from "@/interface/general";
 import {
-  IInitializeLoanRepaymentData,
-  IInitializeLoanRepaymentResponse,
-  IVerifyLoanRepaymentData,
-  IVerifyLoanRepaymentResponse,
   ILoanRepaymentDetailsResponse,
   IUserLoanRepaymentsResponse,
-  IInitializeLoanRepaymentResponseData,
-  IVerifyLoanRepaymentResponseData,
   ILoanRepaymentDetailsResponseData,
   IUserLoanRepaymentsResponseData,
 } from "@/interface/loan";
-import { IPaystackAuthorizationResponse } from "@/interface/payment";
 
 interface IRepaymentLoanPayload {
   repaymentAmount: number;
@@ -24,60 +16,6 @@ interface IRepaymentLoanPayload {
   loanId: string;
   token: string;
 }
-
-export const initializeLoanRepayment = async ({
-  repaymentAmount,
-  repaymentType,
-  paymentMethod,
-  email,
-  callbackUrl,
-  amount,
-  loanId,
-  token,
-}: IRepaymentLoanPayload): Promise<IApiResponse<IPaystackAuthorizationResponse> | null> => {
-  const payload = {
-    repaymentAmount,
-    repaymentType,
-    paymentMethod,
-    email,
-    callbackUrl,
-    amount,
-    loanId,
-    token,
-  };
-
-  try {
-    const response =
-      await $requestWithToken.post<IPaystackAuthorizationResponse>(
-        `/loans/${loanId}/repay`,
-        token,
-        payload
-      );
-
-    return response;
-  } catch (error: any) {
-    throw error;
-  }
-};
-
-export const verifyLoanRepayment = async (
-  repaymentId: string,
-  data: IVerifyLoanRepaymentData,
-  token: string
-): Promise<IVerifyLoanRepaymentResponse | null> => {
-  try {
-    const response =
-      await $requestWithToken.post<IVerifyLoanRepaymentResponseData>(
-        `/loans/repayments/${repaymentId}/verify`,
-        token,
-        data
-      );
-
-    return response;
-  } catch (error: any) {
-    throw error;
-  }
-};
 
 export const getLoanRepaymentDetails = async (
   loanId: string,
