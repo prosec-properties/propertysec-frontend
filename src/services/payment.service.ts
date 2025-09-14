@@ -5,9 +5,8 @@ import {
   PaymentCredentials,
   Transaction,
   ITransactionInitializationPayload,
-  ITransactionInitializationResponse,
-  ITransactionVerificationPayload,
   ITransactionVerificationResponse,
+  ITransactionInitializationData,
 } from "@/interface/payment";
 
 interface IPaymentPayload {
@@ -115,7 +114,7 @@ export async function initializeTransactionApi(
   payload: ITransactionInitializationPayload
 ) {
   try {
-    const response = await $requestWithToken.post<ITransactionInitializationResponse>(
+    const response = await $requestWithToken.post<ITransactionInitializationData>(
       "/transactions/initialize",
       token,
       payload

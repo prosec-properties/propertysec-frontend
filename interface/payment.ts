@@ -236,14 +236,10 @@ export interface ITransactionInitializationPayload {
   metadata?: Record<string, any>;
 }
 
-export interface ITransactionInitializationResponse {
-  status: boolean;
-  message: string;
-  data: {
-    authorization_url: string;
-    access_code: string;
-    reference: string;
-  };
+export interface ITransactionInitializationData {
+  authorization_url: string;
+  access_code: string;
+  reference: string;
 }
 
 export interface ITransactionVerificationPayload {

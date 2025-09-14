@@ -14,7 +14,7 @@ export const useAuth = () => {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const session = useSession();
-  const { setUser, clear } = useLocalStore();
+  const { setUser } = useLocalStore();
 
   const login = useCallback(
     async (data: AccessToken) => {

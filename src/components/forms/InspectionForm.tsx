@@ -46,7 +46,7 @@ const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
     mutationFn: async (data: InspectionFormData) => {
       return await initializeTransactionApi(token, {
         type: "inspection",
-        amount: 5000, 
+        amount: 5000,
         callbackUrl: `${frontendUrl}/verify`,
         metadata: {
           propertyId,
@@ -59,16 +59,21 @@ const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
       });
     },
     onSuccess: (response) => {
-      console.log("Payment init response", response);
-      if (response?.data?.data && response.data.data.authorization_url) {
-        router.push(response.data.data.authorization_url);
+      console.log("Payment init response", response?.data);
+      const data = response?.data;
+
+      if (data && data?.authorization_url) {
+        router.replace(data?.authorization_url);
       } else {
         showToaster("Failed to initialize payment", "destructive");
       }
     },
     onError: (error) => {
       console.error("Payment initialization error:", error);
-      showToaster("Failed to initialize payment. Please try again.", "destructive");
+      showToaster(
+        "Failed to initialize payment. Please try again.",
+        "destructive"
+      );
     },
   });
 
@@ -138,7 +143,10 @@ const InspectionForm = ({ setShowModal, user, propertyId }: Props) => {
           >
             Cancel
           </CustomButton>
-          <CustomButton type="submit" disabled={isSubmitting || initializeMutation.isPending}>
+          <CustomButton
+            type="submit"
+            disabled={isSubmitting || initializeMutation.isPending}
+          >
             {initializeMutation.isPending ? "Processing..." : "Next"}
           </CustomButton>
         </div>
