@@ -1,4 +1,3 @@
-import UserBanner from "@/components/profiles/UserBanner";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import { fetchUserById } from "@/services/user.service";
 import React from "react";

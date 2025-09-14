@@ -14,7 +14,6 @@ import { LandlordProfileSchema } from "@/store/schema/landlordProfileSchema";
 import type { SelectedImagePreview } from "../../../interface/image";
 import type { IProfileFileInterface } from "@/interface/file";
 import type { ICountry, IState } from "@/interface/location";
-import type { IUser } from "@/interface/user";
 
 import CustomInput from "../inputs/CustomInput";
 import SelectInput from "../inputs/SelectInput";

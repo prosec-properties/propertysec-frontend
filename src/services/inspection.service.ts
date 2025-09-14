@@ -1,7 +1,6 @@
 import { $requestWithToken } from "@/api/general";
 import { IMeta, IApiResponse } from "@/interface/general";
 import { InspectionDetail } from "@/interface/user";
-import { IProperty } from "@/interface/property";
 
 interface IInspectionStatistics {
   totalInspections: number;
@@ -9,7 +8,8 @@ interface IInspectionStatistics {
   approvedInspections: number;
 }
 
-interface IFetchInspectionPaymentsResponse extends IApiResponse<InspectionPaymentDetail[]> {
+interface IFetchInspectionPaymentsResponse
+  extends IApiResponse<InspectionPaymentDetail[]> {
   statistics: IInspectionStatistics;
   meta: IMeta;
 }
@@ -27,6 +27,7 @@ export interface InspectionPaymentDetail extends InspectionDetail {
   status: string;
   inspectionDate: string;
   approvalStatus?: "approved" | "pending" | "rejected";
+  amount?: number;
   user: {
     id: string;
     fullName: string;
@@ -72,10 +73,8 @@ export const fetchInspectionPayments = async (
     const url = `/inspections${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const response = await $requestWithToken.get<IFetchInspectionPaymentsResponse>(
-      url,
-      token
-    );
+    const response =
+      await $requestWithToken.get<IFetchInspectionPaymentsResponse>(url, token);
     return response;
   } catch (error) {
     throw error;

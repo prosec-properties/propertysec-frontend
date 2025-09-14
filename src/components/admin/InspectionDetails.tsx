@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { InspectionPaymentDetail } from "@/services/inspection.service";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/payment";
@@ -75,7 +75,7 @@ const InspectionDetails = ({ inspection, onUpdate }: Props) => {
                   Amount
                 </label>
                 <p className="text-base md:text-lg font-semibold">
-                  {formatPrice(inspection.inspectionAmount)}
+                  {formatPrice(inspection?.amount as number)}
                 </p>
               </div>
               <div className="border-b border-gray-100 pb-3">
