@@ -10,7 +10,7 @@ const NewsLetterInput = () => {
         hideLabel
         type="email"
         placeholder="Email"
-        className="rounded-r-none h-[40px] focus-within:to-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none border-grey4 bg-transparent"
+        className="rounded-r-none h-[40px] focus-within:to-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none border-grey4 bg-transparent caret-white text-white"
       />
       <CustomButton
         type="submit"

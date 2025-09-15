@@ -10,12 +10,13 @@ import MobileMenu from "./MobileMenu";
 import Logo from "../misc/Logo";
 import CustomButton from "../buttons/CustomButton";
 import { useUser } from "@/hooks/useUser";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const HeaderMenu = () => {
   const [openMenu, setOpenMenu] = React.useState(false);
   const mobileMenuRef = React.useRef<HTMLDivElement>(null);
   const { isLoggedIn } = useUser();
+  const pathname = usePathname();
 
   const handleMenu = () => {
     setOpenMenu(!openMenu);
@@ -32,7 +33,6 @@ const HeaderMenu = () => {
 
   const handlePostPropertyClick = () => {
     if (!isLoggedIn) {
-      // router.push(SIGN_IN_ROUTE);
       return SIGN_IN_ROUTE;
     } else {
       return UPLOAD_PROPERTY_ROUTE;
@@ -50,7 +50,11 @@ const HeaderMenu = () => {
               {headerMenu.map((menu, index) => (
                 <li key={`${menu.name}${index}`}>
                   <Link
-                    className="transition hover:text-gray-500/75 text-base"
+                    className={`transition hover:text-gray-500/75 text-base ${
+                      pathname === menu.url
+                        ? "text-primary font-semibold"
+                        : "text-gray-700"
+                    }`}
                     href={menu.url}
                   >
                     {menu.name}
