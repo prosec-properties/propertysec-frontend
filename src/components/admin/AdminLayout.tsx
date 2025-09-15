@@ -8,7 +8,7 @@ interface Props {
 const AdminLayout = ({ children }: Props) => {
   return (
     <div className="flex flex-col min-h-screen bg-offWhite">
-      <DashboardHeader className="sticky top-0 z-10" isAffiliate={false} />
+      <DashboardHeader className="sticky top-0 z-10" />
 
       <div className="flex flex-1">
         <div className="sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">

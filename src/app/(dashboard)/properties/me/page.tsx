@@ -8,8 +8,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 import { fetchAffiliateShop } from "@/services/affiliate.service";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
-import MultipleProducts from "@/components/products/MultipleProducts";
 import Landlord from "@/components/dashboard/Landlord";
+import MultipleProperties from "@/components/property/MultipleProperties";
 
 type ISearchParams = Promise<{
   categories?: string;
@@ -69,7 +69,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       );
     }
 
-    return <MultipleProducts products={affiliateShop.data?.products} />;
+    return <MultipleProperties properties={affiliateShop.data?.properties} />;
   }
 }
 

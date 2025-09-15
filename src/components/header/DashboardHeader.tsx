@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState } from "react";
-import { DashboardHeaderData, getFilteredDashboardMenuItems } from "./headerData";
+import { getFilteredDashboardMenuItems } from "./headerData";
 import Logo from "../misc/Logo";
 import { Menu, X } from "lucide-react";
 import { USER_ROLE } from "@/constants/user";
@@ -15,13 +14,7 @@ import DashboardMobileMenu from "./DashboardMobileMenu";
 import UserActionButtons from "./UserActionButtons";
 import SearchInput from "../inputs/SearchInput";
 
-// Main DashboardHeader component with admin-specific changes
-const DashboardHeader = ({
-  className,
-}: {
-  className?: string;
-  isAffiliate: boolean;
-}) => {
+const DashboardHeader = ({ className }: { className?: string }) => {
   const { user } = useUser();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,9 +25,12 @@ const DashboardHeader = ({
 
   const getCurrentSection = () => {
     const filteredMenuData = getFilteredDashboardMenuItems(user?.role);
-    const currentRoute = filteredMenuData.find(
-      (item) => item.url === pathname
-    );
+    const currentRoute = filteredMenuData.find((item) => item.url === pathname);
+
+    if (user?.role === "affiliate" && currentRoute?.name === "My Listing") {
+      return "My Shop";
+    }
+
     return currentRoute?.name || "Dashboard";
   };
 
