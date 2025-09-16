@@ -32,7 +32,7 @@ const PropertyPaymentForm = ({
   propertyId,
   property,
 }: Props) => {
-  const affiliateSlug = new URLSearchParams(window.location.search).get("aff");
+  const affiliateId = new URLSearchParams(window.location.search).get("aff");
   const { token } = useUser();
   const router = useRouter();
 
@@ -62,7 +62,7 @@ const PropertyPaymentForm = ({
           fullName: data.fullName,
           email: data.email,
           phoneNumber: data.phoneNumber,
-          ...(affiliateSlug && { affiliateSlug }),
+          ...(affiliateId && { affiliateId }),
           userId: user?.id,
         },
       });

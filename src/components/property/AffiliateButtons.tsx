@@ -77,13 +77,13 @@ const AffiliateButtons: React.FC<AffiliateButtonsProps> = ({
     <div>
       {isInAffiliateShop && (
         <ActionButton
-          text="Copy Product URL"
+          text="Copy Property URL"
           onClick={() => {
             // Get the current URL and remove any query parameters
             const currentUrl = window.location.href.split("?")[0];
             copyToClipboard(
               addParamsToUrl(currentUrl, {
-                aff: user?.slug,
+                aff: user?.id,
               })
             )
               .then(() => {

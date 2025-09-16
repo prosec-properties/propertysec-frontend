@@ -195,7 +195,7 @@ const SellerButtons: React.FC<{
 const AffiliateButtons: React.FC<{ product: IProduct }> = ({ product }) => {
   return (
     <div>
-      <ActionButton text="Copy Product URL" />
+      <ActionButton text="Copy Property URL" />
       <ActionButton
         text={
           product.availability === "available"

@@ -93,7 +93,7 @@ const AffiliateHome = (props: Props) => {
       <div className="flex flex-col">
         <div className="mb-6">
           <h1 className="font-medium text-xl text-black whitespace-nowrap">
-            My Sho
+            My Shop
           </h1>
           <CustomTab
             defaultValue="properties"
