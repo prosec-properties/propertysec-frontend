@@ -56,7 +56,9 @@ const PropertyCard = (props: Props) => {
 
             <dd className="text-sm ">
               {formatPrice(props.property.price, props.property.currency)}/
-              {props.property.purpose === "shortlet" ? "day" : "year"}
+              {props.property.category?.name?.toLowerCase() === "shortlet"
+                ? "day"
+                : "year"}
             </dd>
           </div>
         </dl>

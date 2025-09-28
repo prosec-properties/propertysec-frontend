@@ -334,6 +334,21 @@ const PropertyForm = (props: Props) => {
     };
   }, []);
 
+  if (props.mode === "edit" && props.property?.availability === "sold") {
+    return (
+      <div className="p-10 w-full bg-white md:basis-[80%] md:max-w-[1200px]">
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Property Cannot Be Edited
+          </h2>
+          <p className="text-gray-600">
+            This property has been sold and cannot be edited.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`p-10 w-full bg-white  md:basis-[80%]"md:max-w-[1200px] `}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -658,7 +673,8 @@ const PropertyForm = (props: Props) => {
             Each file must not exceed 20MB.
           </span>
           <span className="mb-6 font-medium text-grey6 text-sm block">
-            Supported formats: PNG, JPG, JPEG, GIF, SVG, WEBP, BMP, TIFF, ICO for images and MP4, WEBP, MOV for videos.
+            Supported formats: PNG, JPG, JPEG, GIF, SVG, WEBP, BMP, TIFF, ICO
+            for images and MP4, WEBP, MOV for videos.
           </span>
           <NewImagePreview
             existingImages={existingImages}

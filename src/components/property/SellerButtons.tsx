@@ -16,10 +16,14 @@ import { useMutation } from "@tanstack/react-query";
 interface SellerButtonsProps {
   property: IProperty;
   user?: IUser;
-  token: string
+  token: string;
 }
 
-const SellerButtons: React.FC<SellerButtonsProps> = ({ property, user, token }) => {
+const SellerButtons: React.FC<SellerButtonsProps> = ({
+  property,
+  user,
+  token,
+}) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
 
@@ -49,15 +53,21 @@ const SellerButtons: React.FC<SellerButtonsProps> = ({ property, user, token }) 
     <div>
       {user?.id === property.userId && (
         <>
-          <ActionButton
-            text="Edit Property"
-            onClick={() => router.push(`${EDIT_PROPERTY_ROUTE}/${property.id}`)}
-          />
-          <ActionButton
-            text="Delete"
-            variant="secondary"
-            onClick={() => setShowDeleteModal(true)}
-          />
+          {property.availability !== "sold" && (
+            <>
+              <ActionButton
+                text="Edit Property"
+                onClick={() =>
+                  router.push(`${EDIT_PROPERTY_ROUTE}/${property.id}`)
+                }
+              />
+              <ActionButton
+                text="Delete"
+                variant="secondary"
+                onClick={() => setShowDeleteModal(true)}
+              />
+            </>
+          )}
         </>
       )}
 
