@@ -10,6 +10,7 @@ import { fetchAffiliateShop } from "@/services/affiliate.service";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import Landlord from "@/components/dashboard/Landlord";
 import MultipleProperties from "@/components/property/MultipleProperties";
+import AffiliateDashboard from "@/components/dashboard/AffiliateDashboard";
 
 type ISearchParams = Promise<{
   categories?: string;
@@ -69,7 +70,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       );
     }
 
-    return <MultipleProperties properties={affiliateShop.data?.properties} />;
+    return <AffiliateDashboard properties={affiliateShop.data?.properties || []} />;
   }
 }
 

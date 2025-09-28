@@ -9,12 +9,13 @@ import React from "react";
 interface Props {
   text: string;
   tabs: string[];
+  paramName?: string;
 }
 
-const ListingTabs = ({ text, tabs }: Props) => {
+const ListingTabs = ({ text, tabs, paramName = "status" }: Props) => {
   const { getQueryParam, setQueryParam } = useQueryString();
 
-  const param = getQueryParam("status") || tabs[0]; // Default to first tab if no status
+  const param = getQueryParam(paramName) || tabs[0]; // Default to first tab if no param
 
   return (
     <div className="text-grey6 text-lg font-medium">
@@ -24,7 +25,7 @@ const ListingTabs = ({ text, tabs }: Props) => {
             key={index}
             className={cn({ "text-grey8": tab === param })}
             onClick={() => {
-              setQueryParam("status", tab);
+              setQueryParam(paramName, tab);
             }}
           >
             {startCase(tab)}

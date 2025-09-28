@@ -14,6 +14,7 @@ interface Props<T> {
   renderItem: (item: T, index: number) => React.ReactNode;
   titleStyle?: "solid" | "outline";
   titleClassName?: string;
+  paramName?: string;
 }
 
 const TabbedListingView = <T,>({
@@ -24,6 +25,7 @@ const TabbedListingView = <T,>({
   emptyStateMessage,
   titleStyle = "outline",
   titleClassName,
+  paramName,
   renderItem,
 }: Props<T>) => {
   return (
@@ -37,6 +39,7 @@ const TabbedListingView = <T,>({
         <ListingTabs
           text={tabDescription}
           tabs={tabs}
+          paramName={paramName}
         />
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {isNotAnEmptyArray(items) ? (
