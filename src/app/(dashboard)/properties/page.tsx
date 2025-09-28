@@ -27,9 +27,9 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const queries = await searchParams;
 
   const filterParams = {
-    categories: queries?.categories?.split(",").filter(Boolean) || [],
-    locations: queries?.locations?.split(",").filter(Boolean) || [],
-    pricing: queries?.pricing?.split(",").filter(Boolean) || [],
+    categories: queries?.categories,
+    locations: queries?.locations,
+    pricing: queries?.pricing,
     search: queries?.search,
   };
 

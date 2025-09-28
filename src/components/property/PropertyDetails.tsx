@@ -281,22 +281,17 @@ const PropertyDetails: React.FC<Props> = ({
           <h3 className="text-sm font-medium text-gray-900 mb-2">
             Seller Information
           </h3>
-          <div className="space-y-1 text-sm text-gray-600">
-            <p>
-              <span className="font-medium">Name:</span>{" "}
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+              {property.user.fullName
+                .split(' ')
+                .map(name => name[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)}
+            </div>
+            <p className="text-sm text-gray-600 font-medium">
               {property.user.fullName}
-            </p>
-            <p>
-              <span className="font-medium">Email:</span> {property.user.email}
-            </p>
-            {property.user.phoneNumber && (
-              <p>
-                <span className="font-medium">Phone:</span>{" "}
-                {property.user.phoneNumber}
-              </p>
-            )}
-            <p>
-              <span className="font-medium">Role:</span> {property.user.role}
             </p>
           </div>
         </div>

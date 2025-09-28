@@ -1,6 +1,7 @@
 import { ICategory } from "./category";
 import { IProductAvailability } from "./product";
 import { InspectionDetail, IUser } from "./user";
+import { IState } from "./location";
 
 export interface IProperty {
   id: string;
@@ -19,6 +20,7 @@ export interface IProperty {
   append?: string;
   stateId: string;
   cityId: string;
+  state: IState;
   description: string;
   status: IPropertyStatus;
   defaultImageUrl?: string;

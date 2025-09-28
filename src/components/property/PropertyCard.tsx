@@ -17,6 +17,7 @@ interface Props {
 }
 const PropertyCard = (props: Props) => {
   const { user } = useUser();
+
   return (
     <Link
       href={`${PROPERTIES_ROUTE}/${props.property.id}`}
@@ -47,7 +48,7 @@ const PropertyCard = (props: Props) => {
             <dt className="sr-only">Property address</dt>
 
             <dd className="font-normal text-sm text-gray-500">
-              {props.property.address}
+              {props.property.state?.name || props.property?.address}
             </dd>
           </div>
 
