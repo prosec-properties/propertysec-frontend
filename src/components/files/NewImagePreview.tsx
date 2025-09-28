@@ -31,7 +31,8 @@ interface Props {
   fileType: "image" | "video" | "both"; // default is image
   maxFileNumber?: number;
   existingImages: IExistingImage[] | null;
-  isVideoUploadAllowed?: boolean; 
+  isVideoUploadAllowed?: boolean;
+  onRemoveExistingImage?: (imageId: string) => void;
 }
 
 const NewImagePreview = (props: Props) => {
@@ -98,7 +99,8 @@ const NewImagePreview = (props: Props) => {
           fileType={props.fileType}
           maxFileNumber={props.maxFileNumber}
           existingImages={props.existingImages}
-          isVideoUploadAllowed={props.isVideoUploadAllowed} 
+          isVideoUploadAllowed={props.isVideoUploadAllowed}
+          onRemoveExistingImage={props.onRemoveExistingImage}
         />
       </div>
     </div>

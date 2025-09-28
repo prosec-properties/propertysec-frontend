@@ -50,6 +50,7 @@ const PropertyForm = (props: Props) => {
   const [existingImages, setExistingImages] = useState<IExistingImage[] | null>(
     null
   );
+  const [removedExistingImages, setRemovedExistingImages] = useState<string[]>([]);
 
   const isVideoUploadAllowed = React.useMemo(() => {
     return user?.subscriptionStatus === "active";
@@ -181,6 +182,13 @@ const PropertyForm = (props: Props) => {
       }
     });
 
+    // Append removed existing images
+    if (props.mode === "edit" && removedExistingImages.length > 0) {
+      removedExistingImages.forEach((imageId) => {
+        formData.append("removedImages[]", imageId);
+      });
+    }
+
     // Only append new files to avoid re-uploading existing ones
     const filesToUpload = props.mode === "edit" ? newFiles || [] : files || [];
 
@@ -222,6 +230,7 @@ const PropertyForm = (props: Props) => {
       setFiles([]);
       setNewFiles([]);
       setSelectedPhoto(null);
+      setRemovedExistingImages([]);
     } catch (error) {
       console.error("Property submission error:", error);
       throw error;
@@ -660,6 +669,10 @@ const PropertyForm = (props: Props) => {
             setSelectedPhoto={setSelectedPhoto}
             fileType="both"
             isVideoUploadAllowed={isVideoUploadAllowed}
+            onRemoveExistingImage={(imageId) => {
+              setRemovedExistingImages(prev => [...prev, imageId]);
+              setExistingImages(prev => prev ? prev.filter(img => img.id !== imageId) : null);
+            }}
           />
         </article>
 

@@ -38,13 +38,15 @@ interface Props {
   fileType: "image" | "video" | "both";
   maxFileNumber?: number;
   existingImages: IExistingImage[] | null;
-  isVideoUploadAllowed?: boolean; 
+  isVideoUploadAllowed?: boolean;
+  onRemoveExistingImage?: (imageId: string) => void;
 }
 
 
 
 const UploadWithImageDisplay = (props: Props) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<ImagePreview[]>([]);
+  const [existingImageIds, setExistingImageIds] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [hasExceededMaxFileNumber, setHasExceededMaxFileNumber] =
     useState(false);
@@ -209,6 +211,7 @@ const UploadWithImageDisplay = (props: Props) => {
       }));
 
       setImagePreviewUrls(previews);
+      setExistingImageIds(images.map(img => img.id));
       if (previews.length > 0) {
         propsSetSelectedPhoto({
           image: previews[0],
@@ -336,22 +339,29 @@ const UploadWithImageDisplay = (props: Props) => {
       )}
 
       {propsFormat === "multiple"
-        ? imagePreviewUrls?.map((photo, i) => (
-            <UploadImg
-              preview={photo}
-              key={i}
-              format={propsFormat}
-              setSelected={propsSetSelectedPhoto}
-              selected={props.selectedPhoto}
-              isUploaded
-              setSelectedPhotos={
-                setImagePreviewUrls as React.Dispatch<
-                  React.SetStateAction<ImagePreview[] | null>
-                >
-              }
-              selectedPhotos={imagePreviewUrls}
-            />
-          ))
+        ? imagePreviewUrls?.map((photo, i) => {
+            const isExisting = photo.name.startsWith("image-");
+            const imageId = isExisting ? photo.name.replace("image-", "") : undefined;
+            return (
+              <UploadImg
+                preview={photo}
+                key={i}
+                format={propsFormat}
+                setSelected={propsSetSelectedPhoto}
+                selected={props.selectedPhoto}
+                isUploaded
+                setSelectedPhotos={
+                  setImagePreviewUrls as React.Dispatch<
+                    React.SetStateAction<ImagePreview[] | null>
+                  >
+                }
+                selectedPhotos={imagePreviewUrls}
+                isExisting={isExisting}
+                onRemoveExistingImage={props.onRemoveExistingImage}
+                imageId={imageId}
+              />
+            );
+          })
         : null}
 
       <input {...getInputProps()} />

@@ -21,6 +21,9 @@ interface Props
   setDeletedFiles?: React.Dispatch<SetStateAction<string[]>>;
   deletedFiles?: string[];
   isUploaded?: boolean;
+  isExisting?: boolean;
+  onRemoveExistingImage?: (imageId: string) => void;
+  imageId?: string;
 }
 
 export default function UploadImg({
@@ -35,6 +38,9 @@ export default function UploadImg({
   setDeletedFiles,
   deletedFiles,
   isUploaded,
+  isExisting,
+  onRemoveExistingImage,
+  imageId,
   ...props
 }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -86,6 +92,11 @@ export default function UploadImg({
   const handleDeleteClick = () => {
     if (selected && selected?.image?.url === preview.url) {
       setSelected?.(null);
+    }
+
+    if (isExisting && imageId && onRemoveExistingImage) {
+      onRemoveExistingImage(imageId);
+      return;
     }
 
     if (isUploaded) {
