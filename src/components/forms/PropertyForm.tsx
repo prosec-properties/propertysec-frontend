@@ -34,6 +34,8 @@ interface Props {
   categories: ICategory[];
   property?: IProperty;
   mode?: "create" | "edit";
+  adminMode?: boolean;
+  targetUserId?: string;
 }
 
 const PropertyForm = (props: Props) => {
@@ -65,7 +67,11 @@ const PropertyForm = (props: Props) => {
     const propertyId = props.mode === "edit" ? props.property?.id : data?.id;
 
     if (propertyId) {
-      router.push(`/properties/${propertyId}`);
+      if (props.adminMode && props.targetUserId) {
+        router.push(`/admin/users/${props.targetUserId}/properties`);
+      } else {
+        router.push(`/properties/${propertyId}`);
+      }
     }
   };
 
@@ -224,6 +230,7 @@ const PropertyForm = (props: Props) => {
         await createMutation.mutateAsync({
           formData,
           accessToken: sessionData.accessToken,
+          userId: props.adminMode ? props.targetUserId : undefined,
         });
       }
       reset();

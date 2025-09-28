@@ -14,13 +14,16 @@ interface ISearchFilters {
 export const createProperty = async ({
   formData,
   accessToken,
+  userId,
 }: {
   formData: FormData;
   accessToken: string;
+  userId?: string;
 }) => {
   try {
+    const url = userId ? `/admin/properties?userId=${userId}` : "/properties";
     const response = await $requestWithToken.postFormData<IProperty>(
-      "/properties",
+      url,
       accessToken,
       formData
     );

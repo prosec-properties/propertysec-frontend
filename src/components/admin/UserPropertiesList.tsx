@@ -7,6 +7,8 @@ import { IMeta } from "@/interface/general";
 import PropertyCard from "@/components/property/PropertyCard";
 import { Stat, StatsWrapper } from "@/components/misc/Stat";
 import TabbedListingView from "@/components/misc/TabbedListingView";
+import CustomButton from "@/components/buttons/CustomButton";
+import { useRouter } from "next/navigation";
 
 interface Props {
   initialProperties: IProperty[];
@@ -16,12 +18,22 @@ interface Props {
 
 const UserPropertiesList = (props: Props) => {
   const { initialProperties, user, meta } = props;
+  const router = useRouter();
+
+  const handleCreateProperty = () => {
+    router.push(`/admin/users/${user.id}/properties/create`);
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold mb-2">Properties for {user.fullName}</h1>
-        <p className="text-gray-600">Role: {user.role}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">Properties for {user.fullName}</h1>
+          <p className="text-gray-600">Role: {user.role}</p>
+        </div>
+        <CustomButton onClick={handleCreateProperty}>
+          Create Property for User
+        </CustomButton>
       </div>
 
       <StatsWrapper className="bg-primary">
