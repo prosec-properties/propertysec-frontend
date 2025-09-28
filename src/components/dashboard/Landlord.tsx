@@ -12,7 +12,7 @@ const Landlord = (props: { properties: IProperty[] }) => {
   React.useEffect(() => {
     const currentStatus = getQueryParam("status");
     if (!currentStatus) {
-      setQueryParam("status", "draft");
+      setQueryParam("status", "all");
     }
   }, [getQueryParam, setQueryParam]);
 
@@ -20,7 +20,7 @@ const Landlord = (props: { properties: IProperty[] }) => {
     <TabbedListingView
       items={props.properties}
       title="My Listing"
-      tabs={["draft", "published", "rejected", "sold"]}
+      tabs={["all", "draft", "published", "rejected", "sold"]}
       tabDescription="View and manage all your property listings including draft, published, rejected, and sold properties."
       emptyStateMessage="You have no listing yet."
       renderItem={(property: IProperty, index: number) => (

@@ -17,7 +17,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const status = queries.status;
 
   const properties = await fetchAllProperties({
-    status,
+    status: status === "all" ? undefined : status,
   });
   if (!properties?.success) {
     return <ErrorDisplay message="Failed to fetch listings" />;

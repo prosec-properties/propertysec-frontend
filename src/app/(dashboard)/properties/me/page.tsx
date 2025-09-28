@@ -39,7 +39,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const user = session.user;
 
   const filterParams = {
-    status: queries?.status || "draft",
+    status: queries?.status === "all" ? undefined : queries?.status || "draft",
     search: queries?.search,
   };
 
