@@ -8,7 +8,6 @@ export interface IProperty {
   title: string;
   categoryId: string;
   type: IPropertyType;
-  purpose: IPropertyPurpose;
   bedrooms: number;
   bathrooms: number;
   toilets: number;
@@ -91,5 +90,3 @@ export interface IPropertyFileRecord {
   createdAt: string;
   updatedAt: string;
 }
-
-export type IPropertyPurpose = "sale" | "rent" | "shortlet";
