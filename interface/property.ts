@@ -8,6 +8,7 @@ export interface IProperty {
   title: string;
   categoryId: string;
   type: IPropertyType;
+  purpose: IPropertyPurpose;
   bedrooms: number;
   bathrooms: number;
   toilets: number;
@@ -29,7 +30,7 @@ export interface IProperty {
   category: ICategory;
   files: IPropertyFileRecord[];
 
-  inspections?: InspectionDetail[]
+  inspections?: InspectionDetail[];
 }
 
 export const PROPERTY_TYPE_ENUMS = [
@@ -90,3 +91,5 @@ export interface IPropertyFileRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export type IPropertyPurpose = "sale" | "rent" | "shortlet";

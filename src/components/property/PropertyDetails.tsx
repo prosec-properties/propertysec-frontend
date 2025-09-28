@@ -69,7 +69,7 @@ const PropertyDetails: React.FC<Props> = ({
           <div>
             <dt className="sr-only">Price</dt>
             <dd className="text-sm text-grey10 font-medium">
-              {formatPrice(property?.price)}
+              {formatPrice(property?.price)}/{property?.purpose === 'shortlet' ? 'day' : 'year'}
             </dd>
           </div>
         </dl>
@@ -144,7 +144,14 @@ const PropertyDetails: React.FC<Props> = ({
         <div>
           <dt className="sr-only">Price</dt>
           <dd className="text-sm text-grey10 font-medium">
-            {formatPrice(property?.price)}
+            {formatPrice(property?.price)}/{property?.purpose === 'shortlet' ? 'day' : 'year'}
+          </dd>
+        </div>
+
+        <div className="mb-4">
+          <dt className="sr-only">Property details</dt>
+          <dd className="text-sm text-gray-500">
+            Type: {property?.type} | Purpose: {property?.purpose} | Category: {property.category?.name} | Availability: {property?.availability}
           </dd>
         </div>
       </dl>

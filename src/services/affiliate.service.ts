@@ -33,21 +33,19 @@ export const addToAffiliateShop = async (token: string, propertyId: string) => {
   }
 };
 
-export const removeFromAffiliateShop = async (
-  token: string,
-  propertyId: string
-) => {
-  const payload = {
-    propertyId,
-  };
-
+export const fetchAffiliateStats = async (token: string) => {
   try {
-    const response = await $requestWithToken.post<IAffiliateShop>(
-      `/affiliate/remove-from-shop`,
-      token,
-      payload
-    );
-    return response;
+    const response = await $requestWithToken.get(`/affiliates/stats`, token);
+    return response?.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAffiliateTransactions = async (token: string) => {
+  try {
+    const response = await $requestWithToken.get(`/transactions?type=property_purchase`, token);
+    return response?.data || [];
   } catch (error) {
     throw error;
   }

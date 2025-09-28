@@ -61,13 +61,6 @@ const ProductCard = ({ product, className }: Props) => {
             {product.description}
           </p>
         )}
-
-        {/* {user?.role === "affiliate" && (
-          <div className="pt-2 font-medium text-sm">
-            <span className="text-success200">Commission:</span>{" "}
-            <span>{formatPrice(commission, 'NGN')}</span>
-          </div>
-        )} */}
       </div>
     </Link>
   );

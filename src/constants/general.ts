@@ -11,3 +11,8 @@ export enum LOANSTEPS_ENUM {
 
 export const MAX_IMAGE_SIZE_MB = 5;
 export const MAX_VIDEO_SIZE_MB = 10;
+
+export const AFFILIATE_COMMISSION_RATES = {
+  SALE: 0.02, // 2% for sale properties
+  RENT_SHORTLET: 0.05, // 5% for rent/shortlet properties
+} as const;

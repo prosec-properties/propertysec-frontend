@@ -17,7 +17,7 @@ export const DASHBOARD_PROFILE_ROUTE = "/dashboard/profile";
 export const DASHBOARD_MARKETPLACE_ROUTE = "/dashboard/marketplace";
 export const DASHBOARD_LOAN_ROUTE = "/loans";
 export const DASHBOARD_TAKE_LOAN_ROUTE = "/take-loan";
-export const DASHBOARD_SUBSCRIPTION_ROUTE = "/dashboard/subscription";
+export const DASHBOARD_AFFILIATE_ROUTE = "/affiliate";
 
 export const PROFILE_SETTING_ROUTE = "/profile-setting";
 export const PROFILE_ROUTE = "/profile";

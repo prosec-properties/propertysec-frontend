@@ -27,10 +27,6 @@ const DashboardHeader = ({ className }: { className?: string }) => {
     const filteredMenuData = getFilteredDashboardMenuItems(user?.role);
     const currentRoute = filteredMenuData.find((item) => item.url === pathname);
 
-    if (user?.role === "affiliate" && currentRoute?.name === "My Listing") {
-      return "My Shop";
-    }
-
     return currentRoute?.name || "Dashboard";
   };
 

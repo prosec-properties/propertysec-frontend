@@ -55,7 +55,8 @@ const PropertyCard = (props: Props) => {
             <dt className="sr-only">Price</dt>
 
             <dd className="text-sm ">
-              {formatPrice(props.property.price, props.property.currency)}
+              {formatPrice(props.property.price, props.property.currency)}/
+              {props.property.purpose === "shortlet" ? "day" : "year"}
             </dd>
           </div>
         </dl>
@@ -84,12 +85,6 @@ const PropertyCard = (props: Props) => {
             <p className="">{props.property.bedrooms} Beds</p>
           </div>
         </div>
-        {user?.role === "affiliate" && (
-          <div className=" font-medium text-sm">
-            <span className="text-success200">Commission:</span>{" "}
-            <span>20,000</span>
-          </div>
-        )}
       </div>
     </Link>
   );

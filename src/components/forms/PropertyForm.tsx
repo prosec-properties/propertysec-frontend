@@ -118,15 +118,17 @@ const PropertyForm = (props: Props) => {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     setValue,
     reset,
-  } = useForm({
+  } = useForm<z.infer<typeof PropertyFormSchema>>({
     resolver: zodResolver(PropertyFormSchema),
     defaultValues: {
       title: "",
       categoryId: "",
       type: "",
+      purpose: "sale",
       bedrooms: "",
       bathrooms: "",
       toilets: "",
@@ -146,6 +148,8 @@ const PropertyForm = (props: Props) => {
         ?.symbol ?? "₦"
     );
   };
+
+  const watchedPurpose = watch("purpose");
 
   const onSubmit: SubmitHandler<z.infer<typeof PropertyFormSchema>> = async (
     payload
@@ -280,6 +284,7 @@ const PropertyForm = (props: Props) => {
         title: props.property.title,
         categoryId: props.property.categoryId,
         type: props.property.type,
+        purpose: props.property.purpose || "sale",
         bedrooms: String(props.property.bedrooms),
         bathrooms: String(props.property.bathrooms),
         toilets: String(props.property.toilets),
@@ -378,6 +383,46 @@ const PropertyForm = (props: Props) => {
             )}
           />
         </article>
+        <article className="md:flex gap-6">
+          <Controller
+            name="purpose"
+            control={control}
+            render={({ field }) => (
+              <SelectInput
+                inputProps={{ ...field }}
+                name={field.name}
+                formLabel="Purpose"
+                placeholder="Select purpose"
+                value={field.value || ""}
+                options={[
+                  { label: "For Sale", value: "sale" },
+                  { label: "For Rent", value: "rent" },
+                  { label: "Shortlet", value: "shortlet" },
+                ]}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                }}
+                wrapperClassName="mb-6 w-full"
+                errorMessage={errors.purpose?.message}
+              />
+            )}
+          />
+        </article>
+        {watchedPurpose && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-sm text-blue-800">
+              {watchedPurpose === "sale" && (
+                <>For Sale: This property is available for purchase. The price will be displayed per year.</>
+              )}
+              {watchedPurpose === "rent" && (
+                <>For Rent: This property is available for long-term rental. The price will be displayed per year.</>
+              )}
+              {watchedPurpose === "shortlet" && (
+                <>Shortlet: This property is available for short-term rental (typically daily). The price will be displayed per day.</>
+              )}
+            </p>
+          </div>
+        )}
         <article className="md:flex gap-6">
           <Controller
             name="bedrooms"

@@ -5,6 +5,9 @@ export const PropertyFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
   categoryId: z.string().min(1, "Please select the category of the property."),
   type: z.string().min(1, "Please select the type of property."),
+  purpose: z.enum(['sale', 'rent', 'shortlet'], {
+    required_error: "Please select the purpose of the property.",
+  }),
   bedrooms: z.string().min(1, "Please enter the number of bedrooms."),
   bathrooms: z.string().min(1, "Please enter the number of bathrooms."),
   toilets: z.string().min(1, "Please enter the number of toilets."),
