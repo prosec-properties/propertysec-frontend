@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState } from "react";
 import BathIcon from "../icons/Bath";
 import BedIcon from "../icons/Bed";
 import ToiletIcon from "../icons/Toilet";
@@ -19,9 +17,8 @@ import { formatPrice } from "@/lib/payment";
 import { fetchPropertyPurchases } from "@/services/admin.service";
 import CustomButton from "../buttons/CustomButton";
 import { showToaster } from "@/lib/general";
-import { generateInvoicePdfName, downloadPdf } from "@/lib/files";
 import { useQuery } from "@tanstack/react-query";
-import { usePDF } from "react-to-pdf";
+import ReceiptDownloader, { ReceiptDownloaderRef } from "./ReceiptDownloader";
 
 interface Props {
   property: IProperty;
@@ -35,14 +32,10 @@ const PropertyDetails: React.FC<Props> = ({
   role,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [receiptData, setReceiptData] = useState<any>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement | null>(null);
+  const receiptDownloaderRef = useRef<ReceiptDownloaderRef>(null);
   const { user, token } = useUser();
-
-  const { toPDF, targetRef } = usePDF({
-    filename: `property-receipt-${receiptData?.transactionReference || 'unknown'}.pdf`
-  });
 
   const canViewPurchases =
     user?.id === property.userId ||
@@ -56,49 +49,6 @@ const PropertyDetails: React.FC<Props> = ({
   });
 
   const purchases = purchasesData?.data?.purchases || [];
-
-  const handleDownloadReceipt = async (transactionReference: string) => {
-    try {
-      // Find the purchase data for this transaction
-      const purchase = purchases.find(p => p.transactionReference === transactionReference);
-      if (!purchase) {
-        showToaster("Purchase data not found", "destructive");
-        return;
-      }
-
-      // Set receipt data to trigger PDF generation
-      setReceiptData(purchase);
-
-      // Small delay to ensure state update
-      setTimeout(async () => {
-        try {
-          const pdf = await toPDF();
-          if (pdf) {
-            // Convert blob to base64
-            const reader = new FileReader();
-            reader.onload = () => {
-              const base64 = reader.result as string;
-              downloadPdf({
-                fileName: `property-receipt-${transactionReference}`,
-                url: base64
-              });
-              setReceiptData(null);
-              showToaster("Receipt downloaded successfully", "default");
-            };
-            reader.readAsDataURL(pdf);
-          }
-        } catch (error) {
-          console.error("Error generating PDF:", error);
-          showToaster("Failed to generate receipt", "destructive");
-          setReceiptData(null);
-        }
-      }, 100);
-    } catch (error) {
-      console.error("Error downloading receipt:", error);
-      showToaster("Failed to download receipt", "destructive");
-      setReceiptData(null);
-    }
-  };
 
   const handleDotClick = (index: number) => {
     setCurrentIndex(index);
@@ -353,7 +303,7 @@ const PropertyDetails: React.FC<Props> = ({
                   <CustomButton
                     variant="outline"
                     onClick={() =>
-                      handleDownloadReceipt(purchase.transactionReference)
+                      receiptDownloaderRef.current?.downloadReceipt(purchase.transactionReference)
                     }
                     className="text-xs"
                   >
@@ -375,98 +325,11 @@ const PropertyDetails: React.FC<Props> = ({
 
       {roleButtons[user?.role as IUserRole]}
 
-      {/* Hidden Receipt Component for PDF Generation */}
-      {receiptData && (
-        <div
-          ref={targetRef}
-          className="fixed top-0 left-0 w-full h-full bg-white p-8 text-black"
-          style={{
-            position: 'absolute',
-            left: '-9999px',
-            top: '-9999px',
-            width: '210mm',
-            minHeight: '297mm',
-            fontSize: '12px'
-          }}
-        >
-          <div className="max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">PropertySec</h1>
-              <p className="text-gray-600">Property Purchase Receipt</p>
-            </div>
-
-            {/* Receipt Details */}
-            <div className="border border-gray-300 rounded-lg p-6 mb-6">
-              <div className="grid grid-cols-2 gap-6 mb-6">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Transaction Details</h3>
-                  <div className="space-y-1 text-sm">
-                    <p><span className="font-medium">Transaction Reference:</span> {receiptData.transactionReference}</p>
-                    <p><span className="font-medium">Purchase Date:</span> {new Date(receiptData.createdAt).toLocaleDateString()}</p>
-                    <p><span className="font-medium">Status:</span> {receiptData.purchaseStatus}</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Amount</h3>
-                  <div className="text-2xl font-bold text-green-600">
-                    {formatPrice(receiptData.purchaseAmount)} {receiptData.currency}
-                  </div>
-                </div>
-              </div>
-
-              {/* Property Details */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Property Details</h3>
-                <div className="bg-gray-50 p-4 rounded">
-                  <p className="font-medium text-lg mb-1">{property.title}</p>
-                  <p className="text-gray-600 mb-2">{property.address}</p>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <p><span className="font-medium">Type:</span> {property.type}</p>
-                    <p><span className="font-medium">Category:</span> {property.category?.name}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Buyer Details */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Buyer Information</h3>
-                <div className="bg-gray-50 p-4 rounded">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <p><span className="font-medium">Name:</span> {receiptData.buyerName}</p>
-                    <p><span className="font-medium">Email:</span> {receiptData.buyerEmail}</p>
-                    {receiptData.buyerPhone && (
-                      <p><span className="font-medium">Phone:</span> {receiptData.buyerPhone}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Seller Details */}
-              {property.user && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">Seller Information</h3>
-                  <div className="bg-gray-50 p-4 rounded">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <p><span className="font-medium">Name:</span> {property.user.fullName}</p>
-                      <p><span className="font-medium">Email:</span> {property.user.email}</p>
-                      {property.user.phoneNumber && (
-                        <p><span className="font-medium">Phone:</span> {property.user.phoneNumber}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="text-center text-sm text-gray-500">
-              <p>Thank you for using PropertySec!</p>
-              <p className="mt-2">Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReceiptDownloader
+        ref={receiptDownloaderRef}
+        property={property}
+        purchases={purchases}
+      />
     </div>
   );
 };
