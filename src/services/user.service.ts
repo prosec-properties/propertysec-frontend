@@ -52,3 +52,24 @@ export const fetchUserById = async (id: string) => {
     throw error;
   }
 };
+
+export const adminUpdateUser = async ({
+  userId,
+  token,
+  formData,
+}: {
+  userId: string;
+  token: string;
+  formData: FormData;
+}) => {
+  try {
+    const response = await $requestWithToken.putFormData(
+      `/users/admin/${userId}`,
+      token,
+      formData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

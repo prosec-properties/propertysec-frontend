@@ -8,12 +8,15 @@ export const adminGuard = async () => {
   const session = await getServerSession(authConfig);
   const user = session?.user;
   const isAdmin = user?.role === USER_ROLE.ADMIN;
-  if (!session || !isAdmin) {
+  const isImpersonating = !!(session as any)?.impersonating;
+  
+  if (!session || (!isAdmin && !isImpersonating)) {
     redirect(SIGN_IN_ROUTE);
   }
 
   return {
     user,
     token: session?.accessToken,
+    impersonating: (session as any)?.impersonating,
   };
 };

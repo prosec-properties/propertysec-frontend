@@ -3,10 +3,12 @@
 import { IUser } from "@/interface/user";
 import React, { useState } from "react";
 import UserBanner from "./UserBanner";
+import { useSession } from "next-auth/react";
 import UploadedDoc from "../files/UploadedDoc";
 import { IProfileFileCategory, IProfileFileInterface } from "@/interface/file";
 import { useUser } from "@/hooks/useUser";
 import { USER_ROLE } from "@/constants/user";
+import AdminEditUserForm from "../forms/AdminEditUserForm";
 import { deleteAccount } from "@/services/admin.service";
 import CustomModal from "../modal/CustomModal";
 import { showToaster } from "@/lib/general";
@@ -50,8 +52,10 @@ const ADMIN_ONLY_FIELDS = [
 
 const ProfileWrapper = ({ user }: Props) => {
   const { user: appUser, token } = useUser();
-  const isAdmin = appUser?.role === USER_ROLE.ADMIN;
+  const { data: session } = useSession();
+  const isAdmin = appUser?.role === USER_ROLE.ADMIN && !(session as any)?.impersonating;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     personal: true,
@@ -107,6 +111,7 @@ const ProfileWrapper = ({ user }: Props) => {
           user={user}
           isAdmin={isAdmin}
           setShowDeleteModal={setShowDeleteModal}
+          onEditClick={() => setShowEditModal(true)}
         />
       </div>
 
@@ -139,6 +144,25 @@ const ProfileWrapper = ({ user }: Props) => {
             </Button>
           </div>
         </div>
+      </CustomModal>
+
+      {/* Edit User Modal */}
+      <CustomModal
+        isShown={showEditModal}
+        setIsShown={setShowEditModal}
+        contentClass="max-w-2xl"
+        title={`Edit ${user.fullName}'s Profile`}
+      >
+        <AdminEditUserForm
+          user={user}
+          token={token || ""}
+          onSuccess={() => {
+            setShowEditModal(false);
+            // Refresh the page to show updated data
+            window.location.reload();
+          }}
+          onCancel={() => setShowEditModal(false)}
+        />
       </CustomModal>
 
       {/* Main Content Grid */}

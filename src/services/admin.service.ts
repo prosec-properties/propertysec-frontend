@@ -149,3 +149,16 @@ export const disburseLoan = async (token: string, loanId: string) => {
     throw error;
   }
 };
+
+export const impersonateUser = async (token: string, userId: string) => {
+  try {
+    const response = await $requestWithToken.post(
+      `/admin/impersonate/${userId}`,
+      token,
+      {}
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
