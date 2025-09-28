@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Stat, StatsWrapper } from "../misc/Stat";
 import CustomButton from "../buttons/CustomButton";
 import RegisterUserModal from "./RegisterUserModal";
+import { Eye } from "lucide-react";
 
 interface Props {
   initialUsers?: IUser[];
@@ -90,6 +91,27 @@ const UsersList = (props: Props) => {
             >
               {subscriptionStatus(user.subscriptionStatus!)}
             </p>
+          ),
+          actions: (
+            <div className="flex gap-2">
+              <CustomButton
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (user.role === 'affiliate') {
+                    router.push(`/admin/affiliates/${user.id}/properties`);
+                  } else if (user.role === 'buyer') {
+                    router.push(`/admin/buyers/${user.id}/properties`);
+                  } else {
+                    router.push(`/admin/users/${user.id}/properties`);
+                  }
+                }}
+                className="flex items-center gap-1"
+              >
+                <Eye size={14} />
+                View Properties
+              </CustomButton>
+            </div>
           ),
         }))}
         hiddenColumns={["profileFiles", "id"]}
