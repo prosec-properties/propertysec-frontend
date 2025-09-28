@@ -172,7 +172,7 @@ interface IUserPropertiesResponse {
 export const fetchUserProperties = async (
   token: string,
   userId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string }
+  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string; status?: string }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -188,6 +188,10 @@ export const fetchUserProperties = async (
     }
     if (searchParams?.order) {
       params.append("order", searchParams.order);
+    }
+
+    if (searchParams?.status) {
+      params.append("status", searchParams.status);
     }
 
     const url = `/admin/users/${userId}/properties${params.toString() ? `?${params.toString()}` : ""}`;

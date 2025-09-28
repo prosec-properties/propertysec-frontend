@@ -14,14 +14,24 @@ interface Props {
   initialProperties: IProperty[];
   user: IUser;
   meta?: IMeta;
+  initialStatus?: string;
 }
 
 const UserPropertiesList = (props: Props) => {
-  const { initialProperties, user, meta } = props;
+  const { initialProperties, user, meta, initialStatus } = props;
   const router = useRouter();
 
   const handleCreateProperty = () => {
     router.push(`/admin/users/${user.id}/properties/create`);
+  };
+
+  const tabs = ["all", "draft", "published", "rejected", "sold"];
+  const tabLabels = {
+    all: "All",
+    draft: "Draft", 
+    published: "Published",
+    rejected: "Rejected",
+    sold: "Sold"
   };
 
   return (
@@ -53,9 +63,9 @@ const UserPropertiesList = (props: Props) => {
         items={initialProperties}
         title="User Properties"
         titleStyle="solid"
-        tabs={["all"]}
+        tabs={tabs}
         tabDescription={`Properties listed by ${user.fullName}`}
-        emptyStateMessage="This user has no properties yet."
+        emptyStateMessage={`This user has no ${initialStatus && initialStatus !== "all" ? tabLabels[initialStatus as keyof typeof tabLabels].toLowerCase() + " " : ""}properties yet.`}
         renderItem={(property: IProperty, index: number) => (
           <PropertyCard key={index} property={property} />
         )}

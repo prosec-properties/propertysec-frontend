@@ -22,11 +22,14 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const queries = await searchParams;
   const { user, token } = await adminGuard();
 
+  const status = queries.status as string | undefined;
+
   const properties = await fetchUserProperties(token || "", userId, {
     page: queries.page ? parseInt(queries.page) : 1,
     per_page: queries.per_page ? parseInt(queries.per_page) : 20,
     sort_by: queries.sort_by,
     order: queries.order,
+    status: status,
   });
 
   if (!properties?.success) {
@@ -39,6 +42,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
         initialProperties={properties?.data?.properties}
         user={properties?.data?.user}
         meta={properties?.data?.meta}
+        initialStatus={status}
       />
     </div>
   );

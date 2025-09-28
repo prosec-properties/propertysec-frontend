@@ -655,11 +655,10 @@ const PropertyForm = (props: Props) => {
             Add at least one photo of your property here
           </span>
           <span className="mb-2 font-medium text-grey6 text-sm block">
-            Each file must not exceed 5MB for images and 10MB for videos.
+            Each file must not exceed 20MB.
           </span>
           <span className="mb-6 font-medium text-grey6 text-sm block">
-            Supported formats are JPEG and PNG for images and mp4, webm, ogg for
-            videos.
+            Supported formats: PNG, JPG, JPEG, GIF, SVG, WEBP, BMP, TIFF, ICO for images and MP4, WEBP, MOV for videos.
           </span>
           <NewImagePreview
             existingImages={existingImages}
