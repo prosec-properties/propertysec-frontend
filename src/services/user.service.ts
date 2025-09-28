@@ -73,3 +73,51 @@ export const adminUpdateUser = async ({
     throw error;
   }
 };
+
+interface IPurchasedPropertiesResponse {
+  purchases: any[];
+  meta: any;
+}
+
+export const fetchMyPurchasedProperties = async (
+  token: string,
+  params?: Record<string, string>
+) => {
+  try {
+    const urlParams = new URLSearchParams(params);
+    const url = `/users/me/purchased-properties${
+      urlParams.toString() ? `?${urlParams.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<IPurchasedPropertiesResponse>(
+      url,
+      token
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+interface IInspectedPropertiesResponse {
+  inspections: any[];
+  meta: any;
+}
+
+export const fetchMyInspectedProperties = async (
+  token: string,
+  params?: Record<string, string>
+) => {
+  try {
+    const urlParams = new URLSearchParams(params);
+    const url = `/users/me/inspected-properties${
+      urlParams.toString() ? `?${urlParams.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<IInspectedPropertiesResponse>(
+      url,
+      token
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

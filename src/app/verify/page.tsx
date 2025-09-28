@@ -10,8 +10,9 @@ import { verifyTransactionApi } from "@/services/payment.service";
 import {
   DASHBOARD_LOAN_ROUTE,
   DASHBOARD_ROUTE,
-  PROPERTIES_ROUTE,
-  SUBSCRIPRION_ROUTE,
+  MY_INSPECTIONS_ROUTE,
+  MY_PURCHASES_ROUTE,
+  SUBSCRIPTION_ROUTE,
 } from "@/constants/routes";
 
 export default function VerifyTransactionPage() {
@@ -36,14 +37,12 @@ export default function VerifyTransactionPage() {
 
       switch (transactionType) {
         case "subscription":
-          router.push(SUBSCRIPRION_ROUTE);
+          router.push(SUBSCRIPTION_ROUTE);
           break;
         case "inspection":
-          console.log("inspection verified, redirecting to properties");
-          router.push(PROPERTIES_ROUTE);
-          break;
+          router.push(MY_INSPECTIONS_ROUTE);
         case "property_purchase":
-          router.push(PROPERTIES_ROUTE);
+          router.push(MY_PURCHASES_ROUTE);
           break;
         case "loan_repayment":
           router.push(DASHBOARD_LOAN_ROUTE);

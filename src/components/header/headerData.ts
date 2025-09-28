@@ -6,8 +6,10 @@ import {
   DASHBOARD_TAKE_LOAN_ROUTE,
   HOME_ROUTE,
   MY_LISTING_ROUTE,
+  MY_PURCHASES_ROUTE,
+  MY_INSPECTIONS_ROUTE,
   PROPERTIES_ROUTE,
-  SUBSCRIPRION_ROUTE,
+  SUBSCRIPTION_ROUTE,
 } from "@/constants/routes";
 import { USER_ROLE } from "@/constants/user";
 import {
@@ -19,7 +21,7 @@ import MarketPlaceIcon from "../icons/MarketPlace";
 import ListingIcon from "../icons/Listing";
 import SubscriptionIcon from "../icons/Subscription";
 import LoanIcon from "../icons/Loan";
-import { DollarSign } from "lucide-react";
+import { DollarSign, Receipt } from "lucide-react";
 import { IUserRole } from "@/interface/user";
 
 export interface MenuItemData {
@@ -73,7 +75,7 @@ export const DashboardHeaderData: MenuItemData[] = [
   },
   {
     name: "Subscription",
-    url: SUBSCRIPRION_ROUTE,
+    url: SUBSCRIPTION_ROUTE,
     icon: SubscriptionIcon,
     allowedRoles: [USER_ROLE.LANDLORD, USER_ROLE.DEVELOPER, USER_ROLE.LAWYER],
   },
@@ -86,6 +88,18 @@ export const DashboardHeaderData: MenuItemData[] = [
     name: "Loan to Rent",
     url: DASHBOARD_TAKE_LOAN_ROUTE,
     icon: LoanIcon,
+  },
+  {
+    name: "My Purchases",
+    url: MY_PURCHASES_ROUTE,
+    icon: DollarSign,
+    allowedRoles: [USER_ROLE.BUYER],
+  },
+  {
+    name: "My Inspections",
+    url: MY_INSPECTIONS_ROUTE,
+    icon: ListingIcon,
+    allowedRoles: [USER_ROLE.BUYER],
   },
 ];
 

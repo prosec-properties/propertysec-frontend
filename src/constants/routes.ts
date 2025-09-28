@@ -22,7 +22,7 @@ export const DASHBOARD_AFFILIATE_ROUTE = "/affiliate";
 export const PROFILE_SETTING_ROUTE = "/profile-setting";
 export const PROFILE_ROUTE = "/profile";
 
-export const SUBSCRIPRION_ROUTE = "/subscriptions";
+export const SUBSCRIPTION_ROUTE = "/subscriptions";
 
 export const PROPERTIES_ROUTE = "/properties";
 export const UPLOAD_PROPERTY_ROUTE = "/properties/upload";
@@ -43,5 +43,8 @@ export const ADMIN_USERS_ROUTE = "/admin/users";
 export const ADMIN_LOANS_ROUTE = "/admin/loans";
 export const ADMIN_LOAN_DETAIL_ROUTE = "/admin/loans";
 export const ADMIN_FRONT_PAGE_ROUTE = "/admin/front-page";
-export const ADMIN_INSPECTION_PAYMENTS_ROUTE = "/admin/inspections";
+export const MY_PURCHASES_ROUTE = "/my-purchases";
+export const MY_INSPECTIONS_ROUTE = "/my-inspections";
+
 export const ADMIN_SUBSCRIPTION_ROUTE = "/admin/subscriptions";
+export const ADMIN_INSPECTION_PAYMENTS_ROUTE = "/admin/inspection-payments";
