@@ -324,3 +324,40 @@ export const fetchBuyerPurchasedProperties = async (
     throw error;
   }
 };
+
+interface IPropertyPurchasesResponse {
+  purchases: any[];
+  meta?: IMeta;
+}
+
+export const fetchPropertyPurchases = async (
+  token: string,
+  propertyId: string,
+  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string; status?: string }
+) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (searchParams?.page) {
+      params.append("page", searchParams.page.toString());
+    }
+    if (searchParams?.per_page) {
+      params.append("per_page", searchParams.per_page.toString());
+    }
+    if (searchParams?.sort_by) {
+      params.append("sort_by", searchParams.sort_by);
+    }
+    if (searchParams?.order) {
+      params.append("order", searchParams.order);
+    }
+    if (searchParams?.status) {
+      params.append("status", searchParams.status);
+    }
+
+    const url = `/admin/properties/${propertyId}/purchases${params.toString() ? `?${params.toString()}` : ""}`;
+    const response = await $requestWithToken.get<IPropertyPurchasesResponse>(url, token);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};

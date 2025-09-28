@@ -6,7 +6,6 @@ import { fetchMyProperties } from "@/services/properties.service";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
-import { fetchAffiliateShop } from "@/services/affiliate.service";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import Landlord from "@/components/dashboard/Landlord";
 import MultipleProperties from "@/components/property/MultipleProperties";
@@ -62,15 +61,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     return <Landlord properties={properties?.data?.data || []} />;
   }
   if (user.role === USER_ROLE.AFFILIATE) {
-    const affiliateShop = await fetchAffiliateShop(user.token || "");
-
-    if (!affiliateShop?.success) {
-      return (
-        <ErrorDisplay message="Unable to fetch your properties. Please try again later." />
-      );
-    }
-
-    return <AffiliateDashboard properties={affiliateShop.data?.properties || []} />;
+    return <AffiliateDashboard />;
   }
 }
 
