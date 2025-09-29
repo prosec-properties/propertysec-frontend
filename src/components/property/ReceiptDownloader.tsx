@@ -25,13 +25,9 @@ const ReceiptDownloader = forwardRef<
   ReceiptDownloaderProps
 >(({ property, purchases }, ref) => {
   const [receiptData, setReceiptData] = useState<any>(null);
-  const targetRef = useRef<HTMLDivElement>(null);
+  // const targetRef = useRef<HTMLDivElement>(null);
 
-  const { toPDF } = usePDF({
-    filename: `property-receipt-${
-      receiptData?.transactionReference || "unknown"
-    }.pdf`,
-  });
+  const { toPDF, targetRef } = usePDF();
 
   const handleDownloadReceipt = async (transactionReference: string) => {
     try {
@@ -44,18 +40,26 @@ const ReceiptDownloader = forwardRef<
       }
 
       setReceiptData(purchase);
+      toPDF({
+        filename: `property-receipt-${
+          purchase.transactionReference || "unknown"
+        }.pdf`,
+      });
 
-      setTimeout(async () => {
-        try {
-          await toPDF();
-          setReceiptData(null);
-          showToaster("Receipt downloaded successfully", "default");
-        } catch (error) {
-          console.error("Error generating PDF:", error);
-          showToaster("Failed to generate receipt", "destructive");
-          setReceiptData(null);
-        }
-      }, 100);
+      // setTimeout(async () => {
+      //   try {
+      //     // toPDF({
+      //     //   filename: `property-receipt-${
+      //     //     purchase.transactionReference || "unknown"
+      //     //   }.pdf`,
+      //     // });
+      //     showToaster("Receipt downloaded successfully", "default");
+      //   } catch (error) {
+      //     console.error("Error generating PDF:", error);
+      //     showToaster("Failed to generate receipt", "destructive");
+      //     setReceiptData(null);
+      //   }
+      // }, 100);
     } catch (error) {
       console.error("Error downloading receipt:", error);
       showToaster("Failed to download receipt", "destructive");

@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/payment";
 import { useUser } from "@/hooks/useUser";
 import CustomButton from "../buttons/CustomButton";
-import PurchaseReceiptDownloader, { PurchaseReceiptDownloaderRef } from "./PurchaseReceiptDownloader";
+import ReceiptDownloader, { ReceiptDownloaderRef } from "./ReceiptDownloader";
 
 interface Purchase {
   id: string;
@@ -41,12 +41,15 @@ interface Props {
 
 const PurchaseCard = ({ purchase }: Props) => {
   const { user } = useUser();
-  const receiptDownloaderRef = useRef<PurchaseReceiptDownloaderRef>(null);
+  const receiptDownloaderRef = useRef<ReceiptDownloaderRef>(null);
 
-  console.log("Purchase property:", purchase.property);
+  
 
-  const handleDownloadReceipt = async () => {
-    await receiptDownloaderRef.current?.downloadReceipt();
+  const handleDownloadReceipt = () => {
+    console.log("receiptDownloaderRef.current", receiptDownloaderRef.current);
+    receiptDownloaderRef.current?.downloadReceipt(
+      purchase.transactionReference
+    );
   };
 
   const getStatusColor = (status: string) => {
@@ -142,9 +145,10 @@ const PurchaseCard = ({ purchase }: Props) => {
         </div>
       </div>
 
-      <PurchaseReceiptDownloader
+      <ReceiptDownloader
         ref={receiptDownloaderRef}
-        purchase={purchase}
+        property={purchase.property}
+        purchases={[purchase]}
       />
     </div>
   );

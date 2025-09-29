@@ -16,7 +16,6 @@ import GuestButtons from "./GuestButtons";
 import { formatPrice } from "@/lib/payment";
 import { fetchPropertyPurchases } from "@/services/admin.service";
 import CustomButton from "../buttons/CustomButton";
-import { showToaster } from "@/lib/general";
 import { useQuery } from "@tanstack/react-query";
 import ReceiptDownloader, { ReceiptDownloaderRef } from "./ReceiptDownloader";
 
@@ -31,9 +30,9 @@ const PropertyDetails: React.FC<Props> = ({
   isInAffiliateShop,
   role,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const receiptRef = useRef<HTMLDivElement>(null);
-  const ref = useRef<HTMLDivElement | null>(null);
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const receiptRef = useRef<HTMLDivElement>(null);
+  // const ref = useRef<HTMLDivElement | null>(null);
   const receiptDownloaderRef = useRef<ReceiptDownloaderRef>(null);
   const { user, token } = useUser();
 
@@ -50,10 +49,10 @@ const PropertyDetails: React.FC<Props> = ({
 
   const purchases = purchasesData?.data?.purchases || [];
 
-  const handleDotClick = (index: number) => {
-    setCurrentIndex(index);
-    ref.current?.children[index]?.scrollIntoView({ behavior: "smooth" });
-  };
+  // const handleDotClick = (index: number) => {
+  //   setCurrentIndex(index);
+  //   ref.current?.children[index]?.scrollIntoView({ behavior: "smooth" });
+  // };
 
   const sellerRoles = [
     USER_ROLE.LANDLORD,
