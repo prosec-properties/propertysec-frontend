@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React from "react";
 import { MainSideMenuData } from "./MainSideMenuData";
 import Link from "next/link";

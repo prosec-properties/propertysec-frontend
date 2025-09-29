@@ -40,7 +40,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const user = session.user;
 
   try {
-    const inspections = await fetchMyInspectedProperties(user.token!, {
+    const inspections = await fetchMyInspectedProperties(user?.token!, {
       page: queries?.page || "1",
       per_page: queries?.per_page || "20",
       sort_by: queries?.sort_by || "created_at",

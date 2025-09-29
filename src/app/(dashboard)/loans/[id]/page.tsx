@@ -17,7 +17,7 @@ async function Page({ params }: PageProps) {
   const { id } = await params;
   const session = await getServerSession(authConfig);
 
-  if (!session || !session.user || !session.user.token) {
+  if (!session || !session.user || !session.user?.token) {
     redirect("/");
   }
 

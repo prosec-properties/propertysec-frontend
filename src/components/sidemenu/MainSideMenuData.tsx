@@ -1,4 +1,4 @@
-import { DASHBOARD_LISTING_ROUTE, DASHBOARD_LOAN_ROUTE, DASHBOARD_MARKETPLACE_ROUTE, DASHBOARD_PROFILE_ROUTE, DASHBOARD_SUBSCRIPTION_ROUTE } from "@/constants/routes";
+import { DASHBOARD_LISTING_ROUTE, DASHBOARD_LOAN_ROUTE, DASHBOARD_MARKETPLACE_ROUTE, DASHBOARD_PROFILE_ROUTE, SUBSCRIPTION_ROUTE } from "@/constants/routes";
 import ListingIcon from "../icons/Listing";
 import LoanIcon from "../icons/Loan";
 import MarketPlaceIcon from "../icons/MarketPlace";
@@ -24,7 +24,7 @@ export const MainSideMenuData = [
   {
     title: "Subscription",
     icon: <SubscriptIcon />,
-    href: DASHBOARD_SUBSCRIPTION_ROUTE,
+    href: SUBSCRIPTION_ROUTE,
   },
   {
     title: "Profile",

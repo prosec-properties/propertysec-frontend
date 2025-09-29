@@ -18,11 +18,11 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   const session = await getServerSession(authConfig);
 
-  if (!session || !session?.user || !session.user.token) {
+  if (!session || !session?.user || !session.user?.token) {
     redirect(SIGN_IN_ROUTE);
   }
 
-  const subscriptions = await fetchSubscriptions(session.user.token, {
+  const subscriptions = await fetchSubscriptions(session.user?.token, {
     search: queries.search,
     page: queries.page ? parseInt(queries.page) : 1,
     limit: queries.limit ? parseInt(queries.limit) : 10,

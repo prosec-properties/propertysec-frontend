@@ -13,7 +13,7 @@ export const getAuthUserToken = async () => {
       throw new Error("Unauthorized");
     }
     const user = session.user!;
-    return user.token || "";
+    return user?.token || "";
   } catch (error) {
     throw error;
   }

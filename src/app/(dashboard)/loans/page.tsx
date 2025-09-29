@@ -42,10 +42,10 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const searchParams = await props.searchParams;
   const session = await getServerSession(authConfig);
 
-  if (!session || !session.user || !session.user.token) {
+  if (!session || !session.user || !session.user?.token) {
     redirect("/");
   }
-  const response = await getUserLoans(session.user.token);
+  const response = await getUserLoans(session.user?.token);
   // console.log("Loan data:", response?.data?.loans);
 
   return <LoanWrapper loanData={response?.data || defaultLoanData} />;

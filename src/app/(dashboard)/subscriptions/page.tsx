@@ -22,13 +22,13 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const activeTab = searchParams?.tab || "1";
   const session = await getServerSession(authConfig);
 
-  if (!session || !session.user || !session.user.token) {
+  if (!session || !session.user || !session.user?.token) {
     redirect("/");
   }
 
   const subscriptionPlans = await $requestWithToken.get<Plan[]>(
     `/plans?duration=${activeTab}`,
-    session.user.token
+    session.user?.token
   );
 
   console.log("subscriptionPlans", subscriptionPlans);
@@ -46,7 +46,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
       <SubscriptionCard
         plans={subscriptionPlans?.data as Plan[]}
         activeTab={activeTab}
-        token={session.user.token}
+        token={session.user?.token}
       />
     </div>
   );

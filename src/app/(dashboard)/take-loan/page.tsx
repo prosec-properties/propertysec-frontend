@@ -20,7 +20,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const activeTab = searchParams?.tab || "1";
   const session = await getServerSession(authConfig);
 
-  if (!session || !session.user || !session.user.token) {
+  if (!session || !session.user || !session.user?.token) {
     redirect("/");
   }
 
@@ -28,7 +28,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
 
   return (
     <LoanFormWrapper
-      token={session.user.token}
+      token={session.user?.token}
       countries={countries?.data ? [countries?.data] : []}
     />
   );

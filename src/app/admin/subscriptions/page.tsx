@@ -16,7 +16,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   const { user } = await adminGuard();
 
-  const subscriptions = await fetchAllSubscriptions(user.token || "", {
+  const subscriptions = await fetchAllSubscriptions(user?.token || "", {
     search: queries.search,
     page: queries.page ? parseInt(queries.page) : 1,
     limit: queries.limit ? parseInt(queries.limit) : 50,

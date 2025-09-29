@@ -43,7 +43,7 @@ const LoanDetailWrapper = ({ loanId }: Props) => {
       
       try {
         setLoading(true);
-        const response = await getLoanById(loanId, session.user.token);
+        const response = await getLoanById(loanId, session.user?.token);
         if (response?.success && response.data) {
           setLoan(response.data);
         } else {

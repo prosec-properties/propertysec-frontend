@@ -15,7 +15,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   const { user } = await adminGuard();
 
-  const users = await fetchAllUsers(user.token || "", {
+  const users = await fetchAllUsers(user?.token || "", {
     search: queries.search,
     page: queries.page ? parseInt(queries.page) : 1,
     per_page: queries.per_page ? parseInt(queries.per_page) : 50,

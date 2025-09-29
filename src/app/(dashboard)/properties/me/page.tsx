@@ -49,7 +49,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     user.role === USER_ROLE.LAWYER
   ) {
     const [properties] = await Promise.all([
-      fetchMyProperties(session.user.token, filterParams),
+      fetchMyProperties(session.user?.token, filterParams),
     ]);
 
     if (!properties?.success) {

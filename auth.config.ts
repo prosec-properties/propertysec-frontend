@@ -43,7 +43,7 @@ export const authConfig: NextAuthOptions = {
         const futureMillis = currentMillis + expiresAtMillis;
         const futureSeconds = Math.floor(futureMillis / 1000);
 
-        token.accessToken = user.token;
+        token.accessToken = user?.token;
         token.expiresAt = futureSeconds;
         token.user = user;
         token.expiresAtString = user.expiresAt;

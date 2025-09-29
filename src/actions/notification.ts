@@ -15,7 +15,7 @@ export const getUserSettings = async () => {
 
     const user = session.user!;
 
-    const response = await $requestWithToken.get(`/settings`, user.token || "");
+    const response = await $requestWithToken.get(`/settings`, user?.token || "");
 
     return cleanServerData(response);
   } catch (error) {
@@ -32,7 +32,7 @@ export const updateUserSettings = async (data: any) => {
     const user = session.user!;
     const response = await $requestWithToken.patch(
       `/settings`,
-      user.token || "",
+      user?.token || "",
       data
     );
     return cleanServerData(response);
