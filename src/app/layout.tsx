@@ -8,6 +8,7 @@ import { authConfig } from "@/authConfig";
 import React from "react";
 import Script from "next/script";
 import { TanstackProviders } from "@/components/misc/TanstackProvider";
+import ErrorBoundary from "@/components/misc/ErrorBoundary";
 
 const niramit = Niramit({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -27,9 +28,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={niramit.className}>
-        <NextAuthProvider session={session as any}>
-          <TanstackProviders>{children}</TanstackProviders>
-        </NextAuthProvider>
+        <ErrorBoundary>
+          <NextAuthProvider session={session as any}>
+            <TanstackProviders>{children}</TanstackProviders>
+          </NextAuthProvider>
+        </ErrorBoundary>
         <Toaster />
       </body>
       <Script src={"https://js.paystack.co/v2/inline.js"}></Script>

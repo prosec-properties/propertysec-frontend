@@ -16,33 +16,43 @@ export function getApiUrl(path: string): string {
 class BaseRequest {
   protected async fetchRequest(
     path: string,
-    options: RequestInit
+    options: RequestInit,
+    retries: number = 2
   ): Promise<Response> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const response = await fetch(getApiUrl(path), {
-        ...options,
-        signal: controller.signal,
-      });
+        const response = await fetch(getApiUrl(path), {
+          ...options,
+          signal: controller.signal,
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw errorData;
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (response.status >= 500 || attempt === retries) {
+            throw errorData;
+          }
+          // Retry on client errors like 401, but not on 500+
+          continue;
+        }
+        return response;
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          if (attempt === retries) throw new Error("Request timed out");
+          continue;
+        }
+        if (error.code === "UND_ERR_HEADERS_TIMEOUT") {
+          if (attempt === retries) throw new Error("Server response headers timeout");
+          continue;
+        }
+        if (attempt === retries) throw error;
       }
-      return response;
-    } catch (error: any) {
-      if (error.name === "AbortError") {
-        throw new Error("Request timed out");
-      }
-      if (error.code === "UND_ERR_HEADERS_TIMEOUT") {
-        throw new Error("Server response headers timeout");
-      }
-      throw error;
     }
+    throw new Error("Request failed after retries");
   }
 }
 

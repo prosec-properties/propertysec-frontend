@@ -47,7 +47,7 @@ const SearchItems = ({
     };
     onSearch?.(text);
     setQueryParam("search", text);
-  }, [minSearchLength, onSearch, searchTerm]);
+  }, [minSearchLength, onSearch, searchTerm, setQueryParam]);
 
   React.useEffect(() => {
     handleSearch(value);

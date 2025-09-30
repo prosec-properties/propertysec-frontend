@@ -48,9 +48,17 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     user.role === USER_ROLE.DEVELOPER ||
     user.role === USER_ROLE.LAWYER
   ) {
-    const [properties] = await Promise.all([
-      fetchMyProperties(session.user?.token, filterParams),
-    ]);
+    let properties;
+    try {
+      [properties] = await Promise.all([
+        fetchMyProperties(session.user?.token, filterParams),
+      ]);
+    } catch (error: any) {
+      if (error?.message?.includes("Unauthorized") || error?.errors?.[0]?.message?.includes("Unauthorized")) {
+        redirect(SIGN_IN_ROUTE);
+      }
+      properties = { success: false, data: null };
+    }
 
     if (!properties?.success) {
       return (

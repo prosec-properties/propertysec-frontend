@@ -55,7 +55,7 @@ export const useAuth = () => {
         setLoading(false);
       }
     },
-    [pathname, push, refresh, setUser]
+    [push, setUser]
   );
 
   const logout = useCallback(async () => {

@@ -47,7 +47,7 @@ export const useUser = () => {
       }
       updateUser(userData);
     },
-    [data, update]
+    [data, update, updateUser]
   );
 
   const refetchUser = useCallback(async (token) => {
@@ -60,7 +60,7 @@ export const useUser = () => {
     } catch (error) {
       console.error("Failed to refetch user:", error);
     }
-  }, [update]);
+  }, [handleUpdate]);
 
   return {
     user: user || data?.user,
