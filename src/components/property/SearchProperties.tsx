@@ -38,8 +38,7 @@ const SearchItems = ({
 
   const { setQueryParam } = useQueryString();
 
-    const handleSearch = useCallback((value?: string) => {
-    const text = value || searchTerm;
+    const handleSearch = useCallback((text: string) => {
     if (text.length < minSearchLength) {
       onSearch?.('');
       setQueryParam("search", '');
@@ -47,11 +46,11 @@ const SearchItems = ({
     };
     onSearch?.(text);
     setQueryParam("search", text);
-  }, [minSearchLength, onSearch, searchTerm, setQueryParam]);
+  }, [minSearchLength, onSearch, setQueryParam]);
 
   React.useEffect(() => {
     handleSearch(value);
-  }, [value, debounceTime, minSearchLength, onSearch, handleSearch]);
+  }, [value, handleSearch]);
 
 
 
@@ -80,9 +79,9 @@ const SearchItems = ({
             setSearchTerm(e.target.value);
             debounced(e.target.value);
           }}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch(searchTerm)}
         />
-        <CustomButton className="h-[2rem] md:h-[40px]" onClick={() => handleSearch()}>
+        <CustomButton className="h-[2rem] md:h-[40px]" onClick={() => handleSearch(searchTerm)}>
           Search
         </CustomButton>
       </div>

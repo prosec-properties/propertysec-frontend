@@ -13,6 +13,7 @@ import CustomButton from "../buttons/CustomButton";
 import InspectionReceiptDownloader, {
   InspectionReceiptDownloaderRef,
 } from "./InspectionReceiptDownloader";
+import { formatPrice } from "@/lib/payment";
 
 interface Inspection {
   id: string;
@@ -102,7 +103,7 @@ const InspectionCard = ({ inspection }: Props) => {
           <div className="mt-2">
             <dt className="sr-only">Inspection amount</dt>
             <dd className="text-sm font-semibold text-primary">
-              ₦{inspection.inspectionAmount.toLocaleString()}
+              {formatPrice(inspection.inspectionAmount)}
             </dd>
           </div>
 
