@@ -9,7 +9,10 @@ interface IAffiliateShop {
 }
 export const fetchAffiliateShop = async (token: string) => {
   try {
-    const response = await $requestWithToken.get<IAffiliateShop>(`/affiliates/myshop`, token);
+    const response = await $requestWithToken.get<IAffiliateShop>(
+      `/affiliates/myshop`,
+      token
+    );
     return response;
   } catch (error) {
     throw error;
@@ -44,7 +47,10 @@ export const fetchAffiliateStats = async (token: string) => {
 
 export const fetchAffiliateTransactions = async (token: string) => {
   try {
-    const response = await $requestWithToken.get(`/transactions?type=property_purchase`, token);
+    const response = await $requestWithToken.get(
+      `/transactions?type=property_purchase`,
+      token
+    );
     return response?.data || [];
   } catch (error) {
     throw error;

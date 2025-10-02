@@ -69,7 +69,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     return <Landlord properties={properties?.data?.data || []} />;
   }
   if (user.role === USER_ROLE.AFFILIATE) {
-    return <AffiliateDashboard />;
+    return <AffiliateDashboard token={user.token || ""} />;
   }
 }
 

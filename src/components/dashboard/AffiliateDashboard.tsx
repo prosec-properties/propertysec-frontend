@@ -7,12 +7,13 @@ import TabbedListingView from "../misc/TabbedListingView";
 import { useQueryString } from "@/hooks/useQueryString";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAffiliateShop } from "@/services/affiliate.service";
-import { useUser } from "@/hooks/useUser";
 import EmptyState from "../misc/Empty";
 
-const AffiliateDashboard = () => {
+interface Props {
+  token: string;
+}
+const AffiliateDashboard = ({ token }: Props) => {
   const { getQueryParam, setQueryParam } = useQueryString();
-  const { user } = useUser();
 
   React.useEffect(() => {
     const currentAvailability = getQueryParam("availability");
@@ -27,9 +28,11 @@ const AffiliateDashboard = () => {
     error,
   } = useQuery({
     queryKey: ["affiliate-shop"],
-    queryFn: () => fetchAffiliateShop(user?.token || ""),
-    enabled: !!user?.token,
+    queryFn: () => fetchAffiliateShop(token),
+    enabled: !!token,
   });
+
+  console.log("affiliateShop", affiliateShop);
 
   const filteredProperties = React.useMemo(() => {
     if (!affiliateShop?.data?.properties) return [];

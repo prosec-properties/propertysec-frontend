@@ -40,13 +40,9 @@ interface Props {
 }
 
 const PurchaseCard = ({ purchase }: Props) => {
-  const { user } = useUser();
   const receiptDownloaderRef = useRef<ReceiptDownloaderRef>(null);
 
-  
-
   const handleDownloadReceipt = () => {
-    console.log("receiptDownloaderRef.current", receiptDownloaderRef.current);
     receiptDownloaderRef.current?.downloadReceipt(
       purchase.transactionReference
     );
@@ -107,7 +103,7 @@ const PurchaseCard = ({ purchase }: Props) => {
           <div className="mt-2">
             <dt className="sr-only">Purchase amount</dt>
             <dd className="text-sm font-semibold text-primary">
-              {formatPrice(purchase.purchaseAmount, purchase.currency)}
+              {formatPrice(purchase.purchaseAmount)}
             </dd>
           </div>
 
