@@ -2,7 +2,6 @@ import AdminProperties from "@/components/admin/Properties";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import { adminGuard } from "@/lib/admin";
 import { fetchAllProperties } from "@/services/properties.service";
-import { redirect } from "next/navigation";
 import React from "react";
 
 type ISearchParams = Promise<{

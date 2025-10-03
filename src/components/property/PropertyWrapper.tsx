@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { IUserRole } from "@/interface/user";
 
 interface Props {
-  // user: IUser;
   property: IProperty;
   role?: IUserRole
   isInAffiliateShop?: boolean;

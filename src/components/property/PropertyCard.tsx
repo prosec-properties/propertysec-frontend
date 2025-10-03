@@ -17,7 +17,6 @@ interface Props {
 }
 const PropertyCard = (props: Props) => {
   const { user } = useUser();
-
   return (
     <Link
       href={`${PROPERTIES_ROUTE}/${props.property.id}`}

@@ -29,10 +29,6 @@ export default async function page(props: IParams) {
     isInAffiliateShop = !!res?.data;
   }
 
-  if (!property?.success || !property?.data) {
-    console.log("heyy");
-    return;
-  }
   return (
     <PropertyWrapper
       property={property.data}
