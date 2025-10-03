@@ -1,10 +1,7 @@
-import EmptyState from "@/components/misc/Empty";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import AllProperties from "@/components/property/AllProperties";
-import { IProperty } from "@/interface/property";
 import { ICountry } from "@/interface/location";
 import { ICategory } from "@/interface/category";
-import { isNotAnEmptyArray } from "@/lib/general";
 import { fetchCategories } from "@/services/categories.service";
 import { fetchAllProperties } from "@/services/properties.service";
 import { Metadata } from "next";
@@ -43,23 +40,9 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     return <ErrorDisplay message="Failed to fetch listings" />;
   }
 
-  if (
-    !isNotAnEmptyArray(properties?.data?.data as IProperty[]) &&
-    !filterParams.categories &&
-    !filterParams.locations &&
-    !filterParams.pricing
-  ) {
-    return <EmptyState title="No properties found" />;
-  }
-
-  const publishedProperties =
-    properties?.data?.data?.filter(
-      (property) => property.status === "published"
-    ) || [];
-
   return (
     <AllProperties
-      properties={publishedProperties}
+      properties={properties?.data?.data}
       country={country?.data as ICountry}
       categories={categories?.data as ICategory[]}
     />
