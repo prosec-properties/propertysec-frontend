@@ -12,20 +12,29 @@ import { Stat, StatsWrapper } from "../misc/Stat";
 import CustomButton from "../buttons/CustomButton";
 import RegisterUserModal from "./RegisterUserModal";
 import { Eye } from "lucide-react";
+import { IMeta } from "@/interface/general";
+import CustomPagination from "../misc/CustomPagination";
+import { useQueryString } from "@/hooks/useQueryString";
 
 interface Props {
   initialUsers?: IUser[];
   totalUsers?: number | string;
   subscribedUsers?: number | string;
   showOnlyPaid?: boolean;
+  meta?: IMeta;
 }
 
 const UsersList = (props: Props) => {
   const router = useRouter();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const { setQueryParam } = useQueryString();
   const users = props.initialUsers || [];
   const totalUsers = props.totalUsers || 0;
   const subscribedUsers = props.subscribedUsers || 0;
+
+  const handlePageChange = (page: number) => {
+    setQueryParam("page", page.toString());
+  };
 
   const subscriptionStatus = (status: IStatus) => {
     if (status === "active") {
@@ -120,6 +129,15 @@ const UsersList = (props: Props) => {
           router.push(`${PROFILE_ROUTE}/${item.id}`);
         }}
       />
+      {props.meta && props.meta.lastPage > 1 && (
+        <div className="mt-6">
+          <CustomPagination
+            currentPage={props.meta.currentPage}
+            totalPages={props.meta.lastPage}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
       <RegisterUserModal
         isShown={showRegisterModal}
         setIsShown={setShowRegisterModal}

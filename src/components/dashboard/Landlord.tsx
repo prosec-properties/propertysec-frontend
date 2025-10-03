@@ -6,7 +6,9 @@ import React from "react";
 import TabbedListingView from "../misc/TabbedListingView";
 import { useQueryString } from "@/hooks/useQueryString";
 
-const Landlord = (props: { properties: IProperty[] }) => {
+import { IMeta } from "@/interface/general";
+
+const Landlord = (props: { properties: IProperty[]; meta?: IMeta }) => {
   const { getQueryParam, setQueryParam } = useQueryString();
 
   React.useEffect(() => {
@@ -26,6 +28,7 @@ const Landlord = (props: { properties: IProperty[] }) => {
       renderItem={(property: IProperty, index: number) => (
         <ProductCard key={index} property={property} />
       )}
+      meta={props.meta}
     />
   );
 };

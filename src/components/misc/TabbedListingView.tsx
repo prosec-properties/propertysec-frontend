@@ -4,6 +4,9 @@ import { isNotAnEmptyArray } from "@/lib/general";
 import EmptyState from "../misc/Empty";
 import TopHeading from "./TopHeading";
 import { cn } from "@/lib/utils";
+import CustomPagination from "./CustomPagination";
+import { useQueryString } from "@/hooks/useQueryString";
+import { IMeta } from "@/interface/general";
 
 interface Props<T> {
   items: T[];
@@ -15,6 +18,7 @@ interface Props<T> {
   titleStyle?: "solid" | "outline";
   titleClassName?: string;
   paramName?: string;
+  meta?: IMeta;
 }
 
 const TabbedListingView = <T,>({
@@ -27,7 +31,14 @@ const TabbedListingView = <T,>({
   titleClassName,
   paramName,
   renderItem,
+  meta,
 }: Props<T>) => {
+  const { setQueryParam } = useQueryString();
+
+  const handlePageChange = (page: number) => {
+    setQueryParam("page", page.toString());
+  };
+
   return (
     <div>
       {titleStyle === "solid" ? (
@@ -48,6 +59,15 @@ const TabbedListingView = <T,>({
             <EmptyState message={emptyStateMessage} />
           )}
         </div>
+        {meta && meta.lastPage > 1 && (
+          <div className="mt-6">
+            <CustomPagination
+              currentPage={meta.currentPage}
+              totalPages={meta.lastPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

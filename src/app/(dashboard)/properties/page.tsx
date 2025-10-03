@@ -17,6 +17,8 @@ type ISearchParams = Promise<{
   locations?: string;
   pricing?: string;
   search?: string;
+  page?: string;
+  limit?: string;
   [key: string]: string | string[] | undefined;
 }>;
 
@@ -28,6 +30,8 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     locations: queries?.locations,
     pricing: queries?.pricing,
     search: queries?.search,
+    page: queries?.page ? parseInt(queries.page) : 1,
+    limit: queries?.limit ? parseInt(queries.limit) : 20,
   };
 
   const [properties, country, categories] = await Promise.all([
@@ -45,6 +49,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       properties={properties?.data?.data}
       country={country?.data as ICountry}
       categories={categories?.data as ICategory[]}
+      meta={properties?.data?.meta}
     />
   );
 }

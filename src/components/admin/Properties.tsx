@@ -6,8 +6,11 @@ import { IProperty } from "@/interface/property";
 import PropertyCard from "../property/PropertyCard";
 import { useQueryString } from "@/hooks/useQueryString";
 
+import { IMeta } from "@/interface/general";
+
 interface Props {
   properties: IProperty[];
+  meta?: IMeta;
 }
 
 const AdminProperties = (props: Props) => {
@@ -31,6 +34,7 @@ const AdminProperties = (props: Props) => {
       renderItem={(property: IProperty, index: number) => (
         <PropertyCard key={index} property={property} />
       )}
+      meta={props.meta}
     />
   );
 };

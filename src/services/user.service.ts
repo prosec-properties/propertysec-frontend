@@ -121,3 +121,33 @@ export const fetchMyInspectedProperties = async (
     throw error;
   }
 };
+
+// export const downloadPurchaseReceipt = async (
+//   purchaseId: string,
+//   token: string
+// ) => {
+//   try {
+//     const response = await $requestWithToken.download(
+//       `/users/me/purchases/${purchaseId}/receipt`,
+//       token
+//     );
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+// export const downloadInspectionReceipt = async (
+//   inspectionId: string,
+//   token: string
+// ) => {
+//   try {
+//     const response = await $requestWithToken.download(
+//       `/users/me/inspections/${inspectionId}/receipt`,
+//       token
+//     );
+//     return response;
+//   } catch (error) {
+//     throw error;
+//   }
+// };

@@ -4,6 +4,9 @@ import React from "react";
 import { IProperty } from "@/interface/property";
 import PurchaseCard from "../property/PurchaseCard";
 import EmptyState from "../misc/Empty";
+import { IMeta } from "@/interface/general";
+import CustomPagination from "../misc/CustomPagination";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Purchase {
   id: string;
@@ -28,10 +31,18 @@ interface Purchase {
 
 interface Props {
   purchases: Purchase[];
-  meta: any;
+  meta: IMeta;
 }
 
 const MyPurchases = ({ purchases, meta }: Props) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`?${params.toString()}`);
+  };
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">My Purchased Properties</h1>
@@ -46,7 +57,13 @@ const MyPurchases = ({ purchases, meta }: Props) => {
         </div>
       )}
 
-      {/* Pagination can be added here if needed */}
+      {purchases.length > 0 && meta.lastPage > 1 && (
+        <CustomPagination
+          currentPage={meta.currentPage}
+          totalPages={meta.lastPage}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

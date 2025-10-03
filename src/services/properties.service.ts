@@ -44,6 +44,8 @@ export const fetchAllProperties = async (filters?: {
   pricing?: string[] | string;
   status?: string;
   search?: string;
+  page?: number;
+  limit?: number;
 }) => {
   try {
     const params = new URLSearchParams();
@@ -65,6 +67,12 @@ export const fetchAllProperties = async (filters?: {
     }
     if (filters?.search) {
       params.append("search", filters.search);
+    }
+    if (filters?.page) {
+      params.append("page", filters.page.toString());
+    }
+    if (filters?.limit) {
+      params.append("limit", filters.limit.toString());
     }
 
     const url = `/properties${
@@ -116,6 +124,8 @@ export const fetchMyProperties = async (
     pricing?: string[];
     status?: string;
     search?: string;
+    page?: number;
+    limit?: number;
   }
 ) => {
   const params = new URLSearchParams();

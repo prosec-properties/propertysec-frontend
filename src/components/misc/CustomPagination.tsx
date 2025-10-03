@@ -49,6 +49,7 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
           <PaginationLink
             onClick={() => onPageChange(1)}
             isActive={currentPage === 1}
+            className="cursor-pointer"
           >
             1
           </PaginationLink>
@@ -69,6 +70,7 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={currentPage === i}
+            className="cursor-pointer"
           >
             {i}
           </PaginationLink>
@@ -89,6 +91,7 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
           <PaginationLink
             onClick={() => onPageChange(totalPages)}
             isActive={currentPage === totalPages}
+            className="cursor-pointer"
           >
             {totalPages}
           </PaginationLink>
@@ -103,11 +106,11 @@ const CustomPagination: React.FC<CustomPaginationProps> = ({
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious onClick={handlePrevious} />
+          <PaginationPrevious onClick={handlePrevious} className="cursor-pointer" />
         </PaginationItem>
         {renderPageNumbers()}
         <PaginationItem>
-          <PaginationNext onClick={handleNext} />
+          <PaginationNext onClick={handleNext} className="cursor-pointer" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

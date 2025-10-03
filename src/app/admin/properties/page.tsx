@@ -7,6 +7,8 @@ import React from "react";
 
 type ISearchParams = Promise<{
   status?: string;
+  page?: string;
+  limit?: string;
   [key: string]: string | string[] | undefined;
 }>;
 
@@ -18,6 +20,8 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   const properties = await fetchAllProperties({
     status: status === "all" ? undefined : status,
+    page: queries.page ? parseInt(queries.page) : 1,
+    limit: queries.limit ? parseInt(queries.limit) : 20,
   });
   if (!properties?.success) {
     return <ErrorDisplay message="Failed to fetch listings" />;
@@ -25,7 +29,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   return (
     <div>
-      <AdminProperties properties={properties?.data?.data} />
+      <AdminProperties properties={properties?.data?.data} meta={properties?.data?.meta} />
     </div>
   );
 };

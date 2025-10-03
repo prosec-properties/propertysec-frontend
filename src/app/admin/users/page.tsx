@@ -31,6 +31,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
         initialUsers={users?.data?.users}
         subscribedUsers={users?.data?.subscribedUsers}
         totalUsers={users?.data?.totalUsers}
+        meta={users?.data?.meta}
       />
     </>
   );

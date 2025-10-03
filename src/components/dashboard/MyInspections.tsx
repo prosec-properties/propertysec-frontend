@@ -5,6 +5,8 @@ import { IProperty } from "@/interface/property";
 import InspectionCard from "../property/InspectionCard";
 import { IMeta } from "@/interface/general";
 import EmptyState from "../misc/Empty";
+import CustomPagination from "../misc/CustomPagination";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Inspection {
   id: string;
@@ -36,6 +38,14 @@ interface Props {
 }
 
 const MyInspections = ({ inspections, meta }: Props) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`?${params.toString()}`);
+  };
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">My Inspected Properties</h1>
@@ -50,7 +60,13 @@ const MyInspections = ({ inspections, meta }: Props) => {
         </div>
       )}
 
-      {/* Pagination can be added here if needed */}
+      {inspections.length > 0 && meta.lastPage > 1 && (
+        <CustomPagination
+          currentPage={meta.currentPage}
+          totalPages={meta.lastPage}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };

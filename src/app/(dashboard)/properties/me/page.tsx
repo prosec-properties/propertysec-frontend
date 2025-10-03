@@ -17,6 +17,8 @@ type ISearchParams = Promise<{
   pricing?: string;
   search?: string;
   status?: string;
+  page?: string;
+  limit?: string;
   [key: string]: string | string[] | undefined;
 }>;
 
@@ -41,6 +43,8 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const filterParams = {
     status: queries?.status === "all" ? undefined : queries?.status || "draft",
     search: queries?.search,
+    page: queries?.page ? parseInt(queries.page) : 1,
+    limit: queries?.limit ? parseInt(queries.limit) : 10,
   };
 
   if (
@@ -66,7 +70,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       );
     }
 
-    return <Landlord properties={properties?.data?.data || []} />;
+    return <Landlord properties={properties?.data?.data || []} meta={properties?.data?.meta} />;
   }
   if (user.role === USER_ROLE.AFFILIATE) {
     return <AffiliateDashboard token={user.token || ""} />;
