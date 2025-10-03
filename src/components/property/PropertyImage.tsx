@@ -60,7 +60,7 @@ const PropertyImage = (props: Props) => {
       {!showAllImgs() ? (
         <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden rounded-[0.625rem] border-[0.6px] border-grey100 p-3">
           <Image
-            src={props.property.defaultImageUrl || ""}
+            src={props.property.defaultImageUrl || props.property?.files[0]?.fileUrl}
             alt={"property image"}
             width={imageWidth}
             height={imageHeight}
@@ -75,6 +75,8 @@ const PropertyImage = (props: Props) => {
           <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden rounded-[0.625rem] border-[0.6px] border-grey100 p-3">
             {props.property?.files.map((file, index) => {
               const isVideo = isVideoFile(file);
+
+              if (!file.fileUrl) return null;
 
               return (
                 <div

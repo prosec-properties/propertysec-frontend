@@ -15,10 +15,10 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   await adminGuard();
 
-  const status = queries.status;
+  const status = queries.status || "all";
 
   const properties = await fetchAllProperties({
-    status: status === "all" ? undefined : status,
+    status,
     page: queries.page ? parseInt(queries.page) : 1,
     limit: queries.limit ? parseInt(queries.limit) : 20,
   });

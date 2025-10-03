@@ -10,6 +10,7 @@ import { Stat, StatsWrapper } from "../misc/Stat";
 import TopHeading from "../misc/TopHeading";
 import { ISubscriptionWithUser } from "@/services/subscriptions.service";
 import { ADMIN_SUBSCRIPTION_ROUTE } from "@/constants/routes";
+import { formatPrice } from "@/lib/payment";
 
 interface Props {
   initialSubscriptions?: ISubscriptionWithUser[];
@@ -25,10 +26,10 @@ const SubscriptionsList = (props: Props) => {
   const activeSubscriptions = props.activeSubscriptions || 0;
   const expiredSubscriptions = props.expiredSubscriptions || 0;
 
-  const calculateStatus = (endDate: string): 'active' | 'expired' => {
+  const calculateStatus = (endDate: string): "active" | "expired" => {
     const now = new Date();
     const end = new Date(endDate);
-    return end > now ? 'active' : 'expired';
+    return end > now ? "active" : "expired";
   };
 
   const calculateDaysRemaining = (endDate: string): number => {
@@ -40,14 +41,16 @@ const SubscriptionsList = (props: Props) => {
   };
 
   const isExpired = (endDate: string): boolean => {
-    return calculateStatus(endDate) === 'expired';
+    return calculateStatus(endDate) === "expired";
   };
 
   const calculateStats = () => {
     const total = subscriptions.length;
-    const active = subscriptions.filter(sub => calculateStatus(sub.endDate) === 'active').length;
+    const active = subscriptions.filter(
+      (sub) => calculateStatus(sub.endDate) === "active"
+    ).length;
     const expired = total - active;
-    
+
     return {
       total: totalSubscriptions || total,
       active: activeSubscriptions || active,
@@ -74,7 +77,7 @@ const SubscriptionsList = (props: Props) => {
   return (
     <div className="space-y-6">
       <TopHeading title="Subscriptions" className="mb-6" />
-      
+
       <StatsWrapper className="bg-primary">
         <Stat
           title="Total Subscriptions"
@@ -101,28 +104,23 @@ const SubscriptionsList = (props: Props) => {
       <CustomTable
         tableData={subscriptions?.map((subscription, index) => {
           const status = calculateStatus(subscription.endDate);
-          const daysRemaining = calculateDaysRemaining(subscription.endDate);
-          const expired = isExpired(subscription.endDate);
-          
-          console.log(`Subscription ${index}:`, {
-            id: subscription.id,
-            user: subscription.user,
-            plan: subscription.plan,
-            status: status,
-            daysRemaining: daysRemaining,
-            startDate: subscription.startDate,
-            endDate: subscription.endDate
-          });
-          
+
           return {
             id: subscription.id || `subscription-${index}`,
-            user: subscription.user?.fullName || (subscription.user as any)?.full_name || "N/A",
+            user:
+              subscription.user?.fullName ||
+              (subscription.user as any)?.full_name ||
+              "N/A",
             email: subscription.user?.email || "N/A",
             plan: subscription.plan?.name || "N/A",
-            price: `${subscription.plan?.currency || "₦"}${subscription.plan?.price || 0}`,
-            duration: `${subscription.plan?.duration || 0} days`,
-            startDate: subscription.startDate ? formatDate(subscription.startDate) : "N/A",
-            endDate: subscription.endDate ? formatDate(subscription.endDate) : "N/A",
+            price: formatPrice(subscription.plan?.price || 0),
+            duration: `${subscription.plan?.duration || 0} months`,
+            startDate: subscription.startDate
+              ? formatDate(subscription.startDate)
+              : "N/A",
+            endDate: subscription.endDate
+              ? formatDate(subscription.endDate)
+              : "N/A",
             status: (
               <p
                 className={cn(

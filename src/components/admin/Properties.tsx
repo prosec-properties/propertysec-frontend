@@ -16,13 +16,6 @@ interface Props {
 const AdminProperties = (props: Props) => {
   const { getQueryParam, setQueryParam } = useQueryString();
 
-  React.useEffect(() => {
-    const currentStatus = getQueryParam("status");
-    if (!currentStatus) {
-      setQueryParam("status", "all");
-    }
-  }, [getQueryParam, setQueryParam]);
-
   return (
     <TabbedListingView
       items={props.properties}

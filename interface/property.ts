@@ -23,7 +23,7 @@ export interface IProperty {
   state: IState;
   description: string;
   status: IPropertyStatus;
-  defaultImageUrl?: string;
+  defaultImageUrl: string;
   meta?: string;
   createdAt: string;
   updatedAt: string;

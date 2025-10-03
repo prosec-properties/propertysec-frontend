@@ -32,13 +32,15 @@ const PropertyCard = (props: Props) => {
           PREMIUM
         </div>
       )}
-      <Image
-        alt="property image"
-        width={400}
-        height={224}
-        src={props.property.defaultImageUrl || ""}
-        className="h-56 w-full rounded-[0.675rem] object-cover mb-6"
-      />
+      {props.property.defaultImageUrl && (
+        <Image
+          alt="property image"
+          width={400}
+          height={224}
+          src={props.property.defaultImageUrl}
+          className="h-56 w-full rounded-[0.675rem] object-cover mb-6"
+        />
+      )}
 
       <div className="">
         <dl>
