@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/payment";
 import { formatDate } from "@/lib/date";
 import CustomButton from "@/components/buttons/CustomButton";
 import { generateInvoicePdfName } from "@/lib/files";
-import generatePDF, { Resolution, Margin } from "react-to-pdf";
+import { usePDFDownloader } from "@/hooks/usePDFDownloader";
 
 interface SubscriptionReceiptClientProps {
   paymentInfo: Transaction | null;
@@ -19,6 +19,15 @@ const SubscriptionReceiptClient: React.FC<SubscriptionReceiptClientProps> = ({
   userEmail,
 }) => {
   const receiptRef = useRef<HTMLDivElement>(null);
+  const { payload: receiptData, setPayload: setReceiptData, download, targetRef } =
+    usePDFDownloader((p) =>
+      generateInvoicePdfName({
+        planName: (p as Transaction)?.plan?.name ?? paymentInfo?.plan?.name ?? "subscription",
+        planDuration:
+          (p as Transaction)?.plan?.duration?.toString() ?? paymentInfo?.plan?.duration?.toString() ?? "",
+        reference: (p as Transaction)?.reference ?? paymentInfo?.reference ?? "receipt",
+      }) + ".pdf"
+    );
 
   const handleDownloadInvoice = async () => {
     if (!paymentInfo) {
@@ -27,31 +36,9 @@ const SubscriptionReceiptClient: React.FC<SubscriptionReceiptClientProps> = ({
     }
 
     try {
-      const fileName = generateInvoicePdfName({
-        planName: paymentInfo.plan?.name ?? "subscription",
-        planDuration: paymentInfo.plan?.duration?.toString() ?? "",
-        reference: paymentInfo.reference ?? "receipt",
-      });
-
-      await generatePDF(
-        receiptRef, 
-        { 
-          filename: `${fileName}.pdf`,
-          method: 'save',
-          resolution: Resolution.MEDIUM,
-          page: { 
-            margin: Margin.SMALL,
-            format: 'a4',
-            orientation: 'portrait'
-          },
-          canvas: {
-            mimeType: 'image/jpeg',
-            qualityRatio: 0.95
-          }
-        }
-      );
-      
-      showToaster("Receipt downloaded successfully!", "success");
+      // Use shared hook to prepare payload and generate PDF from hidden DOM
+      setReceiptData(paymentInfo);
+      await download(paymentInfo);
     } catch (error) {
       showToaster("Error downloading receipt.", "destructive");
       console.error("Error downloading receipt:", error);
@@ -74,7 +61,7 @@ const SubscriptionReceiptClient: React.FC<SubscriptionReceiptClientProps> = ({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div ref={receiptRef} className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-8">
+      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
           Payment Receipt
         </h1>
@@ -257,6 +244,83 @@ const SubscriptionReceiptClient: React.FC<SubscriptionReceiptClientProps> = ({
             Download Receipt PDF
           </CustomButton>
         </div>
+
+        {/* Hidden receipt used for PDF generation - kept visually offscreen */}
+        {receiptData != null && (
+          <div
+            ref={targetRef}
+            className="bg-white p-8 text-black"
+            style={{
+              position: "fixed",
+              left: "-9999px",
+              top: "-9999px",
+              width: "210mm",
+              minHeight: "297mm",
+              fontSize: "12px",
+            }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">PropertySec</h1>
+                <p className="text-gray-600">Subscription Payment Receipt</p>
+              </div>
+
+              <div className="border border-gray-300 rounded-lg p-6 mb-6">
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Transaction Details</h3>
+                    <div className="space-y-1 text-sm">
+                      <p>
+                        <span className="font-medium">Transaction Reference:</span>{" "}
+                        {(receiptData as Transaction).reference}
+                      </p>
+                      <p>
+                        <span className="font-medium">Purchase Date:</span>{" "}
+                        {new Date((receiptData as Transaction).date || (receiptData as Transaction).createdAt).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <span className="font-medium">Status:</span>{" "}
+                        {(receiptData as Transaction).status}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Amount</h3>
+                    <div className="text-2xl font-bold text-green-600">
+                      {formatPrice((receiptData as Transaction).actualAmount || (receiptData as Transaction).amount, (receiptData as Transaction).currency)}
+                    </div>
+                  </div>
+                </div>
+
+                {(receiptData as Transaction).plan && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-2">Plan Details</h3>
+                    <div className="bg-gray-50 p-4 rounded">
+                      <p className="font-medium text-lg mb-1">{(receiptData as Transaction).plan!.name}</p>
+                      {(receiptData as Transaction).plan!.duration && (
+                        <p className="text-sm">Duration: {(receiptData as Transaction).plan!.duration} days</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {(receiptData as Transaction).narration && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-2">Narration</h3>
+                    <div className="bg-gray-50 p-4 rounded">
+                      <p className="text-sm">{(receiptData as Transaction).narration}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="text-center text-sm text-gray-500">
+                <p>Thank you for using PropertySec!</p>
+                <p className="mt-2">Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-10 text-center">
           <p className="text-gray-600">

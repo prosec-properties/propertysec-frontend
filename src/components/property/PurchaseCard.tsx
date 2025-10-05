@@ -7,36 +7,15 @@ import BedIcon from "../icons/Bed";
 import ToiletIcon from "../icons/Toilet";
 import Link from "next/link";
 import { PROPERTIES_ROUTE } from "@/constants/routes";
-import { IProperty } from "@/interface/property";
+import { IProperty, IPropertyPurchase } from "@/interface/property";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/payment";
 import { useUser } from "@/hooks/useUser";
 import CustomButton from "../buttons/CustomButton";
-import ReceiptDownloader, { ReceiptDownloaderRef } from "./ReceiptDownloader";
-
-interface Purchase {
-  id: string;
-  purchaseAmount: number;
-  currency: string;
-  purchaseStatus: "PENDING" | "COMPLETED" | "CANCELLED" | "REFUNDED";
-  transactionReference: string;
-  buyerName: string;
-  buyerEmail: string;
-  buyerPhone: string;
-  createdAt: string;
-  updatedAt: string;
-  property: IProperty & {
-    user: {
-      id: string;
-      fullName: string;
-      email: string;
-      phoneNumber: string;
-    };
-  };
-}
+import ReceiptDownloader, { ReceiptDownloaderRef } from "../receipts/PropertyPurchase";
 
 interface Props {
-  purchase: Purchase;
+  purchase: IPropertyPurchase;
 }
 
 const PurchaseCard = ({ purchase }: Props) => {

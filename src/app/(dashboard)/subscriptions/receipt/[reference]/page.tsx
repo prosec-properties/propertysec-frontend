@@ -2,7 +2,7 @@ import React from "react";
 import { getServerSession } from "next-auth/next";
 import { authConfig } from "@/../auth.config";
 import { getTransactionByReferenceApi } from "@/services/payment.service";
-import SubscriptionReceiptClient from "@/components/subscription/SubscriptionReceiptClient";
+import SubscriptionReceiptClient from "@/components/receipts/SubscriptionReceiptClient";
 import { PaymentCredentials, Transaction } from "@/interface/payment";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import { redirect } from "next/navigation";
@@ -39,8 +39,6 @@ async function SubscriptionReceiptPage({ params }: PageProps) {
     errorFetching =
       response?.message || "Failed to fetch transaction details from server.";
   }
-
-  console.log("response", response?.data);
 
   paymentInfo = response?.data || null;
 

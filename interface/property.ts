@@ -92,3 +92,63 @@ export interface IPropertyFileRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface IPropertyPurchase {
+  id?: string;
+  purchaseAmount: number;
+  currency: string;
+  purchaseStatus: "PENDING" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+  status?: string;
+  paymentStatus?: string;
+  transactionReference: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
+  purchaserName?: string;
+  purchaserEmail?: string;
+  purchaserPhone?: string;
+  paymentMethod?: string;
+  method?: string;
+  paymentGateway?: string;
+  gateway?: string;
+  price?: number;
+  createdAt: string;
+  updatedAt?: string;
+  user?: {
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
+  property: IProperty & {
+    user?: {
+      id: string;
+      fullName: string;
+      email: string;
+      phoneNumber: string;
+    };
+  };
+}
+
+export interface IPropertyInspection {
+  id: string;
+  inspectionAmount: number;
+  inspectionStatus: "PENDING" | "COMPLETED";
+  approvalStatus?: "approved" | "pending" | "rejected";
+  inspectionReport: string;
+  userId: string;
+  propertyId: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  inspectionDate: string;
+  createdAt: string;
+  updatedAt: string;
+  property: IProperty & {
+    user: {
+      id: string;
+      fullName: string;
+      email: string;
+      phoneNumber: string;
+    };
+  };
+}

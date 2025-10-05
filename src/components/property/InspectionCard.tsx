@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import CustomButton from "../buttons/CustomButton";
 import InspectionReceiptDownloader, {
   InspectionReceiptDownloaderRef,
-} from "./InspectionReceiptDownloader";
+} from "../receipts/InspectionReceiptDownloader";
 import { formatPrice } from "@/lib/payment";
 
 interface Inspection {

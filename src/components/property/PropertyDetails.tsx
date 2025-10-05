@@ -19,7 +19,7 @@ import AffiliateButtons from "./AffiliateButtons";
 import PreviewButtons from "./PreviewButtons";
 import GuestButtons from "./GuestButtons";
 import CustomButton from "../buttons/CustomButton";
-import ReceiptDownloader, { ReceiptDownloaderRef } from "./ReceiptDownloader";
+import ReceiptDownloader, { ReceiptDownloaderRef } from "../receipts/PropertyPurchase";
 import { getInitials } from "@/lib/user";
 
 interface Props {

@@ -1,78 +1,77 @@
 "use client";
 
-import React, {
-  useState,
-  forwardRef,
-  useImperativeHandle,
-  useCallback,
-} from "react";
-import { usePDF } from "react-to-pdf";
-import { showToaster } from "@/lib/general";
+import React, { forwardRef, useImperativeHandle } from "react";
 import { formatPrice } from "@/lib/payment";
-import { IProperty } from "@/interface/property";
+import { IProperty, IPropertyPurchase } from "@/interface/property";
+import { usePDFDownloader } from "@/hooks/usePDFDownloader";
+
+interface ReceiptData {
+  transactionReference: string;
+  createdAt: string;
+  purchaseStatus: string;
+  purchaseAmount: number;
+  currency: string;
+  buyerName: string;
+  buyerEmail: string;
+  buyerPhone: string;
+  paymentMethod?: string;
+  paymentGateway?: string;
+  property: IProperty;
+}
 
 interface ReceiptDownloaderProps {
   property: IProperty;
-  purchase: any;
+  purchase: IPropertyPurchase;
 }
 
 export interface ReceiptDownloaderRef {
   downloadReceipt: (transactionReference: string) => Promise<void>;
 }
 
-
-const ReceiptDownloader = forwardRef<
+const PropertyPurchase = forwardRef<
   ReceiptDownloaderRef,
   ReceiptDownloaderProps
 >(({ property, purchase }, ref) => {
-  const [receiptData, setReceiptData] = useState<any>(null);
-  const { toPDF, targetRef } = usePDF({
-    filename: `property-receipt-${purchase?.transactionReference}.pdf`,
-  });
-
-  // Expose downloadReceipt to parent via ref
-  const downloadReceipt = useCallback(
-    async (transactionReference: string) => {
-      if (!purchase) {
-        showToaster("No purchase data available to generate receipt.", "destructive");
-        return;
-      }
-
-      const data = {
-        transactionReference:
-          transactionReference || purchase.transactionReference || purchase.id,
-        createdAt: purchase.createdAt || new Date().toISOString(),
-        purchaseStatus: purchase.status || purchase.paymentStatus || "Completed",
-        purchaseAmount: purchase.amount || purchase.price || 0,
-        currency: purchase.currency || property.currency || "NGN",
-        buyerName:
-          purchase.buyerName || purchase.user?.fullName || purchase.purchaserName || "",
-        buyerEmail: purchase.buyerEmail || purchase.user?.email || purchase.purchaserEmail || "",
-        buyerPhone:
-          purchase.buyerPhone || purchase.user?.phoneNumber || purchase.purchaserPhone || "",
-        paymentMethod: purchase.paymentMethod || purchase.method,
-        paymentGateway: purchase.paymentGateway || purchase.gateway,
-      };
-
-      setReceiptData(data);
-
-      // Wait for the hidden receipt DOM to mount and paint so react-to-pdf can capture it.
-      await new Promise((res) => setTimeout(res, 250));
-
-      try {
-        if (!toPDF) throw new Error("toPDF is not available");
-        await toPDF();
-        showToaster("Receipt downloaded", "success");
-      } catch (err) {
-        console.error("Failed to generate PDF", err);
-        showToaster("Failed to generate receipt PDF", "destructive");
-      } finally {
-        // remove hidden node after a short delay to avoid impacting UX
-        setTimeout(() => setReceiptData(null), 800);
-      }
-    },
-    [purchase, property, toPDF]
+  const {
+    payload: receiptData,
+    setPayload: setReceiptData,
+    download,
+    targetRef,
+  } = usePDFDownloader(
+    (p) => `property-receipt-${purchase?.transactionReference || "receipt"}.pdf`
   );
+
+  const downloadReceipt = async (transactionReference: string) => {
+    if (!purchase) {
+      const { showToaster } = await import("@/lib/general");
+      showToaster(
+        "No purchase data available to generate receipt.",
+        "destructive"
+      );
+      return;
+    }
+
+    const data: ReceiptData = {
+      transactionReference: purchase.transactionReference || "",
+      createdAt: purchase.createdAt,
+      purchaseStatus: purchase.purchaseStatus || "Completed",
+      purchaseAmount: purchase.purchaseAmount || 0,
+      currency: purchase.currency || "NGN",
+      buyerName: purchase.buyerName || "",
+      buyerEmail: purchase.buyerEmail || "",
+      buyerPhone: purchase.buyerPhone || purchase.user?.phoneNumber || "",
+      paymentMethod: purchase.paymentMethod || purchase.method,
+      paymentGateway: purchase.paymentGateway || purchase.gateway,
+      property,
+    };
+
+    setReceiptData(data);
+    try {
+      await download(data);
+    } catch (err) {
+      // already handled in hook
+    }
+  };
 
   useImperativeHandle(ref, () => ({
     downloadReceipt,
@@ -115,23 +114,25 @@ const ReceiptDownloader = forwardRef<
                       <span className="font-medium">
                         Transaction Reference:
                       </span>{" "}
-                      {receiptData.transactionReference}
+                      {(receiptData as ReceiptData).transactionReference}
                     </p>
                     <p>
                       <span className="font-medium">Purchase Date:</span>{" "}
-                      {new Date(receiptData.createdAt).toLocaleDateString()}
+                      {new Date(
+                        (receiptData as ReceiptData).createdAt
+                      ).toLocaleDateString()}
                     </p>
                     <p>
                       <span className="font-medium">Status:</span>{" "}
-                      {receiptData.purchaseStatus}
+                      {(receiptData as ReceiptData).purchaseStatus}
                     </p>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Amount</h3>
                   <div className="text-2xl font-bold text-green-600">
-                    {formatPrice(receiptData.purchaseAmount)}{" "}
-                    {receiptData.currency}
+                    {formatPrice((receiptData as ReceiptData).purchaseAmount)}{" "}
+                    {(receiptData as ReceiptData).currency}
                   </div>
                 </div>
               </div>
@@ -169,16 +170,16 @@ const ReceiptDownloader = forwardRef<
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <p>
                       <span className="font-medium">Name:</span>{" "}
-                      {receiptData.buyerName}
+                      {(receiptData as ReceiptData).buyerName}
                     </p>
                     <p>
                       <span className="font-medium">Email:</span>{" "}
-                      {receiptData.buyerEmail}
+                      {(receiptData as ReceiptData).buyerEmail}
                     </p>
-                    {receiptData.buyerPhone && (
+                    {(receiptData as ReceiptData).buyerPhone && (
                       <p>
                         <span className="font-medium">Phone:</span>{" "}
-                        {receiptData.buyerPhone}
+                        {(receiptData as ReceiptData).buyerPhone}
                       </p>
                     )}
                   </div>
@@ -213,7 +214,7 @@ const ReceiptDownloader = forwardRef<
               )}
 
               {/* Payment Method */}
-              {receiptData.paymentMethod && (
+              {(receiptData as ReceiptData).paymentMethod && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-gray-900 mb-2">
                     Payment Method
@@ -221,12 +222,12 @@ const ReceiptDownloader = forwardRef<
                   <div className="bg-gray-50 p-4 rounded">
                     <p className="text-sm">
                       <span className="font-medium">Method:</span>{" "}
-                      {receiptData.paymentMethod}
+                      {(receiptData as ReceiptData).paymentMethod}
                     </p>
-                    {receiptData.paymentGateway && (
+                    {(receiptData as ReceiptData).paymentGateway && (
                       <p className="text-sm">
                         <span className="font-medium">Gateway:</span>{" "}
-                        {receiptData.paymentGateway}
+                        {(receiptData as ReceiptData).paymentGateway}
                       </p>
                     )}
                   </div>
@@ -255,7 +256,8 @@ const ReceiptDownloader = forwardRef<
                 {new Date().toLocaleTimeString()}
               </p>
               <p className="mt-1 text-xs">
-                PropertySec Inc. • 123 Business Ave, City, State 12345 • support@propertysec.com
+                PropertySec Inc. • 123 Business Ave, City, State 12345 •
+                support@propertysec.com
               </p>
             </div>
           </div>
@@ -265,6 +267,6 @@ const ReceiptDownloader = forwardRef<
   );
 });
 
-ReceiptDownloader.displayName = "ReceiptDownloader";
+PropertyPurchase.displayName = "PropertyPurchase";
 
-export default ReceiptDownloader;
+export default PropertyPurchase;
