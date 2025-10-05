@@ -1,15 +1,17 @@
 import {
-  ADMIN_PRODUCTS_ROUTE,
   ADMIN_PROPERTIES_ROUTE,
   ADMIN_USERS_ROUTE,
   ADMIN_LOANS_ROUTE,
-  ADMIN_FRONT_PAGE_ROUTE,
   ADMIN_SUBSCRIPTION_ROUTE,
-  ADMIN_INSPECTION_PAYMENTS_ROUTE,
   SIGN_OUT_ROUTE,
+  ADMIN_INSPECTIONS_ROUTE,
 } from "@/constants/routes";
-import { HomeIcon, UsersIcon, NewspaperIcon, LogOutIcon, ClipboardCheckIcon } from "lucide-react";
-import MarketPlaceIcon from "../icons/MarketPlace";
+import {
+  HomeIcon,
+  UsersIcon,
+  LogOutIcon,
+  ClipboardCheckIcon,
+} from "lucide-react";
 import SubscriptionIcon from "../icons/Subscription";
 import LoanIcon from "../icons/Loan";
 
@@ -37,8 +39,8 @@ export const AdminMenuData: IAdminMenu[] = [
     iconType: "lucid",
   },
   {
-    name: "Inspection Payments",
-    url: ADMIN_INSPECTION_PAYMENTS_ROUTE,
+    name: "Inspections",
+    url: ADMIN_INSPECTIONS_ROUTE,
     icon: ClipboardCheckIcon,
     adminOnly: true,
     iconType: "lucid",

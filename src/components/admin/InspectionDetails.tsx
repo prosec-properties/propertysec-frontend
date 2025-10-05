@@ -1,21 +1,28 @@
 "use client";
 
 import React, { useState } from "react";
-import { InspectionPaymentDetail } from "@/services/inspection.service";
+import {
+  InspectionPaymentDetail,
+  updateInspectionStatus,
+} from "@/services/inspection.service";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/payment";
 import { cn } from "@/lib/utils";
 import CustomButton from "../buttons/CustomButton";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/hooks/useUser";
+import { showToaster } from "@/lib/general";
 
 interface Props {
   inspection: InspectionPaymentDetail;
   onUpdate?: (updatedInspection: InspectionPaymentDetail) => void;
+  token: string;
 }
 
-const InspectionDetails = ({ inspection, onUpdate }: Props) => {
+const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
   const router = useRouter();
+  const [isUpdating, setIsUpdating] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     inspection: true,
     user: true,
@@ -28,6 +35,43 @@ const InspectionDetails = ({ inspection, onUpdate }: Props) => {
       ...prev,
       [section]: !prev[section],
     }));
+  };
+
+  const handleMarkAsCompleted = async () => {
+    console.log("User token:", token);
+    if (!token) return;
+
+    console.log("Marking inspection as completed...");
+
+    setIsUpdating(true);
+    try {
+      const response = await updateInspectionStatus(
+        token,
+        inspection.id,
+        "COMPLETED"
+      );
+
+      if (response && response.success) {
+        showToaster("Inspection marked as completed successfully!", "success");
+        if (onUpdate) {
+          onUpdate({
+            ...inspection,
+            inspectionStatus: "COMPLETED",
+            status: "paid",
+          });
+        }
+      } else {
+        showToaster("Failed to update inspection status", "destructive");
+      }
+    } catch (error) {
+      console.error("Error updating inspection status:", error);
+      showToaster(
+        "An error occurred while updating the inspection status",
+        "destructive"
+      );
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -104,6 +148,26 @@ const InspectionDetails = ({ inspection, onUpdate }: Props) => {
                   >
                     {inspection.status}
                   </span>
+                  {
+                    // user?.role === "admin" &&
+                    inspection.inspectionStatus === "PENDING" && (
+                      <CustomButton
+                        onClick={handleMarkAsCompleted}
+                        disabled={isUpdating}
+                        className="flex items-center text-xs px-3 py-1 h-auto"
+                        variant="primary"
+                      >
+                        {isUpdating ? (
+                          "Updating..."
+                        ) : (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Mark as Completed
+                          </>
+                        )}
+                      </CustomButton>
+                    )
+                  }
                 </div>
               </div>
               {inspection.inspectionReport && (
@@ -163,8 +227,7 @@ const InspectionDetails = ({ inspection, onUpdate }: Props) => {
                   Phone Number
                 </label>
                 <p className="text-xs md:text-sm">
-                  {inspection.user?.phoneNumber ||
-                    inspection.phoneNumber}
+                  {inspection.user?.phoneNumber || inspection.phoneNumber}
                 </p>
               </div>
             </div>
@@ -172,7 +235,7 @@ const InspectionDetails = ({ inspection, onUpdate }: Props) => {
         </div>
 
         {/* Property Information */}
-        
+
         <div className="bg-white rounded-lg shadow-sm border xl:col-span-2 overflow-hidden">
           <button
             onClick={() => toggleSection("property")}

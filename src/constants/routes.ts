@@ -47,4 +47,4 @@ export const MY_PURCHASES_ROUTE = "/my-purchases";
 export const MY_INSPECTIONS_ROUTE = "/my-inspections";
 
 export const ADMIN_SUBSCRIPTION_ROUTE = "/admin/subscriptions";
-export const ADMIN_INSPECTION_PAYMENTS_ROUTE = "/admin/inspection-payments";
+export const ADMIN_INSPECTIONS_ROUTE = "/admin/inspections";

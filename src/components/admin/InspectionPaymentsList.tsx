@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { InspectionPaymentDetail } from "@/services/inspection.service";
 import { useLocalSearchParams } from "@/hooks/useLocalSearchParams";
 import { formatPrice } from "@/lib/payment";
+import { ADMIN_INSPECTIONS_ROUTE } from "@/constants/routes";
 
 interface Props {
   initialInspectionPayments?: InspectionPaymentDetail[];
@@ -42,7 +43,6 @@ const InspectionPaymentsList = (props: Props) => {
     setActiveTab(tab);
     setSearchParams("status", tab);
   };
-
 
   const tableData = useMemo(
     () =>
@@ -137,7 +137,7 @@ const InspectionPaymentsList = (props: Props) => {
         hiddenColumns={["id"]}
         isClickable
         onRowClick={(item) => {
-          router.push(`/admin/inspections/${item.id}`);
+          router.push(`${ADMIN_INSPECTIONS_ROUTE}/${item.id}`);
         }}
       />
     </div>
