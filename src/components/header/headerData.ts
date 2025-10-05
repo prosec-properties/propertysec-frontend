@@ -99,7 +99,7 @@ export const DashboardHeaderData: MenuItemData[] = [
     name: "My Inspections",
     url: MY_INSPECTIONS_ROUTE,
     icon: ListingIcon,
-    allowedRoles: [USER_ROLE.BUYER],
+    allowedRoles: [USER_ROLE.BUYER, USER_ROLE.LANDLORD, USER_ROLE.AFFILIATE, USER_ROLE.DEVELOPER, USER_ROLE.LAWYER],
   },
 ];
 

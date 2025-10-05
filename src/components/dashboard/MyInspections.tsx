@@ -48,10 +48,10 @@ const MyInspections = ({ inspections, meta }: Props) => {
   };
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">My Inspected Properties</h1>
+      <h1 className="text-2xl font-bold mb-6">My Inspection Payments</h1>
 
       {inspections.length === 0 ? (
-        <EmptyState title="No inspected properties found" />
+        <EmptyState title="No inspection payments found" />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {inspections.map((inspection) => (

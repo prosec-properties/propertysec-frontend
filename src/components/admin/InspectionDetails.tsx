@@ -22,6 +22,7 @@ interface Props {
 
 const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
   const router = useRouter();
+  const { user } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     inspection: true,
@@ -148,26 +149,23 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
                   >
                     {inspection.status}
                   </span>
-                  {
-                    // user?.role === "admin" &&
-                    inspection.inspectionStatus === "PENDING" && (
-                      <CustomButton
-                        onClick={handleMarkAsCompleted}
-                        disabled={isUpdating}
-                        className="flex items-center text-xs px-3 py-1 h-auto"
-                        variant="primary"
-                      >
-                        {isUpdating ? (
-                          "Updating..."
-                        ) : (
-                          <>
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Mark as Completed
-                          </>
-                        )}
-                      </CustomButton>
-                    )
-                  }
+                  {user?.role === "admin" && inspection.inspectionStatus === "PENDING" && (
+                    <CustomButton
+                      onClick={handleMarkAsCompleted}
+                      disabled={isUpdating}
+                      className="flex items-center text-xs px-3 py-1 h-auto"
+                      variant="primary"
+                    >
+                      {isUpdating ? (
+                        "Updating..."
+                      ) : (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Confirm Inspection Completed
+                        </>
+                      )}
+                    </CustomButton>
+                  )}
                 </div>
               </div>
               {inspection.inspectionReport && (

@@ -18,7 +18,7 @@ type ISearchParams = Promise<{
 }>;
 
 export const metadata = {
-  title: "My Inspected Properties",
+  title: "My Inspection Payments",
 };
 
 async function Page({ searchParams }: { searchParams: ISearchParams }) {
@@ -29,7 +29,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     redirect(SIGN_IN_ROUTE);
   }
 
-  if (session.user.role !== USER_ROLE.BUYER) {
+  if (session.user.role === USER_ROLE.ADMIN) {
     redirect(SIGN_IN_ROUTE);
   }
 
@@ -48,11 +48,11 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     });
 
     if (!inspections?.success) {
-      return <ErrorDisplay message="Failed to fetch inspected properties" />;
+      return <ErrorDisplay message="Failed to fetch inspection payments" />;
     }
 
     if (!inspections.data?.inspections?.length) {
-      return <EmptyState title="No inspected properties found" />;
+      return <EmptyState title="No inspection payments found" />;
     }
 
     return (
@@ -62,7 +62,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       />
     );
   } catch (error) {
-    return <ErrorDisplay message="Failed to fetch inspected properties" />;
+    return <ErrorDisplay message="Failed to fetch inspection payments" />;
   }
 }
 

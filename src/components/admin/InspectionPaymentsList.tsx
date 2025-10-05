@@ -74,7 +74,7 @@ const InspectionPaymentsList = (props: Props) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-8">
-        <p>Property Inspection Payments</p>
+        <p>Property Inspections</p>
       </div>
 
       <StatsWrapper className="bg-primary">
@@ -122,12 +122,12 @@ const InspectionPaymentsList = (props: Props) => {
               : "bg-gray-100 text-gray-700"
           )}
         >
-          Paid
+          Completed
         </button>
       </div>
 
       <TableSearch
-        title="Inspection Payments"
+        title="Property Inspections"
         placeholder="Search by user, property, email... Click on any row to view details"
         onSearch={handleSearch}
       />
