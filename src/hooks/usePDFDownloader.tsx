@@ -15,14 +15,26 @@ export function usePDFDownloader(filenameResolver?: FilenameResolver) {
     return "receipt.pdf";
   };
 
-  const { toPDF, targetRef } = usePDF({ filename: resolveFilename(payload) });
+  const { toPDF, targetRef } = usePDF({ 
+    filename: resolveFilename(payload),
+    method: 'save',
+    page: { 
+      margin: { top: 20, right: 20, bottom: 20, left: 20 },
+      format: 'a4',
+      orientation: 'portrait'
+    },
+    canvas: {
+      mimeType: 'image/png',
+      qualityRatio: 1
+    }
+  });
 
   const download = useCallback(
     async (data: unknown) => {
       setPayload(data);
 
-      // allow DOM to mount/paint
-      await new Promise((res) => setTimeout(res, 250));
+      // allow DOM to mount/paint - increased delay for complex content
+      await new Promise((res) => setTimeout(res, 1000));
 
       try {
         if (!toPDF) throw new Error("toPDF is not available");

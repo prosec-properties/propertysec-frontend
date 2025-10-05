@@ -4,6 +4,7 @@ import React, { forwardRef, useImperativeHandle } from "react";
 import { showToaster } from "@/lib/general";
 import { usePDFDownloader } from "@/hooks/usePDFDownloader";
 import { IPropertyInspection } from "@/interface/property";
+import { formatPrice } from "@/lib/payment";
 
 interface InspectionReceiptDownloaderProps {
   inspection: IPropertyInspection;
@@ -29,13 +30,14 @@ const InspectionReceiptDownloader = forwardRef<
       }.pdf`
   );
 
+  console.log("Receipt data:", receiptData);
+
   const handleDownloadReceipt = async () => {
     setReceiptData(inspection);
     try {
       await download(inspection);
       showToaster("Receipt downloaded successfully", "default");
     } catch (error) {
-      // download already shows toaster for failure; keep existing log
       console.error("Error generating PDF:", error);
     }
   };
@@ -102,10 +104,9 @@ const InspectionReceiptDownloader = forwardRef<
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Amount</h3>
                   <div className="text-2xl font-bold text-green-600">
-                    ₦
-                    {(
-                      receiptData as IPropertyInspection
-                    ).inspectionAmount.toLocaleString()}
+                    {formatPrice(
+                      (receiptData as IPropertyInspection).inspectionAmount
+                    )}
                   </div>
                 </div>
               </div>
