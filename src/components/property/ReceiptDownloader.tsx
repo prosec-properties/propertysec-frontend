@@ -1,10 +1,10 @@
 "use client";
 
 import React, {
-  useRef,
   useState,
   forwardRef,
   useImperativeHandle,
+  useCallback,
 } from "react";
 import { usePDF } from "react-to-pdf";
 import { showToaster } from "@/lib/general";
@@ -13,62 +13,69 @@ import { IProperty } from "@/interface/property";
 
 interface ReceiptDownloaderProps {
   property: IProperty;
-  purchases: any[];
+  purchase: any;
 }
 
 export interface ReceiptDownloaderRef {
   downloadReceipt: (transactionReference: string) => Promise<void>;
 }
 
+
 const ReceiptDownloader = forwardRef<
   ReceiptDownloaderRef,
   ReceiptDownloaderProps
->(({ property, purchases }, ref) => {
+>(({ property, purchase }, ref) => {
   const [receiptData, setReceiptData] = useState<any>(null);
-  // const targetRef = useRef<HTMLDivElement>(null);
+  const { toPDF, targetRef } = usePDF({
+    filename: `property-receipt-${purchase?.transactionReference}.pdf`,
+  });
 
-  const { toPDF, targetRef } = usePDF();
-
-  const handleDownloadReceipt = async (transactionReference: string) => {
-    try {
-      const purchase = purchases.find(
-        (p) => p.transactionReference === transactionReference
-      );
+  // Expose downloadReceipt to parent via ref
+  const downloadReceipt = useCallback(
+    async (transactionReference: string) => {
       if (!purchase) {
-        showToaster("Purchase data not found", "destructive");
+        showToaster("No purchase data available to generate receipt.", "destructive");
         return;
       }
 
-      setReceiptData(purchase);
-      toPDF({
-        filename: `property-receipt-${
-          purchase.transactionReference || "unknown"
-        }.pdf`,
-      });
+      const data = {
+        transactionReference:
+          transactionReference || purchase.transactionReference || purchase.id,
+        createdAt: purchase.createdAt || new Date().toISOString(),
+        purchaseStatus: purchase.status || purchase.paymentStatus || "Completed",
+        purchaseAmount: purchase.amount || purchase.price || 0,
+        currency: purchase.currency || property.currency || "NGN",
+        buyerName:
+          purchase.buyerName || purchase.user?.fullName || purchase.purchaserName || "",
+        buyerEmail: purchase.buyerEmail || purchase.user?.email || purchase.purchaserEmail || "",
+        buyerPhone:
+          purchase.buyerPhone || purchase.user?.phoneNumber || purchase.purchaserPhone || "",
+        paymentMethod: purchase.paymentMethod || purchase.method,
+        paymentGateway: purchase.paymentGateway || purchase.gateway,
+      };
 
-      // setTimeout(async () => {
-      //   try {
-      //     // toPDF({
-      //     //   filename: `property-receipt-${
-      //     //     purchase.transactionReference || "unknown"
-      //     //   }.pdf`,
-      //     // });
-      //     showToaster("Receipt downloaded successfully", "default");
-      //   } catch (error) {
-      //     console.error("Error generating PDF:", error);
-      //     showToaster("Failed to generate receipt", "destructive");
-      //     setReceiptData(null);
-      //   }
-      // }, 100);
-    } catch (error) {
-      console.error("Error downloading receipt:", error);
-      showToaster("Failed to download receipt", "destructive");
-      setReceiptData(null);
-    }
-  };
+      setReceiptData(data);
+
+      // Wait for the hidden receipt DOM to mount and paint so react-to-pdf can capture it.
+      await new Promise((res) => setTimeout(res, 250));
+
+      try {
+        if (!toPDF) throw new Error("toPDF is not available");
+        await toPDF();
+        showToaster("Receipt downloaded", "success");
+      } catch (err) {
+        console.error("Failed to generate PDF", err);
+        showToaster("Failed to generate receipt PDF", "destructive");
+      } finally {
+        // remove hidden node after a short delay to avoid impacting UX
+        setTimeout(() => setReceiptData(null), 800);
+      }
+    },
+    [purchase, property, toPDF]
+  );
 
   useImperativeHandle(ref, () => ({
-    downloadReceipt: handleDownloadReceipt,
+    downloadReceipt,
   }));
 
   return (
@@ -77,9 +84,9 @@ const ReceiptDownloader = forwardRef<
       {receiptData && (
         <div
           ref={targetRef}
-          className="fixed top-0 left-0 w-full h-full bg-white p-8 text-black"
+          className="bg-white p-8 text-black"
           style={{
-            position: "absolute",
+            position: "fixed",
             left: "-9999px",
             top: "-9999px",
             width: "210mm",
@@ -145,6 +152,10 @@ const ReceiptDownloader = forwardRef<
                       <span className="font-medium">Category:</span>{" "}
                       {property.category?.name}
                     </p>
+                    <p>
+                      <span className="font-medium">Price:</span>{" "}
+                      {formatPrice(property.price)} {property.currency}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -200,6 +211,40 @@ const ReceiptDownloader = forwardRef<
                   </div>
                 </div>
               )}
+
+              {/* Payment Method */}
+              {receiptData.paymentMethod && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    Payment Method
+                  </h3>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm">
+                      <span className="font-medium">Method:</span>{" "}
+                      {receiptData.paymentMethod}
+                    </p>
+                    {receiptData.paymentGateway && (
+                      <p className="text-sm">
+                        <span className="font-medium">Gateway:</span>{" "}
+                        {receiptData.paymentGateway}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Terms and Conditions */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  Terms & Conditions
+                </h3>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p>• This receipt serves as proof of purchase.</p>
+                  <p>• All sales are final unless otherwise specified.</p>
+                  <p>• Please retain this receipt for your records.</p>
+                  <p>• For any inquiries, contact support@propertysec.com</p>
+                </div>
+              </div>
             </div>
 
             {/* Footer */}
@@ -208,6 +253,9 @@ const ReceiptDownloader = forwardRef<
               <p className="mt-2">
                 Generated on {new Date().toLocaleDateString()} at{" "}
                 {new Date().toLocaleTimeString()}
+              </p>
+              <p className="mt-1 text-xs">
+                PropertySec Inc. • 123 Business Ave, City, State 12345 • support@propertysec.com
               </p>
             </div>
           </div>

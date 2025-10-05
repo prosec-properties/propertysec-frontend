@@ -144,7 +144,7 @@ const PurchaseCard = ({ purchase }: Props) => {
       <ReceiptDownloader
         ref={receiptDownloaderRef}
         property={purchase.property}
-        purchases={[purchase]}
+        purchase={purchase}
       />
     </div>
   );

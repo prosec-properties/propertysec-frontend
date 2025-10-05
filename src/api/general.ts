@@ -46,7 +46,8 @@ class BaseRequest {
           continue;
         }
         if (error.code === "UND_ERR_HEADERS_TIMEOUT") {
-          if (attempt === retries) throw new Error("Server response headers timeout");
+          if (attempt === retries)
+            throw new Error("Server response headers timeout");
           continue;
         }
         if (attempt === retries) throw error;

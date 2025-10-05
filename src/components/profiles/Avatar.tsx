@@ -10,7 +10,7 @@ export interface IAvatarProps {
   size?: "sm" | "md" | "lg" | "xl" | "xxl";
   className?: string;
   onClick?: () => void;
-  userId: string; 
+  userId?: string; 
 }
 const Avatar: React.FC<IAvatarProps> = ({
   imageSrc,
