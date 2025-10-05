@@ -1,39 +1,15 @@
 "use client";
 
 import React from "react";
-import { IProperty } from "@/interface/property";
+import { IProperty, IPropertyInspection } from "@/interface/property";
 import InspectionCard from "../property/InspectionCard";
 import { IMeta } from "@/interface/general";
 import EmptyState from "../misc/Empty";
 import CustomPagination from "../misc/CustomPagination";
 import { useRouter, useSearchParams } from "next/navigation";
 
-interface Inspection {
-  id: string;
-  inspectionAmount: number;
-  inspectionStatus: "PENDING" | "COMPLETED";
-  approvalStatus?: "approved" | "pending" | "rejected";
-  inspectionReport: string;
-  userId: string;
-  propertyId: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  inspectionDate: string;
-  createdAt: string;
-  updatedAt: string;
-  property: IProperty & {
-    user: {
-      id: string;
-      fullName: string;
-      email: string;
-      phoneNumber: string;
-    };
-  };
-}
-
 interface Props {
-  inspections: Inspection[];
+  inspections: IPropertyInspection[];
   meta: IMeta;
 }
 
@@ -43,7 +19,7 @@ const MyInspections = ({ inspections, meta }: Props) => {
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', newPage.toString());
+    params.set("page", newPage.toString());
     router.push(`?${params.toString()}`);
   };
   return (

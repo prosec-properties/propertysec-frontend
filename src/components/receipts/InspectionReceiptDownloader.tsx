@@ -30,8 +30,6 @@ const InspectionReceiptDownloader = forwardRef<
       }.pdf`
   );
 
-  console.log("Receipt data:", receiptData);
-
   const handleDownloadReceipt = async () => {
     setReceiptData(inspection);
     try {
@@ -85,9 +83,7 @@ const InspectionReceiptDownloader = forwardRef<
                     </p>
                     <p>
                       <span className="font-medium">Inspection Date:</span>{" "}
-                      {new Date(
-                        (receiptData as IPropertyInspection).inspectionDate
-                      ).toLocaleDateString()}
+                      {(receiptData as IPropertyInspection).createdAt}
                     </p>
                     <p>
                       <span className="font-medium">Status:</span>{" "}
@@ -124,17 +120,21 @@ const InspectionReceiptDownloader = forwardRef<
                     {(receiptData as IPropertyInspection).property.address}
                   </p>
                   <div className="grid grid-cols-3 gap-4 text-sm">
-                    <p>
-                      <span className="font-medium">Type:</span>{" "}
-                      {(receiptData as IPropertyInspection).property.type}
-                    </p>
-                    <p>
-                      <span className="font-medium">Category:</span>{" "}
-                      {
-                        (receiptData as IPropertyInspection).property.category
-                          ?.name
-                      }
-                    </p>
+                    {(receiptData as IPropertyInspection).property.type && (
+                      <p>
+                        <span className="font-medium">Type:</span>{" "}
+                        {(receiptData as IPropertyInspection).property.type}
+                      </p>
+                    )}
+                    {(receiptData as IPropertyInspection).property.category && (
+                      <p>
+                        <span className="font-medium">Category:</span>{" "}
+                        {
+                          (receiptData as IPropertyInspection).property.category
+                            ?.name
+                        }
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

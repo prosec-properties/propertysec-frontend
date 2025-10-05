@@ -7,40 +7,17 @@ import BedIcon from "../icons/Bed";
 import ToiletIcon from "../icons/Toilet";
 import Link from "next/link";
 import { PROPERTIES_ROUTE } from "@/constants/routes";
-import { IProperty } from "@/interface/property";
+import { IPropertyInspection } from "@/interface/property";
 import { cn } from "@/lib/utils";
 import CustomButton from "../buttons/CustomButton";
 import InspectionReceiptDownloader, {
   InspectionReceiptDownloaderRef,
 } from "../receipts/InspectionReceiptDownloader";
 import { formatPrice } from "@/lib/payment";
-
-interface Inspection {
-  id: string;
-  inspectionAmount: number;
-  inspectionStatus: "PENDING" | "COMPLETED";
-  approvalStatus?: "approved" | "pending" | "rejected";
-  inspectionReport: string;
-  userId: string;
-  propertyId: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  inspectionDate: string;
-  createdAt: string;
-  updatedAt: string;
-  property: IProperty & {
-    user: {
-      id: string;
-      fullName: string;
-      email: string;
-      phoneNumber: string;
-    };
-  };
-}
+import { formatDate } from "@/lib/date";
 
 interface Props {
-  inspection: Inspection;
+  inspection: IPropertyInspection;
 }
 
 const InspectionCard = ({ inspection }: Props) => {
@@ -110,7 +87,7 @@ const InspectionCard = ({ inspection }: Props) => {
           <div className="mt-1">
             <dt className="sr-only">Inspection date</dt>
             <dd className="text-xs text-gray-500">
-              Inspected on {new Date(inspection.createdAt).toLocaleDateString()}
+              Inspected on {formatDate(inspection.createdAt)}
             </dd>
           </div>
         </dl>
