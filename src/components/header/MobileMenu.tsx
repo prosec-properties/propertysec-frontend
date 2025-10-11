@@ -12,6 +12,7 @@ const MobileMenu = () => {
           <Link
             href={menu.url}
             className="flex items-center gap-3 transition hover:text-gray-500/75 text-base"
+            prefetch
           >
             {<menu.icon className="w-5 h-5" />}
             <span>{menu.name}</span>
@@ -22,6 +23,7 @@ const MobileMenu = () => {
         <Link
           href={SIGN_IN_ROUTE}
           className="flex items-center gap-3 rounded-md py-2.5 font-semibold sm:block"
+          prefetch
         >
           <User className="w-5 h-5" />
           <span>Login</span>

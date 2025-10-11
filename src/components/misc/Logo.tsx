@@ -11,7 +11,7 @@ interface Props{
 }
 const Logo = (props: Props) => {
   return (
-    <Link className={cn("block", props.className)} href={HOME_ROUTE}>
+    <Link className={cn("block", props.className)} href={HOME_ROUTE} prefetch>
       <span className="sr-only">Home</span>
       <LogoIcon className="w-[6rem] h-[2rem] hidden md:block" />
       <Image

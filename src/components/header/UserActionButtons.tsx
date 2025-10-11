@@ -37,11 +37,11 @@ const UserActionButtons = ({ user, isMobile }: UserActionButtonsProps) => (
         isMobile ? "justify-center  gap-8 w-full" : "gap-4"
       }`}
     >
-      <Link href={`${PROFILE_SETTING_ROUTE}/${user?.slug}`}>
+      <Link href={`${PROFILE_SETTING_ROUTE}/${user?.slug}`} prefetch>
         <UserGearIcon />
       </Link>
 
-      <Link href={SIGN_OUT_ROUTE}>
+      <Link href={SIGN_OUT_ROUTE} prefetch>
         <LogOut />
       </Link>
     </div>

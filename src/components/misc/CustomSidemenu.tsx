@@ -191,7 +191,7 @@ const CustomSideMenu = ({
             <SidebarMenu>
               {filteredMenuItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <Link href={item.url}>
+                  <Link href={item.url} prefetch>
                     <SidebarMenuButton isActive={pathname === item.url}>
                       <div className="flex items-center">
                         {item.iconType === "custom" ? (

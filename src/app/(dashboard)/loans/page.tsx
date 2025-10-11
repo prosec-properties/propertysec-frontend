@@ -4,7 +4,7 @@ import { getUserLoans, IUserLoansResponse } from "@/services/loan.service";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Loans",
@@ -46,9 +46,18 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
     redirect("/");
   }
   const response = await getUserLoans(session.user?.token);
-  // console.log("Loan data:", response?.data?.loans);
 
-  return <LoanWrapper loanData={response?.data || defaultLoanData} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <LoanWrapper loanData={response?.data || defaultLoanData} />
+    </Suspense>
+  );
 }
 
 export default Page;

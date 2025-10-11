@@ -56,6 +56,7 @@ const HeaderMenu = () => {
                         : "text-gray-700"
                     }`}
                     href={menu.url}
+                    prefetch
                   >
                     {menu.name}
                   </Link>

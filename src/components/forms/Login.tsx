@@ -95,6 +95,7 @@ const LoginForm = () => {
           <Link
             href={FORGOT_PASSWORD_ROUTE}
             className="italic text-grey11 font-medium"
+            prefetch
           >
             Forgot password?
           </Link>

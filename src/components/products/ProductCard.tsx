@@ -31,6 +31,7 @@ const ProductCard = ({ product, className }: Props) => {
         className
       )}
       aria-label={`View details for ${product.title}`}
+      prefetch
     >
       <div className="relative aspect-video w-full mb-6 rounded-[0.675rem] overflow-hidden">
         <Image

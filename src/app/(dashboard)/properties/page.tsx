@@ -1,12 +1,14 @@
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
-import AllProperties from "@/components/property/AllProperties";
 import { ICountry } from "@/interface/location";
 import { ICategory } from "@/interface/category";
 import { fetchCategories } from "@/services/categories.service";
 import { fetchAllProperties } from "@/services/properties.service";
 import { Metadata } from "next";
-import React from "react";
+import React, { Suspense } from "react";
 import { fetchACountry } from "@/services/location.service";
+import Spinner from "@/components/misc/Spinner";
+import AllProperties from "@/components/property/AllProperties";
+
 
 export const metadata: Metadata = {
   title: "Properties",
@@ -45,12 +47,14 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   }
 
   return (
-    <AllProperties
-      properties={properties?.data?.data}
-      country={country?.data as ICountry}
-      categories={categories?.data as ICategory[]}
-      meta={properties?.data?.meta}
-    />
+    <Suspense fallback={<Spinner fullScreen={false} />}>
+      <AllProperties
+        properties={properties?.data?.data}
+        country={country?.data as ICountry}
+        categories={categories?.data as ICategory[]}
+        meta={properties?.data?.meta}
+      />
+    </Suspense>
   );
 }
 

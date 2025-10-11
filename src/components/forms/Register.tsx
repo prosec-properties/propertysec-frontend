@@ -209,7 +209,7 @@ const RegisterForm = () => {
         <>
           <div className="my-6 text-center">
             Already have an account? {"  "}
-            <Link href={SIGN_IN_ROUTE} className="text-blue-600 underline">
+            <Link href={SIGN_IN_ROUTE} className="text-blue-600 underline" prefetch>
               Login
             </Link>
           </div>

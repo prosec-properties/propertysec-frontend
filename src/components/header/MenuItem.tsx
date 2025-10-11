@@ -20,6 +20,7 @@ const MenuItem = ({ menu, pathname }: MenuItemProps) => {
           isActive ? "text-primary" : ""
         }`}
         href={menu.url}
+        prefetch
       >
         <span className="md:hidden">
           {Icon && (

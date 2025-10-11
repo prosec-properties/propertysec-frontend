@@ -53,7 +53,7 @@ const InspectionCard = ({ inspection }: Props) => {
         </span>
       </div>
 
-      <Link href={`${PROPERTIES_ROUTE}/${inspection.property.id}`}>
+      <Link href={`${PROPERTIES_ROUTE}/${inspection.property.id}`} prefetch>
         <Image
           alt="property image"
           width={400}

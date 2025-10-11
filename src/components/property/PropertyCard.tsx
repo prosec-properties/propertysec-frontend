@@ -21,6 +21,7 @@ const PropertyCard = (props: Props) => {
     <Link
       href={`${PROPERTIES_ROUTE}/${props.property.id}`}
       className="block rounded-[0.675rem] p-4 shadow-sm shadow-indigo-100 bg-white relative"
+      prefetch
     >
       {props.property.availability === "sold" && (
         <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">

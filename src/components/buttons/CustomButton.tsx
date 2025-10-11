@@ -55,6 +55,7 @@ const CustomButton = React.forwardRef<
             "w-full",
             linkClassName
           )}
+          prefetch
         >
           {children}
         </Link>

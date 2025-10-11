@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { CircleX, FileVideo, Image as ImageIcon } from "lucide-react"; // Import FileVideo icon
 import { FileData } from "@/interface/file";
 import { ImagePreview, SelectedImagePreview, UploadImageFormat } from "@/interface/image";
+import Image from "next/image";
 
 interface Props
   extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "placeholder"> {
@@ -221,12 +222,13 @@ export default function UploadImg({
 
       {preview.file.type.startsWith("image/") ? (
         <div className={fileStyle.class} onClick={handleImgClick}>
-          <img
-            {...props}
+          <Image
             src={preview.url}
             alt={preview.name}
             title={preview.name}
-            style={fileStyle.style}
+            width={format === "single" ? 400 : isSm ? 130 : 70}
+            height={format === "single" ? 300 : isSm ? 120 : 61}
+            className="w-full h-full object-cover rounded-[7px]"
             aria-label={
               "You are trying to upload this file named: " + preview.name
             }

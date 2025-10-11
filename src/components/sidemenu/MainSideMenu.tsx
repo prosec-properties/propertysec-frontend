@@ -17,6 +17,7 @@ const MainSideMenu = () => {
               <Link
                 href="#"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-greyBody"
+                prefetch
               >
                 <span>{item.icon}</span>
                 <span>{item.title}</span>

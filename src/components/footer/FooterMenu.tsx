@@ -45,6 +45,7 @@ const FooterMenu = () => {
                             rel="noreferrer"
                             target="_blank"
                             className="text-gray-70 transition hover:opacity-75"
+                            prefetch
                           >
                             <span className="sr-only">{social.name}</span>
 
@@ -61,6 +62,7 @@ const FooterMenu = () => {
                         <Link
                           href={link.url}
                           className="transition hover:opacity-75 "
+                          prefetch
                         >
                           {link.name}
                         </Link>

@@ -20,6 +20,7 @@ const PropertyCategoryCard = (props: Props) => {
         props.className,
         "rounded-[0.625rem] border-[0.6px] border-grey100 bg-white p-3"
       )}
+      prefetch
     >
       <div className="mb-10">
         <Image

@@ -12,7 +12,9 @@ import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/payment";
 import { useUser } from "@/hooks/useUser";
 import CustomButton from "../buttons/CustomButton";
-import ReceiptDownloader, { ReceiptDownloaderRef } from "../receipts/PropertyPurchase";
+import ReceiptDownloader, {
+  ReceiptDownloaderRef,
+} from "../receipts/PropertyPurchase";
 
 interface Props {
   purchase: IPropertyPurchase;
@@ -55,7 +57,7 @@ const PurchaseCard = ({ purchase }: Props) => {
         </span>
       </div>
 
-      <Link href={`${PROPERTIES_ROUTE}/${purchase.property.id}`}>
+      <Link href={`${PROPERTIES_ROUTE}/${purchase.property.id}`} prefetch>
         <Image
           alt="property image"
           width={400}
