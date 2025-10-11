@@ -57,7 +57,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     );
 
     return (
-      <Suspense fallback={<Spinner fullScreen={false} />}>
+      <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading properties..." />}>
         <Landlord
           properties={myProperties?.data?.data || []}
           meta={myProperties?.data?.meta}
@@ -68,7 +68,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   if (user.role === USER_ROLE.AFFILIATE) {
     const shop = await fetchAffiliateShop(session.user?.token);
     return (
-      <Suspense fallback={<Spinner fullScreen={false} />}>
+      <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading shop..." />}>
         <AffiliateDashboard properties={shop?.data?.properties || []} />
       </Suspense>
     );

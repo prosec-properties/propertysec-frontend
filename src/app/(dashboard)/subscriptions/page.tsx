@@ -38,7 +38,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Suspense fallback={<Spinner fullScreen={false} />}>
+      <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading subscriptions..." />}>
         <SubscriptionCard
           plans={subscriptionPlans?.data as Plan[]}
           activeTab={activeTab}

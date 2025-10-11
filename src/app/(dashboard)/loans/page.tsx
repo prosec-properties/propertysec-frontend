@@ -49,7 +49,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const response = await getUserLoans(session.user?.token);
 
   return (
-    <Suspense fallback={<Spinner fullScreen={false} />}>
+    <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading loans..." />}>
       <LoanWrapper loanData={response?.data || defaultLoanData} />
     </Suspense>
   );

@@ -47,7 +47,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   }
 
   return (
-    <Suspense fallback={<Spinner fullScreen={false} />}>
+    <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading properties..." />}>
       <AllProperties
         properties={properties?.data?.data}
         country={country?.data as ICountry}
