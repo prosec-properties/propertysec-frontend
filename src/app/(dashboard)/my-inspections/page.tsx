@@ -22,7 +22,6 @@ export const metadata = {
 };
 
 async function Page({ searchParams }: { searchParams: ISearchParams }) {
-  const queries = await searchParams;
   const session = await getServerSession(authConfig);
 
   if (!session) {
@@ -37,33 +36,11 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     redirect(SIGN_IN_ROUTE);
   }
 
-  const user = session.user;
+  return <MyInspectionsClient token={session.user.token} />;
+}
 
-  try {
-    const inspections = await fetchMyInspectedProperties(user?.token!, {
-      page: queries?.page || "1",
-      per_page: queries?.per_page || "20",
-      sort_by: queries?.sort_by || "created_at",
-      order: queries?.order || "desc",
-    });
-
-    if (!inspections?.success) {
-      return <ErrorDisplay message="Failed to fetch inspection payments" />;
-    }
-
-    if (!inspections.data?.inspections?.length) {
-      return <EmptyState title="No inspection payments found" />;
-    }
-
-    return (
-      <MyInspections
-        inspections={inspections.data.inspections}
-        meta={inspections.data.meta}
-      />
-    );
-  } catch (error) {
-    return <ErrorDisplay message="Failed to fetch inspection payments" />;
-  }
+function MyInspectionsClient({ token }: { token: string }) {
+  return <MyInspections token={token} />;
 }
 
 export default Page;

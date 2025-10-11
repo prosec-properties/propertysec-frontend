@@ -73,8 +73,6 @@ const LoanInfoForm = (props: Props) => {
     setNextOfKin,
   } = useLoanRequestStore();
 
-  console.log("user", user);
-
   const mutation = useMutation({
     mutationFn: takeLoanApi,
     onSuccess: (data) => {

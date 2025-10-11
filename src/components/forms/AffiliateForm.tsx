@@ -100,7 +100,6 @@ const AffiliateProfileForm: React.FC<Props> = ({ token }) => {
 
   useEffect(() => {
     if (!user) return;
-    console.log("user", user);
 
     const files = user.profileFiles || [];
 

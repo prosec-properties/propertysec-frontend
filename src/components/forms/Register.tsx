@@ -47,20 +47,19 @@ const RegisterForm = () => {
   const mutation = useMutation({
     mutationFn: register,
     onSuccess: (data) => {
-      // showToaster(data?.message || "Your account has been registered successfully! Confirm your email to complete your registration", "success");
-      // console.log("data", data?.data);
+      showToaster(data?.message || "Your account has been registered successfully! Confirm your email to complete your registration", "success");
 
-      // push(`${VERIFY_EMAIL_ROUTE}?email=${data?.data?.email}`);
-      if (user && user.role === USER_ROLE.ADMIN) {
-        showToaster(
-          "User account has been registered successfully!",
-          "success"
-        );
-        setSearchParams("addedByAdmin", "true");
-        return;
-      }
-      showToaster("Your account has been registered successfully!", "success");
-      push(SIGN_IN_ROUTE);
+      push(`${VERIFY_EMAIL_ROUTE}?email=${data?.data?.email}`);
+      // if (user && user.role === USER_ROLE.ADMIN) {
+      //   showToaster(
+      //     "User account has been registered successfully!",
+      //     "success"
+      //   );
+      //   setSearchParams("addedByAdmin", "true");
+      //   return;
+      // }
+      // showToaster("Your account has been registered successfully!", "success");
+      // push(SIGN_IN_ROUTE);
     },
     onError: (error) => {
       console.log("error from component", error);

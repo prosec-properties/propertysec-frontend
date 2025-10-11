@@ -52,25 +52,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     user.role === USER_ROLE.DEVELOPER ||
     user.role === USER_ROLE.LAWYER
   ) {
-    let properties;
-    try {
-      [properties] = await Promise.all([
-        fetchMyProperties(session.user?.token, filterParams),
-      ]);
-    } catch (error: any) {
-      if (error?.message?.includes("Unauthorized") || error?.errors?.[0]?.message?.includes("Unauthorized")) {
-        redirect(SIGN_IN_ROUTE);
-      }
-      properties = { success: false, data: null };
-    }
-
-    if (!properties?.success) {
-      return (
-        <EmptyState message="Unable to fetch your properties. Please try again later." />
-      );
-    }
-
-    return <Landlord properties={properties?.data?.data || []} meta={properties?.data?.meta} />;
+    return <Landlord token={session.user?.token} />;
   }
   if (user.role === USER_ROLE.AFFILIATE) {
     return <AffiliateDashboard token={user.token || ""} />;
