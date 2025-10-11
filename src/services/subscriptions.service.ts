@@ -96,7 +96,8 @@ export const getSubscriptionDetails = async (
   try {
     const response = await $requestWithToken.get<ISubscriptionWithUser>(
       `/subscriptions/${subscriptionId}`,
-      token
+      token,
+      "force-cache"
     );
     return response;
   } catch (error) {

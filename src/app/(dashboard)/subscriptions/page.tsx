@@ -29,7 +29,8 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
 
   const subscriptionPlans = await $requestWithToken.get<Plan[]>(
     `/plans?duration=${activeTab}`,
-    session.user?.token
+    session.user?.token,
+    "force-cache"
   );
 
   if (!isNotAnEmptyArray(subscriptionPlans?.data as Plan[])) {
@@ -38,7 +39,15 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading subscriptions..." />}>
+      <Suspense
+        fallback={
+          <Spinner
+            fullScreen={false}
+            size="md"
+            message="Loading subscriptions..."
+          />
+        }
+      >
         <SubscriptionCard
           plans={subscriptionPlans?.data as Plan[]}
           activeTab={activeTab}

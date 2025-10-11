@@ -4,10 +4,12 @@ import { ICategoryType } from "@/interface/file";
 
 export const fetchCategories = async (type?: ICategoryType) => {
   try {
-    const response = await $requestWithoutToken.get<ICategory[]>(`/categories?type=${type}`);
+    const response = await $requestWithoutToken.get<ICategory[]>(
+      `/categories?type=${type}`,
+      "force-cache"
+    );
     return response;
   } catch (error) {
     throw error;
   }
 };
-
