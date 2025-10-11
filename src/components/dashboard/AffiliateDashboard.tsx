@@ -5,14 +5,11 @@ import { IProperty } from "@/interface/property";
 import React from "react";
 import TabbedListingView from "../misc/TabbedListingView";
 import { useQueryString } from "@/hooks/useQueryString";
-import { useQuery } from "@tanstack/react-query";
-import { fetchAffiliateShop } from "@/services/affiliate.service";
-import EmptyState from "../misc/Empty";
 
 interface Props {
-  token: string;
+  properties: IProperty[];
 }
-const AffiliateDashboard = ({ token }: Props) => {
+const AffiliateDashboard = ({ properties }: Props) => {
   const { getQueryParam, setQueryParam } = useQueryString();
 
   React.useEffect(() => {
@@ -22,50 +19,19 @@ const AffiliateDashboard = ({ token }: Props) => {
     }
   }, [getQueryParam, setQueryParam]);
 
-  const {
-    data: affiliateShop,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["affiliate-shop"],
-    queryFn: () => fetchAffiliateShop(token),
-    enabled: !!token,
-  });
-
-  console.log("affiliateShop", affiliateShop);
-
-  const filteredProperties = React.useMemo(() => {
-    if (!affiliateShop?.data?.properties) return [];
-
+  const filteredProperties = React.useCallback(() => {
     const availability = getQueryParam("availability") || "available";
     if (availability === "all") {
-      return affiliateShop.data.properties;
+      return properties;
     }
-    return affiliateShop.data.properties.filter(
+    return properties.filter(
       (property) => property.availability === availability
     );
-  }, [affiliateShop?.data?.properties, getQueryParam]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your shop...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <EmptyState message="Unable to fetch your properties. Please try again later." />
-    );
-  }
+  }, [properties, getQueryParam]);
 
   return (
     <TabbedListingView
-      items={filteredProperties}
+      items={filteredProperties()}
       title="My Shop"
       tabs={["available", "sold"]}
       tabDescription="View and manage properties in your affiliate shop."

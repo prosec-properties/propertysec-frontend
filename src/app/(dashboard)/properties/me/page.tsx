@@ -1,15 +1,14 @@
 import { authConfig } from "@/authConfig";
-import EmptyState from "@/components/misc/Empty";
 import { HOME_ROUTE, SIGN_IN_ROUTE } from "@/constants/routes";
 import { USER_ROLE } from "@/constants/user";
 import { fetchMyProperties } from "@/services/properties.service";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import React from "react";
-import ErrorDisplay from "@/components/misc/ErrorDisplay";
+import React, { Suspense } from "react";
 import Landlord from "@/components/dashboard/Landlord";
-import MultipleProperties from "@/components/property/MultipleProperties";
 import AffiliateDashboard from "@/components/dashboard/AffiliateDashboard";
+import Spinner from "@/components/misc/Spinner";
+import { fetchAffiliateShop } from "@/services/affiliate.service";
 
 type ISearchParams = Promise<{
   categories?: string;
@@ -52,10 +51,27 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     user.role === USER_ROLE.DEVELOPER ||
     user.role === USER_ROLE.LAWYER
   ) {
-    return <Landlord token={session.user?.token} />;
+    const myProperties = await fetchMyProperties(
+      session.user?.token,
+      filterParams
+    );
+
+    return (
+      <Suspense fallback={<Spinner fullScreen={false} />}>
+        <Landlord
+          properties={myProperties?.data?.data || []}
+          meta={myProperties?.data?.meta}
+        />
+      </Suspense>
+    );
   }
   if (user.role === USER_ROLE.AFFILIATE) {
-    return <AffiliateDashboard token={user.token || ""} />;
+    const shop = await fetchAffiliateShop(session.user?.token);
+    return (
+      <Suspense fallback={<Spinner fullScreen={false} />}>
+        <AffiliateDashboard properties={shop?.data?.properties || []} />
+      </Suspense>
+    );
   }
 }
 

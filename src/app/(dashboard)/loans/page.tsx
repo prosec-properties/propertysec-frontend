@@ -1,5 +1,6 @@
 import { authConfig } from "@/authConfig";
 import LoanWrapper from "@/components/loans/LoanWrapper";
+import Spinner from "@/components/misc/Spinner";
 import { getUserLoans, IUserLoansResponse } from "@/services/loan.service";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
@@ -48,13 +49,7 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const response = await getUserLoans(session.user?.token);
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      }
-    >
+    <Suspense fallback={<Spinner fullScreen={false} />}>
       <LoanWrapper loanData={response?.data || defaultLoanData} />
     </Suspense>
   );

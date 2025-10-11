@@ -2,7 +2,7 @@ import { $requestWithToken } from "@/api/general";
 import { IProduct } from "@/interface/product";
 import { IProperty } from "@/interface/property";
 
-interface IAffiliateShop {
+export interface IAffiliateShop {
   properties: IProperty[];
   products: IProduct[];
   totalItems: number;
