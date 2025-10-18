@@ -74,6 +74,9 @@ export interface ILoanSummary {
   totalLoans: string;
   statusCounts: ILoanStatusCount[];
   approvedLoans: string;
+  disbursedLoans: string;
+  totalAmount: string;
+  totalRepaid: string;
 }
 
 // Additional interfaces for complete loan data

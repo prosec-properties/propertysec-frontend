@@ -38,7 +38,7 @@ const LoanRequests = (props: Props) => {
       <StatsWrapper className="bg-primary">
         <Stat
           title="Total Loan Disbursed"
-          value={formatPrice(props.loanStats?.statusCounts?.[0]?.totalamount)}
+          value={formatPrice(props.loanStats?.disbursedLoans || "0")}
         />
         <Stat
           title="Active Loans"

@@ -27,7 +27,8 @@ const LandlordInfoSchema = z.object({
   landlordBankName: z.string().min(1, { message: "Bank name is required" }),
   landlordAccountNumber: z
     .string()
-    .min(1, { message: "Account number is required" }),
+    .min(10, { message: "Account number is required" })
+    .max(10, { message: "Account number cannot be more than ten digits" }),
   landlordAddress: z
     .string()
     .min(1, { message: "Landlord address is required" }),
@@ -167,14 +168,14 @@ const LandlordInfoForm = ({ token, disabled }: Props) => {
           control={control}
           render={({ field }) => (
             <NumericFormat
-            {...field}
-            label="Landlord Phone Number"
-            name={field.name}
-            placeholder="eg "
-            wrapperClassName="mb-6 md:w-1/2"
-            errorMessage={errors.phoneNumber?.message}
-            customInput={CustomInput}
-          />
+              {...field}
+              label="Landlord Phone Number"
+              name={field.name}
+              placeholder="eg "
+              wrapperClassName="mb-6 md:w-1/2"
+              errorMessage={errors.phoneNumber?.message}
+              customInput={CustomInput}
+            />
           )}
         />
       </article>

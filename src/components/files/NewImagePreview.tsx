@@ -64,23 +64,23 @@ const NewImagePreview = (props: Props) => {
       {selected && (
         <>
           {isImage ? (
-            <div className="sm:basis-[50%] bg-red-800 h-[300px] w-[300px]">
+            <div className="sm:basis-[50%] h-[300px] w-[300px] max-w-full overflow-hidden rounded-lg">
               <Image
                 src={selected.image.url}
                 alt={selected.fileName}
                 width={300}
                 height={300}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             </div>
           ) : isVideo ? (
-            <div className="sm:basis-[50%] bg-red-800 h-[300px] w-[300px]">
+            <div className="sm:basis-[50%] h-[300px] w-[300px] max-w-full overflow-hidden rounded-lg">
               <video
                 width={300}
                 height={300}
                 controls
                 src={selected.image.url}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               >
                 Your browser does not support the video tag.
               </video>

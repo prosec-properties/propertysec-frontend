@@ -15,6 +15,7 @@ import { NumericFormat } from "react-number-format";
 import { z } from "zod";
 import { useUser } from "@/hooks/useUser";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
+import { formatPrice } from "@/lib/payment";
 import { takeLoanApi } from "@/services/loan.service";
 import { useMutation } from "@tanstack/react-query";
 import { LOANSTEPS_ENUM } from "@/constants/general";
@@ -194,7 +195,7 @@ const LoanInfoForm = (props: Props) => {
               "40000",
               "50000",
               "100000",
-            ].map((item) => ({ label: item, value: item }))}
+            ].map((item) => ({ label: formatPrice(item), value: item }))}
             onValueChange={(value) => {
               field.onChange(value);
             }}
