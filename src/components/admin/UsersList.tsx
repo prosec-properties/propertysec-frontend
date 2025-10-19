@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import TableSearch from "../tables/TableSearch";
 import CustomTable from "../tables/CustomTable";
-import { IStatus, IUser } from "@/interface/user";
+import { IStatus, IUser, IUserRole, IUserRoleEnum } from "@/interface/user";
 import { formatDate } from "@/lib/date";
 import { useRouter } from "next/navigation";
 import { PROFILE_ROUTE } from "@/constants/routes";
@@ -15,6 +15,7 @@ import { Eye } from "lucide-react";
 import { IMeta } from "@/interface/general";
 import CustomPagination from "../misc/CustomPagination";
 import { useQueryString } from "@/hooks/useQueryString";
+import ListingTabs from "../listings/ListingTabs";
 
 interface Props {
   initialUsers?: IUser[];
@@ -24,10 +25,19 @@ interface Props {
   meta?: IMeta;
 }
 
+const ROLE_TABS: string[] = ["all", ...IUserRoleEnum];
+
+const isValidRole = (value: string | null): value is IUserRole => {
+  if (!value) {
+    return false;
+  }
+  return (IUserRoleEnum as readonly string[]).includes(value);
+};
+
 const UsersList = (props: Props) => {
   const router = useRouter();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const { setQueryParam } = useQueryString();
+  const { setQueryParam, getQueryParam } = useQueryString();
   const users = props.initialUsers || [];
   const totalUsers = props.totalUsers || 0;
   const subscribedUsers = props.subscribedUsers || 0;
@@ -35,6 +45,11 @@ const UsersList = (props: Props) => {
   const handlePageChange = (page: number) => {
     setQueryParam("page", page.toString());
   };
+
+  const roleParam = getQueryParam("role");
+  const selectedRole: IUserRole | "all" = isValidRole(roleParam)
+    ? roleParam
+    : "all";
 
   const subscriptionStatus = (status: IStatus) => {
     if (status === "active") {
@@ -47,6 +62,15 @@ const UsersList = (props: Props) => {
   const subscriptionFilteredUsers = props.showOnlyPaid
     ? users.filter((user) => user.subscriptionStatus === "active")
     : users;
+
+  const roleFilteredUsers =
+    selectedRole === "all"
+      ? subscriptionFilteredUsers
+      : subscriptionFilteredUsers.filter((user) => user.role === selectedRole);
+
+  const tabDescription = props.showOnlyPaid
+    ? "View subscribed users by role."
+    : "Filter the user list by role.";
 
   return (
     <div className="space-y-6">
@@ -75,69 +99,79 @@ const UsersList = (props: Props) => {
           </StatsWrapper>
         </>
       )}
-
-      <TableSearch
-        title={props.showOnlyPaid ? "Subscribers" : "List of Users"}
-        placeholder="Search by name, email, phone..."
-      />
-
-      <CustomTable
-        tableData={subscriptionFilteredUsers?.map((user) => ({
-          id: user.id,
-          name: user.fullName,
-          phone: user.phoneNumber,
-          location: user?.stateOfResidence || "-",
-          dateJoined: formatDate(user.createdAt),
-          role: <p className="capitalize">{user.role}</p>,
-          status: (
-            <p
-              className={cn("capitalize w-fit px-3 py-2 rounded-[3px]", {
-                ["bg-successLight text-success"]:
-                  user.subscriptionStatus === "active",
-                ["bg-grey100 text-grey8"]:
-                  user.subscriptionStatus === "inactive",
-              })}
-            >
-              {subscriptionStatus(user.subscriptionStatus!)}
-            </p>
-          ),
-          actions: (
-            <div className="flex gap-2">
-              <CustomButton
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (user.role === 'affiliate') {
-                    router.push(`/admin/affiliates/${user.id}/properties`);
-                  } else if (user.role === 'buyer') {
-                    router.push(`/admin/buyers/${user.id}/properties`);
-                  } else {
-                    router.push(`/admin/users/${user.id}/properties`);
-                  }
-                }}
-                className="flex items-center gap-1"
-              >
-                <Eye size={14} />
-                View Properties
-              </CustomButton>
-            </div>
-          ),
-        }))}
-        hiddenColumns={["profileFiles", "id"]}
-        isClickable
-        onRowClick={(item) => {
-          router.push(`${PROFILE_ROUTE}/${item.id}`);
-        }}
-      />
-      {props.meta && props.meta.lastPage > 1 && (
-        <div className="mt-6">
-          <CustomPagination
-            currentPage={props.meta.currentPage}
-            totalPages={props.meta.lastPage}
-            onPageChange={handlePageChange}
+      <div className="bg-white border-[0.6px] border-grey100 rounded-[0.625rem]">
+        <div className="p-6">
+          <ListingTabs
+            text={tabDescription}
+            tabs={ROLE_TABS}
+            paramName="role"
           />
+
+          <TableSearch
+            title={props.showOnlyPaid ? "Subscribers" : "List of Users"}
+            placeholder="Search by name, email, phone..."
+            className="mt-6"
+          />
+
+          <CustomTable
+            tableData={roleFilteredUsers?.map((user) => ({
+              id: user.id,
+              name: user.fullName,
+              phone: user.phoneNumber,
+              location: user?.stateOfResidence || "-",
+              dateJoined: formatDate(user.createdAt),
+              role: <p className="capitalize">{user.role}</p>,
+              status: (
+                <p
+                  className={cn("capitalize w-fit px-3 py-2 rounded-[3px]", {
+                    ["bg-successLight text-success"]:
+                      user.subscriptionStatus === "active",
+                    ["bg-grey100 text-grey8"]:
+                      user.subscriptionStatus === "inactive",
+                  })}
+                >
+                  {subscriptionStatus(user.subscriptionStatus!)}
+                </p>
+              ),
+              actions: (
+                <div className="flex gap-2">
+                  <CustomButton
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (user.role === "affiliate") {
+                        router.push(`/admin/affiliates/${user.id}/properties`);
+                      } else if (user.role === "buyer") {
+                        router.push(`/admin/buyers/${user.id}/properties`);
+                      } else {
+                        router.push(`/admin/users/${user.id}/properties`);
+                      }
+                    }}
+                    className="flex items-center gap-1"
+                  >
+                    <Eye size={14} />
+                    View Properties
+                  </CustomButton>
+                </div>
+              ),
+            }))}
+            hiddenColumns={["profileFiles", "id"]}
+            isClickable
+            onRowClick={(item) => {
+              router.push(`${PROFILE_ROUTE}/${item.id}`);
+            }}
+          />
+          {props.meta && props.meta.lastPage > 1 && (
+            <div className="mt-6">
+              <CustomPagination
+                currentPage={props.meta.currentPage}
+                totalPages={props.meta.lastPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
-      )}
+      </div>
       <RegisterUserModal
         isShown={showRegisterModal}
         setIsShown={setShowRegisterModal}

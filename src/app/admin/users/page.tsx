@@ -8,6 +8,7 @@ type ISearchParams = Promise<{
   search?: string;
   page?: string;
   per_page?: string;
+  role?: string;
   [key: string]: string | string[] | undefined;
 }>;
 
@@ -15,10 +16,13 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   const { user } = await adminGuard();
 
+  const role = typeof queries.role === "string" ? queries.role : undefined;
+
   const users = await fetchAllUsers(user?.token || "", {
     search: queries.search,
     page: queries.page ? parseInt(queries.page) : 1,
     per_page: queries.per_page ? parseInt(queries.per_page) : 50,
+    role,
   });
   
   if (!users?.success) {

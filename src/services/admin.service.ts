@@ -1,7 +1,7 @@
 import { $requestWithToken } from "@/api/general";
 import { IMeta } from "@/interface/general";
 import { ILoan, ILoanSummary } from "@/interface/loan";
-import { IUser } from "@/interface/user";
+import { IUser, IUserRole } from "@/interface/user";
 import { IFetchAllPropertiesResponse } from "./properties.service";
 
 interface IResponse {
@@ -12,7 +12,12 @@ interface IResponse {
 }
 export const fetchAllUsers = async (
   token: string,
-  searchParams?: { search?: string; page?: number; per_page?: number }
+  searchParams?: {
+    search?: string;
+    page?: number;
+    per_page?: number;
+    role?: IUserRole | "all";
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -25,6 +30,9 @@ export const fetchAllUsers = async (
     }
     if (searchParams?.per_page) {
       params.append("per_page", searchParams.per_page.toString());
+    }
+    if (searchParams?.role && searchParams.role !== "all") {
+      params.append("role", searchParams.role);
     }
 
     const url = `/admin/users${
