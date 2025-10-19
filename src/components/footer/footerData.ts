@@ -2,6 +2,15 @@ import InstagramIcon from "@/components/icons/Instagram";
 import FacebookIcon from "@/components/icons/Facebook";
 import TwitterIcon from "@/components/icons/Twitter";
 import LinkedInIcon from "@/components/icons/LinkedIn";
+import {
+  ABOUT_ROUTE,
+  CONTACT_ROUTE,
+  DASHBOARD_TAKE_LOAN_ROUTE,
+  PRIVACY_POLICY_ROUTE,
+  PRODUCTS_ROUTE,
+  PROPERTIES_ROUTE,
+  TERMS_ROUTE,
+} from "@/constants/routes";
 
 type Icon = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
@@ -11,15 +20,15 @@ export const footerData = [
     links: [
       {
         name: "Properties",
-        url: "#",
+        url: PROPERTIES_ROUTE,
       },
       {
         name: "Loan to Rent",
-        url: "#",
+        url: DASHBOARD_TAKE_LOAN_ROUTE,
       },
       {
         name: "Other Products",
-        url: "#",
+        url: PRODUCTS_ROUTE,
       },
     ],
   },
@@ -28,19 +37,19 @@ export const footerData = [
     links: [
       {
         name: "Privacy Policy",
-        url: "#",
+        url: PRIVACY_POLICY_ROUTE,
       },
       {
-        name: "Terms &  Conditions",
-        url: "#",
+        name: "Terms & Conditions",
+        url: TERMS_ROUTE,
       },
       {
         name: "About Us",
-        url: "#",
+        url: ABOUT_ROUTE,
       },
       {
-        name: "Contact  Us",
-        url: "#",
+        name: "Contact Us",
+        url: CONTACT_ROUTE,
       },
     ],
   },

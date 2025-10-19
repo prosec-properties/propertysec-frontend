@@ -36,6 +36,8 @@ export const EDIT_PRODUCT_ROUTE = "/products/edit";
 
 export const ABOUT_ROUTE = "/about";
 export const CONTACT_ROUTE = "/contact";
+export const PRIVACY_POLICY_ROUTE = "/privacy-policy";
+export const TERMS_ROUTE = "/terms-and-conditions";
 
 export const ADMIN_PRODUCTS_ROUTE = "/admin/products";
 export const ADMIN_PROPERTIES_ROUTE = "/admin/properties";
