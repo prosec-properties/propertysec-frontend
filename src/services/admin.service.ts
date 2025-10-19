@@ -10,10 +10,13 @@ interface IResponse {
   totalUsers: number | string;
   subscribedUsers: number | string;
 }
-export const fetchAllUsers = async (token: string, searchParams?: { search?: string; page?: number; per_page?: number }) => {
+export const fetchAllUsers = async (
+  token: string,
+  searchParams?: { search?: string; page?: number; per_page?: number }
+) => {
   try {
     const params = new URLSearchParams();
-    
+
     if (searchParams?.search) {
       params.append("search", searchParams.search);
     }
@@ -24,7 +27,9 @@ export const fetchAllUsers = async (token: string, searchParams?: { search?: str
       params.append("per_page", searchParams.per_page.toString());
     }
 
-    const url = `/admin/users${params.toString() ? `?${params.toString()}` : ""}`;
+    const url = `/admin/users${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     const response = await $requestWithToken.get<IResponse>(url, token);
     return response;
   } catch (error) {
@@ -53,10 +58,13 @@ export const fetchSubscribedUsers = async (token: string) => {
   }
 };
 
-export const loanRequests = async (token: string, searchParams?: { search?: string; page?: number; limit?: number }) => {
+export const loanRequests = async (
+  token: string,
+  searchParams?: { search?: string; page?: number; limit?: number }
+) => {
   try {
     const params = new URLSearchParams();
-    
+
     if (searchParams?.search) {
       params.append("search", searchParams.search);
     }
@@ -67,8 +75,14 @@ export const loanRequests = async (token: string, searchParams?: { search?: stri
       params.append("limit", searchParams.limit.toString());
     }
 
-    const url = `/loans/loan-requests${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<ILoanRequestsResponse>(url, token);
+    const url = `/loans/loan-requests${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<ILoanRequestsResponse>(
+      url,
+      token,
+      "no-cache"
+    );
     return response;
   } catch (error) {
     throw error;
@@ -79,7 +93,8 @@ export const loanStats = async (token: string) => {
   try {
     const response = await $requestWithToken.get<ILoanSummary>(
       "/loans/loan-stats",
-      token
+      token,
+      "no-cache"
     );
     return response;
   } catch (error) {
@@ -89,10 +104,7 @@ export const loanStats = async (token: string) => {
 
 export const deleteAccount = async (token: string, userId: string) => {
   try {
-    const response = await $requestWithToken.delete(
-      `/users/${userId}`,
-      token
-    );
+    const response = await $requestWithToken.delete(`/users/${userId}`, token);
     return response;
   } catch (error) {
     throw error;
@@ -124,7 +136,11 @@ export const approveLoan = async (token: string, loanId: string) => {
   }
 };
 
-export const rejectLoan = async (token: string, loanId: string, reason?: string) => {
+export const rejectLoan = async (
+  token: string,
+  loanId: string,
+  reason?: string
+) => {
   try {
     const response = await $requestWithToken.patch(
       `/loans/${loanId}/reject`,
@@ -172,7 +188,13 @@ interface IUserPropertiesResponse {
 export const fetchUserProperties = async (
   token: string,
   userId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string; status?: string }
+  searchParams?: {
+    page?: number;
+    per_page?: number;
+    sort_by?: string;
+    order?: string;
+    status?: string;
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -194,8 +216,13 @@ export const fetchUserProperties = async (
       params.append("status", searchParams.status);
     }
 
-    const url = `/admin/users/${userId}/properties${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<IUserPropertiesResponse>(url, token);
+    const url = `/admin/users/${userId}/properties${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<IUserPropertiesResponse>(
+      url,
+      token
+    );
     return response;
   } catch (error) {
     throw error;
@@ -229,7 +256,12 @@ interface IAffiliatePropertiesResponse {
 export const fetchAffiliateProperties = async (
   token: string,
   affiliateId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string }
+  searchParams?: {
+    page?: number;
+    per_page?: number;
+    sort_by?: string;
+    order?: string;
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -247,8 +279,13 @@ export const fetchAffiliateProperties = async (
       params.append("order", searchParams.order);
     }
 
-    const url = `/admin/affiliates/${affiliateId}/properties${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<IAffiliatePropertiesResponse>(url, token);
+    const url = `/admin/affiliates/${affiliateId}/properties${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<IAffiliatePropertiesResponse>(
+      url,
+      token
+    );
     return response;
   } catch (error) {
     throw error;
@@ -264,7 +301,12 @@ interface IBuyerInspectedPropertiesResponse {
 export const fetchBuyerInspectedProperties = async (
   token: string,
   buyerId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string }
+  searchParams?: {
+    page?: number;
+    per_page?: number;
+    sort_by?: string;
+    order?: string;
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -282,8 +324,14 @@ export const fetchBuyerInspectedProperties = async (
       params.append("order", searchParams.order);
     }
 
-    const url = `/admin/buyers/${buyerId}/inspected-properties${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<IBuyerInspectedPropertiesResponse>(url, token);
+    const url = `/admin/buyers/${buyerId}/inspected-properties${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response =
+      await $requestWithToken.get<IBuyerInspectedPropertiesResponse>(
+        url,
+        token
+      );
     return response;
   } catch (error) {
     throw error;
@@ -299,7 +347,12 @@ interface IBuyerPurchasedPropertiesResponse {
 export const fetchBuyerPurchasedProperties = async (
   token: string,
   buyerId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string }
+  searchParams?: {
+    page?: number;
+    per_page?: number;
+    sort_by?: string;
+    order?: string;
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -317,8 +370,14 @@ export const fetchBuyerPurchasedProperties = async (
       params.append("order", searchParams.order);
     }
 
-    const url = `/admin/buyers/${buyerId}/purchased-properties${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<IBuyerPurchasedPropertiesResponse>(url, token);
+    const url = `/admin/buyers/${buyerId}/purchased-properties${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response =
+      await $requestWithToken.get<IBuyerPurchasedPropertiesResponse>(
+        url,
+        token
+      );
     return response;
   } catch (error) {
     throw error;
@@ -333,7 +392,13 @@ interface IPropertyPurchasesResponse {
 export const fetchPropertyPurchases = async (
   token: string,
   propertyId: string,
-  searchParams?: { page?: number; per_page?: number; sort_by?: string; order?: string; status?: string }
+  searchParams?: {
+    page?: number;
+    per_page?: number;
+    sort_by?: string;
+    order?: string;
+    status?: string;
+  }
 ) => {
   try {
     const params = new URLSearchParams();
@@ -354,8 +419,13 @@ export const fetchPropertyPurchases = async (
       params.append("status", searchParams.status);
     }
 
-    const url = `/admin/properties/${propertyId}/purchases${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await $requestWithToken.get<IPropertyPurchasesResponse>(url, token);
+    const url = `/admin/properties/${propertyId}/purchases${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    const response = await $requestWithToken.get<IPropertyPurchasesResponse>(
+      url,
+      token
+    );
     return response;
   } catch (error) {
     throw error;

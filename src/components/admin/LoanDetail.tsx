@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ILoanWithDetails } from "@/interface/loan";
+import React, { useMemo, useState } from "react";
+import { ILoanFile, ILoanWithDetails } from "@/interface/loan";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/payment";
 import Status from "../misc/Status";
@@ -14,36 +14,39 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { useSession } from "next-auth/react";
 import { useToast } from "../ui/use-toast";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  DollarSign, 
-  FileText, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  DollarSign,
+  FileText,
   CheckCircle,
   XCircle,
   ArrowLeft,
   Download,
   AlertCircle,
   Clock,
-  Building,
   CreditCard,
   Shield,
   Home,
   Users,
   Briefcase,
-  Target,
   ChevronDown,
   ChevronUp,
-  Eye,
-  EyeOff
+  Eye
 } from "lucide-react";
 
 interface Props {
   loan: ILoanWithDetails;
 }
+
+const formatLoanFileType = (type: string) =>
+  type
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
 const LoanDetail = ({ loan }: Props) => {
   const router = useRouter();
@@ -66,6 +69,31 @@ const LoanDetail = ({ loan }: Props) => {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+
+  const applicationFiles = useMemo<ILoanFile[]>(() => {
+    const requestFiles = loan.loanRequest?.files ?? [];
+    const loanFiles = loan.files ?? [];
+    const unique = new Map<string, ILoanFile>();
+
+    [...requestFiles, ...loanFiles].forEach((file) => {
+      if (file && !unique.has(file.id)) {
+        unique.set(file.id, file);
+      }
+    });
+
+    return Array.from(unique.values());
+  }, [loan]);
+
+  const filesByType = useMemo(() => {
+    return applicationFiles.reduce<Record<string, ILoanFile[]>>((grouped, file) => {
+      const key = file.fileType || "other";
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key]?.push(file);
+      return grouped;
+    }, {});
+  }, [applicationFiles]);
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -485,6 +513,123 @@ const LoanDetail = ({ loan }: Props) => {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Personal Documents */}
+                  {(filesByType.id_card || filesByType.passport_photograph || filesByType.utility_bill || filesByType.other) && (
+                    <div className="mt-4 pt-4 border-t">
+                      <p className="text-sm font-medium text-gray-700 mb-3">Personal Documents</p>
+                      <div className="space-y-2">
+                        {filesByType.id_card?.map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-medium capitalize truncate">
+                                  {file.fileName || 'ID Card'}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  Uploaded {formatDate(file.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(file.fileUrl, '_blank')}
+                              className="flex items-center gap-1 flex-shrink-0"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
+                            </Button>
+                          </div>
+                        ))}
+                        {filesByType.passport_photograph?.map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-medium capitalize truncate">
+                                  {file.fileName || 'Passport Photograph'}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  Uploaded {formatDate(file.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(file.fileUrl, '_blank')}
+                              className="flex items-center gap-1 flex-shrink-0"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
+                            </Button>
+                          </div>
+                        ))}
+                        {filesByType.utility_bill?.map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-medium capitalize truncate">
+                                  {file.fileName || 'Utility Bill'}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  Uploaded {formatDate(file.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(file.fileUrl, '_blank')}
+                              className="flex items-center gap-1 flex-shrink-0"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
+                            </Button>
+                          </div>
+                        ))}
+                        {filesByType.other?.map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-medium capitalize truncate">
+                                  {file.fileName || 'Document'}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  Uploaded {formatDate(file.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(file.fileUrl, '_blank')}
+                              className="flex items-center gap-1 flex-shrink-0"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -530,6 +675,42 @@ const LoanDetail = ({ loan }: Props) => {
                         <p className="font-medium font-mono">{loan.bank.bvn}</p>
                       </div>
                     </div>
+                    
+                    {/* Bank Statement Files */}
+                    {filesByType.bank_statement && filesByType.bank_statement.length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Bank Statement</p>
+                        <div className="space-y-2">
+                          {filesByType.bank_statement.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="font-medium capitalize truncate">
+                                    {file.fileName || 'Bank Statement'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    Uploaded {formatDate(file.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(file.fileUrl, '_blank')}
+                                className="flex items-center gap-1 flex-shrink-0"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -576,6 +757,42 @@ const LoanDetail = ({ loan }: Props) => {
                         <p className="font-medium">{loan.employment.officeAddress}</p>
                       </div>
                     </div>
+                    
+                    {/* Employment Letter Files */}
+                    {filesByType.employment_letter && filesByType.employment_letter.length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Employment Letter</p>
+                        <div className="space-y-2">
+                          {filesByType.employment_letter.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="font-medium capitalize truncate">
+                                    {file.fileName || 'Employment Letter'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    Uploaded {formatDate(file.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(file.fileUrl, '_blank')}
+                                className="flex items-center gap-1 flex-shrink-0"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -622,6 +839,42 @@ const LoanDetail = ({ loan }: Props) => {
                         <p className="font-medium">{loan.guarantor.officeAddress}</p>
                       </div>
                     </div>
+                    
+                    {/* Guarantor Form Files */}
+                    {filesByType.guarantor_form && filesByType.guarantor_form.length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Guarantor Form</p>
+                        <div className="space-y-2">
+                          {filesByType.guarantor_form.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="font-medium capitalize truncate">
+                                    {file.fileName || 'Guarantor Form'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    Uploaded {formatDate(file.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(file.fileUrl, '_blank')}
+                                className="flex items-center gap-1 flex-shrink-0"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -668,48 +921,44 @@ const LoanDetail = ({ loan }: Props) => {
                         <p className="font-medium">{loan.landlord.address}</p>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Supporting Documents */}
-            {loan.files && loan.files.length > 0 && (
-              <div className="bg-white rounded-lg border shadow-sm p-4 sm:p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText className="w-5 h-5 text-indigo-600" />
-                  <h2 className="text-lg font-semibold">Supporting Documents</h2>
-                  <Badge variant="outline">{loan.files.length} files</Badge>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {loan.files.map((file) => (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="font-medium capitalize truncate">
-                            {file.fileType.replace("_", " ")}
-                          </p>
-                          <p className="text-sm text-gray-600 truncate">
-                            {file.fileName || "Document"}
-                          </p>
+                    
+                    {/* Tenancy Agreement Files */}
+                    {filesByType.tenancy_agreement && filesByType.tenancy_agreement.length > 0 && (
+                      <div className="mt-4 pt-4 border-t">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Tenancy Agreement</p>
+                        <div className="space-y-2">
+                          {filesByType.tenancy_agreement.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 min-w-0">
+                                <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="font-medium capitalize truncate">
+                                    {file.fileName || 'Tenancy Agreement'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    Uploaded {formatDate(file.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(file.fileUrl, '_blank')}
+                                className="flex items-center gap-1 flex-shrink-0"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
+                              </Button>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(file.fileUrl, "_blank")}
-                        className="flex items-center gap-1 flex-shrink-0"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline">View</span>
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -954,8 +1203,8 @@ const LoanDetail = ({ loan }: Props) => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Documents</span>
-                  <Badge variant={(loan.files?.length || 0) > 0 ? "default" : "secondary"}>
-                    {loan.files?.length || 0} files
+                  <Badge variant={applicationFiles.length > 0 ? "default" : "secondary"}>
+                    {applicationFiles.length} files
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">

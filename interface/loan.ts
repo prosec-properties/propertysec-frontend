@@ -147,6 +147,7 @@ export interface ILoanRequest {
   reasonForLoanRequest?: string;
   createdAt: string;
   updatedAt: string;
+  files?: ILoanFile[];
 }
 
 // Extended loan interface with all related data
