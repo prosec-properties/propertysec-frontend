@@ -3,6 +3,7 @@ import { adminGuard } from "@/lib/admin";
 import { fetchAllUsers } from "@/services/admin.service";
 import React from "react";
 import UsersList from "@/components/admin/UsersList";
+import { IUserRole } from "@/interface/user";
 
 type ISearchParams = Promise<{
   search?: string;
@@ -22,7 +23,7 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
     search: queries.search,
     page: queries.page ? parseInt(queries.page) : 1,
     per_page: queries.per_page ? parseInt(queries.per_page) : 50,
-    role,
+    role: role as IUserRole,
   });
   
   if (!users?.success) {
