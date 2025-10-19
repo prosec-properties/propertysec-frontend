@@ -1,21 +1,24 @@
-"use server";
-
 import { $requestWithToken } from "@/api/general";
-import { authConfig } from "@/authConfig";
 import { cleanServerData, formatServerError } from "@/lib/general";
-import { getServerSession } from "next-auth";
+import type { INotificationSettings } from "@/interface/setting";
 
-export const getUserSettings = async () => {
+type NotificationSettingUpdates = Partial<
+  Pick<
+    INotificationSettings,
+    "emailNotificationsFeatureUpdates" | "emailNotificationsListingUpdates"
+  >
+>;
+
+export const getUserSettings = async (token: string) => {
   try {
-    const session = await getServerSession(authConfig);
-
-    if (!session || !session.user || !session.user) {
+    if (!token) {
       throw new Error("Unauthorized");
     }
 
-    const user = session.user!;
-
-    const response = await $requestWithToken.get(`/settings`, user?.token || "");
+    const response = await $requestWithToken.get<INotificationSettings>(
+      `/settings`,
+      token
+    );
 
     return cleanServerData(response);
   } catch (error) {
@@ -23,16 +26,18 @@ export const getUserSettings = async () => {
   }
 };
 
-export const updateUserSettings = async (data: any) => {
+export const updateUserSettings = async (
+  token: string,
+  data: NotificationSettingUpdates
+) => {
   try {
-    const session = await getServerSession(authConfig);
-    if (!session || !session.user || !session.user) {
+    if (!token) {
       throw new Error("Unauthorized");
     }
-    const user = session.user!;
-    const response = await $requestWithToken.patch(
+
+    const response = await $requestWithToken.patch<INotificationSettings>(
       `/settings`,
-      user?.token || "",
+      token,
       data
     );
     return cleanServerData(response);

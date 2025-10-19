@@ -31,8 +31,6 @@ export default async function Page({ params }: { params: IParams }) {
 
   const countries = await fetchCountries();
 
-  // console.log("Fetched countries:", countries?.data?.);
-
   if (!countries?.success) {
     return <ErrorDisplay message="Error Fetching Countries" />;
   }
@@ -60,6 +58,6 @@ export default async function Page({ params }: { params: IParams }) {
       return <AdminProfileForm token={session.accessToken} />;
 
     default:
-      return <div>Role is not assigned yet</div>;
+      return <BuyerProfileForm countries={countries?.data || []} />;
   }
 }

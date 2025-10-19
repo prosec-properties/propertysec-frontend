@@ -16,7 +16,7 @@ const FooterMenu = () => {
             <h2 className="mt-4">PROPERTY SEC</h2>
 
             <p className="mt-4 max-w-xs mb-8">
-              Subscribe to our newsletter to receive mails about ourlatest
+              Subscribe to our newsletter to receive updates about our latest
               products
             </p>
 
