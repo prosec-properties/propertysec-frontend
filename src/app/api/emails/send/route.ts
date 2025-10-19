@@ -42,9 +42,20 @@ const fetchErrorMessage = async (response: Response) => {
   }
 };
 
+const parseMailAddress = (value: string) => {
+  const raw = value.trim();
+  const match = raw.match(/^(.*)<(.+)>$/);
+  if (match) {
+    const name = match[1].trim().replace(/"/g, "");
+    return { email: match[2].trim(), name: name.length > 0 ? name : undefined };
+  }
+
+  return { email: raw };
+};
+
 export async function POST(request: NextRequest) {
   const dispatchKey = process.env.EMAIL_DISPATCH_API_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
+  const brevoKey = process.env.BREVO_API_KEY;
   const fromAddress = process.env.EMAIL_FROM_ADDRESS;
   const supportEmail = process.env.SUPPORT_EMAIL ?? "propertyseconline@gmail.com";
 
@@ -55,7 +66,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!resendKey || !fromAddress) {
+  if (!brevoKey || !fromAddress) {
     return NextResponse.json(
       { error: "Email delivery service is not configured" },
       { status: 500 }
@@ -110,19 +121,28 @@ export async function POST(request: NextRequest) {
   const subject = templateConfig.subject(templateData as any);
   const recipients = Array.isArray(parsedRequest.to) ? parsedRequest.to : [parsedRequest.to];
 
+  const sender = parseMailAddress(fromAddress);
+  const primaryRecipientName = typeof (templateData as any)?.userName === "string" ? (templateData as any).userName : undefined;
+  const to = recipients.map((email, index) => ({
+    email,
+    name: index === 0 ? primaryRecipientName : undefined,
+  }));
+
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${resendKey}`,
+        "api-key": brevoKey,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
-        from: fromAddress,
-        to: recipients,
+        sender,
+        to,
         subject,
-        html: htmlOutput,
-        text: textOutput,
+        htmlContent: htmlOutput,
+        textContent: textOutput,
+        tags: [parsedRequest.type],
       }),
     });
 
