@@ -2,7 +2,7 @@ import { $requestWithToken } from "@/api/general";
 import { IMeta } from "@/interface/general";
 import { ILoan, ILoanSummary } from "@/interface/loan";
 import { IUser } from "@/interface/user";
-import { string } from "zod";
+import { IFetchAllPropertiesResponse } from "./properties.service";
 
 interface IResponse {
   users: IUser[];
@@ -423,6 +423,66 @@ export const fetchPropertyPurchases = async (
       params.toString() ? `?${params.toString()}` : ""
     }`;
     const response = await $requestWithToken.get<IPropertyPurchasesResponse>(
+      url,
+      token
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAllPropertiesAdmin = async (
+  token: string,
+  filters?: {
+    categories?: string[] | string;
+    locations?: string[] | string;
+    pricing?: string[] | string;
+    status?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }
+) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (filters?.categories) {
+      const categories = Array.isArray(filters.categories)
+        ? filters.categories
+        : JSON.parse(filters.categories);
+      params.append("categories", JSON.stringify(categories));
+    }
+    if (filters?.locations) {
+      const locations = Array.isArray(filters.locations)
+        ? filters.locations
+        : JSON.parse(filters.locations);
+      params.append("locations", JSON.stringify(locations));
+    }
+    if (filters?.pricing) {
+      const pricing = Array.isArray(filters.pricing)
+        ? filters.pricing
+        : JSON.parse(filters.pricing);
+      params.append("pricing", JSON.stringify(pricing));
+    }
+    if (filters?.status) {
+      params.append("status", filters.status);
+    }
+    if (filters?.search) {
+      params.append("search", filters.search);
+    }
+    if (filters?.page) {
+      params.append("page", filters.page.toString());
+    }
+    if (filters?.limit) {
+      params.append("limit", filters.limit.toString());
+    }
+
+    const url = `/admin/properties${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+
+    const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
       url,
       token
     );

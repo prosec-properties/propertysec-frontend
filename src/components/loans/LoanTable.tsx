@@ -118,11 +118,21 @@ const LoanTable = ({ loans, onRowClick, activeFilter = "all" }: Props) => {
           title: "No pending loans",
           description: "You don't have any pending loan requests.",
         };
+      case "active":
+        return {
+          title: "No active loans",
+          description: "There are no approved loans awaiting disbursement.",
+        };
       case "approved":
         return {
           title: "No approved loans",
           description:
             "You don't have any approved loans waiting for disbursement.",
+        };
+      case "completed":
+        return {
+          title: "No completed loans",
+          description: "You don't have any completed or disbursed loans.",
         };
       case "disbursed":
         return {

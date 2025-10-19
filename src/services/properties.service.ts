@@ -33,7 +33,7 @@ export const createProperty = async ({
   }
 };
 
-interface IFetchAllPropertiesResponse {
+export interface IFetchAllPropertiesResponse {
   data: IProperty[];
   meta: IMeta;
 }

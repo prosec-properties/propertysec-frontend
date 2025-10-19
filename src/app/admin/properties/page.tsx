@@ -1,7 +1,7 @@
 import AdminProperties from "@/components/admin/Properties";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import { adminGuard } from "@/lib/admin";
-import { fetchAllProperties } from "@/services/properties.service";
+import { fetchAllPropertiesAdmin } from "@/services/admin.service";
 import React from "react";
 
 type ISearchParams = Promise<{
@@ -13,11 +13,11 @@ type ISearchParams = Promise<{
 
 const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
-  await adminGuard();
+  const { token } = await adminGuard();
 
   const status = queries.status || "all";
 
-  const properties = await fetchAllProperties({
+  const properties = await fetchAllPropertiesAdmin(token, {
     status,
     page: queries.page ? parseInt(queries.page) : 1,
     limit: queries.limit ? parseInt(queries.limit) : 20,
@@ -28,7 +28,10 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   return (
     <div>
-      <AdminProperties properties={properties?.data?.data} meta={properties?.data?.meta} />
+      <AdminProperties
+        properties={properties?.data?.data}
+        meta={properties?.data?.meta}
+      />
     </div>
   );
 };
