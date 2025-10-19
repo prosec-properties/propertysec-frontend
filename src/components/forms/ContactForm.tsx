@@ -8,13 +8,16 @@ import { ContactFormSchema } from "@/store/schema/contactFormSchema";
 import CustomButton from "../buttons/CustomButton";
 import TextArea from "../inputs/TextArea";
 import { z } from "zod";
+import { $requestWithoutToken } from "@/api/general";
+import { useToast } from "@/components/ui/use-toast";
 
 const ContactForm = () => {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm({
+    reset,
+  } = useForm<z.infer<typeof ContactFormSchema>>({
     resolver: zodResolver(ContactFormSchema),
     defaultValues: {
       firstName: "",
@@ -25,13 +28,42 @@ const ContactForm = () => {
     },
   });
 
+  const { toast } = useToast();
+
   const onSubmit: SubmitHandler<z.infer<typeof ContactFormSchema>> = async (
     payload
   ) => {
     try {
-      console.log(payload);
+      const response = await $requestWithoutToken.post<{
+        message: string;
+        success: boolean;
+      }>("/contact", payload);
+
+      if (response?.success) {
+        toast({
+          title: "Message sent",
+          description:
+            response.message ||
+            "Thanks for reaching out. We'll respond shortly.",
+        });
+        reset();
+        return;
+      }
+
+      toast({
+        title: "Unable to send message",
+        description:
+          response?.message ||
+          "Please try again or contact us through another channel.",
+        variant: "destructive",
+      });
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast({
+        title: "Unable to send message",
+        description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -123,7 +155,9 @@ const ContactForm = () => {
             />
           )}
         />
-        <CustomButton className="w-full">Send</CustomButton>
+        <CustomButton className="w-full" loading={isSubmitting}>
+          Send
+        </CustomButton>
       </form>
     </div>
   );
