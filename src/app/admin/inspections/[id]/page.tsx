@@ -1,9 +1,7 @@
 import { fetchInspectionPaymentById } from "@/services/inspection.service";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import InspectionDetails from "@/components/admin/InspectionDetails";
-import { notFound, redirect } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { authConfig } from "@/../auth.config";
+import { notFound } from "next/navigation";
 import { adminGuard } from "@/lib/admin";
 
 interface Props {
@@ -13,13 +11,7 @@ interface Props {
 }
 
 const InspectionDetailsPage = async ({ params }: Props) => {
-  const session = await getServerSession(authConfig);
-  const token = session?.accessToken;
-  await adminGuard();
-
-  if (!session || !token) {
-    redirect("/");
-  }
+  const { token } = await adminGuard();
 
   try {
     const { id } = await params;

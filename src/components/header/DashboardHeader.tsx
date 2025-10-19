@@ -79,9 +79,9 @@ const DashboardHeader = ({ className }: { className?: string }) => {
         </div>
 
         {/* Middle section - Search for admin, menu for others */}
-        <div className="flex flex-1 items-center justify-end md:justify-between">
+        <div className="flex flex-1 items-center justify-end md:justify-between ">
           {isAdmin ? (
-            <div className="hidden md:flex flex-1 justify-center px-4">
+            <div className="hidden md:flex flex-1 justify-center px-4 invisible">
               <SearchInput
                 placeholder="Search..."
                 value={searchQuery}
@@ -131,7 +131,7 @@ const DashboardHeader = ({ className }: { className?: string }) => {
 
       {/* Mobile search input for admin (shown only on mobile) */}
       {isAdmin && (
-        <div className="md:hidden px-4 py-2 border-t">
+        <div className="md:hidden px-4 py-2 border-t invisible">
           <SearchInput
             placeholder="Search..."
             value={searchQuery}

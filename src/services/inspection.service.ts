@@ -74,7 +74,14 @@ export const fetchInspectionPayments = async (
       params.toString() ? `?${params.toString()}` : ""
     }`;
     const response =
-      await $requestWithToken.get<IFetchInspectionPaymentsResponse>(url, token);
+      await $requestWithToken.get<IFetchInspectionPaymentsResponse>(
+        url,
+        token,
+        "default",
+        {
+          tags: ["inspections"],
+        }
+      );
     return response;
   } catch (error) {
     throw error;

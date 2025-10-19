@@ -65,7 +65,7 @@ const HeaderMenu = () => {
             </ul>
           </nav>
 
-          <div className="hidden flex-grow-2 md:block">
+          <div className="hidden flex-grow-2 md:block invisible">
             <SearchInput />
           </div>
 
