@@ -24,6 +24,10 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
   const router = useRouter();
   const { user } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [currentInspectionStatus, setCurrentInspectionStatus] = useState(
+    inspection.inspectionStatus
+  );
+  const [currentStatus, setCurrentStatus] = useState(inspection.status);
   const [expandedSections, setExpandedSections] = useState({
     inspection: true,
     user: true,
@@ -39,10 +43,7 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
   };
 
   const handleMarkAsCompleted = async () => {
-    console.log("User token:", token);
     if (!token) return;
-
-    console.log("Marking inspection as completed...");
 
     setIsUpdating(true);
     try {
@@ -54,6 +55,8 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
 
       if (response && response.success) {
         showToaster("Inspection marked as completed successfully!", "success");
+        setCurrentInspectionStatus("COMPLETED");
+        setCurrentStatus("completed");
         if (onUpdate) {
           onUpdate({
             ...inspection,
@@ -141,31 +144,32 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
                       "px-3 py-1 rounded-full text-xs font-medium w-fi capitalize",
                       {
                         "bg-green-100 text-green-800":
-                          inspection.inspectionStatus === "COMPLETED",
+                          currentInspectionStatus === "COMPLETED",
                         "bg-yellow-100 text-yellow-800":
-                          inspection.inspectionStatus === "PENDING",
+                          currentInspectionStatus === "PENDING",
                       }
                     )}
                   >
-                    {inspection.status}
+                    {currentStatus}
                   </span>
-                  {user?.role === "admin" && inspection.inspectionStatus === "PENDING" && (
-                    <CustomButton
-                      onClick={handleMarkAsCompleted}
-                      disabled={isUpdating}
-                      className="flex items-center text-xs px-3 py-1 h-auto"
-                      variant="primary"
-                    >
-                      {isUpdating ? (
-                        "Updating..."
-                      ) : (
-                        <>
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Confirm Inspection Completed
-                        </>
-                      )}
-                    </CustomButton>
-                  )}
+                  {user?.role === "admin" &&
+                    currentInspectionStatus === "PENDING" && (
+                      <CustomButton
+                        onClick={handleMarkAsCompleted}
+                        disabled={isUpdating}
+                        className="flex items-center text-xs px-3 py-1 h-auto"
+                        variant="primary"
+                      >
+                        {isUpdating ? (
+                          "Updating..."
+                        ) : (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Confirm Inspection Completed
+                          </>
+                        )}
+                      </CustomButton>
+                    )}
                 </div>
               </div>
               {inspection.inspectionReport && (
@@ -317,7 +321,7 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
                 </p>
               </div>
             </div>
-            {inspection.inspectionStatus === "COMPLETED" && (
+            {currentInspectionStatus === "COMPLETED" && (
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div className="min-w-0 flex-1">
