@@ -1,5 +1,6 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
 import { IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { IUser } from "@/interface/user";
 
 export const updateUserProfile = async ({
@@ -91,12 +92,7 @@ export const fetchMyPurchasedProperties = async (
       urlParams.toString() ? `?${urlParams.toString()}` : ""
     }`;
     const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["my-purchases", ...(options.next.tags ?? [])])
-          ),
-        }
+      ? buildNextTags(["my-purchases"], options)
       : undefined;
 
     const response = await $requestWithToken.get<IPurchasedPropertiesResponse>(
@@ -127,12 +123,7 @@ export const fetchMyInspectedProperties = async (
       urlParams.toString() ? `?${urlParams.toString()}` : ""
     }`;
     const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["my-inspections", ...(options.next.tags ?? [])])
-          ),
-        }
+      ? buildNextTags(["my-inspections"], options)
       : undefined;
 
     const response = await $requestWithToken.get<IInspectedPropertiesResponse>(

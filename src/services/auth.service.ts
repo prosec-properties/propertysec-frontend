@@ -1,6 +1,7 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
 import { AccessToken } from "@/interface/auth";
-import { IApiResponse } from "@/interface/general";
+import { IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { IUser, IUserRole, IUserRoleEnum } from "@/interface/user";
 
 interface IRegisterPayload {
@@ -19,9 +20,18 @@ export const register = async (payload: IRegisterPayload) => {
   }
 };
 
-export const fetchUserInfo = async (token: string) => {
+export const fetchUserInfo = async (token: string, options?: IFetchOptions) => {
   try {
-    return await $requestWithToken.get<IUser>("/users/me", token);
+    const nextConfig = options?.next
+      ? buildNextTags(["user-info"], options)
+      : undefined;
+
+    return await $requestWithToken.get<IUser>(
+      "/users/me",
+      token,
+      options?.cache ?? "no-cache",
+      nextConfig
+    );
   } catch (error) {
     throw error;
   }

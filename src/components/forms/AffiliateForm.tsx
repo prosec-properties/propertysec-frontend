@@ -7,7 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 
 import { useUser } from "@/hooks/useUser";
-import {  updateUserProfile } from "@/services/user.service";
+import { revalidateCurrentUser } from "@/actions/user";
+import { updateUserProfile } from "@/services/user.service";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 
 import type { SelectedImagePreview } from "../../../interface/image";
@@ -75,6 +76,9 @@ const AffiliateProfileForm: React.FC<Props> = ({ token }) => {
         ...data?.data,
       };
       updateUser(userInfo as IUser, token);
+      revalidateCurrentUser().catch((error) => {
+        console.error("Failed to revalidate user-info tag:", error);
+      });
       showToaster("Profile updated successfully", "success");
     },
     onError: (error) => {

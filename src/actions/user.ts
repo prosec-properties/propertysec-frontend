@@ -19,6 +19,10 @@ export const approveBuyerAccount = async (id: string) => {
   }
 };
 
+export const revalidateCurrentUser = async () => {
+  revalidateTag("user-info");
+};
+
 export const unapproveBuyerAccount = async (id: string) => {
     try {
       const token = await getAuthUserToken();

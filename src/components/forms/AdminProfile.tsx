@@ -5,6 +5,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
 import { useUser } from "@/hooks/useUser";
+import { revalidateCurrentUser } from "@/actions/user";
 import { updateUserProfile } from "@/services/user.service";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import type { IUser } from "@/interface/user";
@@ -55,6 +56,9 @@ const AdminProfileForm: React.FC<Props> = ({ token }) => {
         ...data?.data,
       } as IUser;
       updateUser(userInfo, token);
+      revalidateCurrentUser().catch((error) => {
+        console.error("Failed to revalidate user-info tag:", error);
+      });
       showToaster("Profile updated successfully", "success");
     },
     onError: (error) => {

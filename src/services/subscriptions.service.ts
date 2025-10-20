@@ -2,6 +2,7 @@ import { $requestWithToken } from "@/api/general";
 import { IFetchOptions, IMeta } from "@/interface/general";
 import { Plan, Subscription } from "@/interface/payment";
 import { IUser } from "@/interface/user";
+import { buildNextTags } from "@/lib/cacheTags";
 
 export interface ISubscriptionWithUser {
   id: string;
@@ -80,14 +81,7 @@ export const fetchAllSubscriptions = async (
     const url = `/subscriptions/subscribed-users${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["subscriptions", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["subscriptions"] };
+    const nextConfig = buildNextTags(["subscriptions"], options);
 
     const response = await $requestWithToken.get<ISubscriptionsResponse>(
       url,
@@ -107,17 +101,7 @@ export const getSubscriptionDetails = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              `subscription-${subscriptionId}`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : { tags: [`subscription-${subscriptionId}`] };
+    const nextConfig = buildNextTags([`subscription-${subscriptionId}`], options);
 
     const response = await $requestWithToken.get<ISubscriptionWithUser>(
       `/subscriptions/${subscriptionId}`,
@@ -156,14 +140,7 @@ export const fetchSubscriptions = async (
     const url = `/subscriptions${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["subscriptions", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["subscriptions"] };
+    const nextConfig = buildNextTags(["subscriptions"], options);
 
     const response = await $requestWithToken.get<{
       success: boolean;

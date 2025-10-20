@@ -1,5 +1,6 @@
 import { $requestWithToken } from "@/api/general";
 import { IFetchOptions, IMeta } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { ILoan, ILoanSummary } from "@/interface/loan";
 import { IUser, IUserRole } from "@/interface/user";
 import { IFetchAllPropertiesResponse } from "./properties.service";
@@ -39,14 +40,7 @@ export const fetchAllUsers = async (
     const url = `/admin/users${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["admin-users", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["admin-users"] };
+    const nextConfig = buildNextTags(["admin-users"], options);
 
     const response = await $requestWithToken.get<IResponse>(
       url,
@@ -74,14 +68,7 @@ export const fetchSubscribedUsers = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["admin-subscribed-users", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["admin-subscribed-users"] };
+    const nextConfig = buildNextTags(["admin-subscribed-users"], options);
 
     const response = await $requestWithToken.get<IUser>(
       "/subscribed-users",
@@ -116,14 +103,7 @@ export const loanRequests = async (
     const url = `/loans/loan-requests${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["admin-loan-requests", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["admin-loan-requests"] };
+    const nextConfig = buildNextTags(["admin-loan-requests"], options);
 
     const response = await $requestWithToken.get<ILoanRequestsResponse>(
       url,
@@ -139,14 +119,7 @@ export const loanRequests = async (
 
 export const loanStats = async (token: string, options?: IFetchOptions) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["admin-loan-stats", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["admin-loan-stats"] };
+    const nextConfig = buildNextTags(["admin-loan-stats"], options);
 
     const response = await $requestWithToken.get<ILoanSummary>(
       "/loans/loan-stats",
@@ -175,17 +148,7 @@ export const getLoanDetails = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              `admin-loan-${loanId}`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : { tags: [`admin-loan-${loanId}`] };
+    const nextConfig = buildNextTags([`admin-loan-${loanId}`], options);
 
     const response = await $requestWithToken.get<ILoan>(
       `/loans/${loanId}`,
@@ -296,20 +259,10 @@ export const fetchUserProperties = async (
     const url = `/admin/users/${userId}/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              "admin-user-properties",
-              `admin-user-${userId}-properties`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : {
-          tags: ["admin-user-properties", `admin-user-${userId}-properties`],
-        };
+    const nextConfig = buildNextTags(
+      ["admin-user-properties", `admin-user-${userId}-properties`],
+      options
+    );
 
     const response = await $requestWithToken.get<IUserPropertiesResponse>(
       url,
@@ -377,23 +330,10 @@ export const fetchAffiliateProperties = async (
     const url = `/admin/affiliates/${affiliateId}/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              "admin-affiliate-properties",
-              `admin-affiliate-${affiliateId}-properties`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : {
-          tags: [
-            "admin-affiliate-properties",
-            `admin-affiliate-${affiliateId}-properties`,
-          ],
-        };
+    const nextConfig = buildNextTags(
+      ["admin-affiliate-properties", `admin-affiliate-${affiliateId}-properties`],
+      options
+    );
 
     const response = await $requestWithToken.get<IAffiliatePropertiesResponse>(
       url,
@@ -443,23 +383,10 @@ export const fetchBuyerInspectedProperties = async (
     const url = `/admin/buyers/${buyerId}/inspected-properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              "admin-buyer-inspections",
-              `admin-buyer-${buyerId}-inspections`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : {
-          tags: [
-            "admin-buyer-inspections",
-            `admin-buyer-${buyerId}-inspections`,
-          ],
-        };
+    const nextConfig = buildNextTags(
+      ["admin-buyer-inspections", `admin-buyer-${buyerId}-inspections`],
+      options
+    );
 
     const response =
       await $requestWithToken.get<IBuyerInspectedPropertiesResponse>(
@@ -510,23 +437,10 @@ export const fetchBuyerPurchasedProperties = async (
     const url = `/admin/buyers/${buyerId}/purchased-properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              "admin-buyer-purchases",
-              `admin-buyer-${buyerId}-purchases`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : {
-          tags: [
-            "admin-buyer-purchases",
-            `admin-buyer-${buyerId}-purchases`,
-          ],
-        };
+    const nextConfig = buildNextTags(
+      ["admin-buyer-purchases", `admin-buyer-${buyerId}-purchases`],
+      options
+    );
 
     const response =
       await $requestWithToken.get<IBuyerPurchasedPropertiesResponse>(
@@ -580,23 +494,10 @@ export const fetchPropertyPurchases = async (
     const url = `/admin/properties/${propertyId}/purchases${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              "admin-property-purchases",
-              `admin-property-${propertyId}-purchases`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : {
-          tags: [
-            "admin-property-purchases",
-            `admin-property-${propertyId}-purchases`,
-          ],
-        };
+    const nextConfig = buildNextTags(
+      ["admin-property-purchases", `admin-property-${propertyId}-purchases`],
+      options
+    );
 
     const response = await $requestWithToken.get<IPropertyPurchasesResponse>(
       url,
@@ -661,14 +562,7 @@ export const fetchAllPropertiesAdmin = async (
       params.toString() ? `?${params.toString()}` : ""
     }`;
 
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["admin-properties", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["admin-properties"] };
+    const nextConfig = buildNextTags(["admin-properties"], options);
 
     const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
       url,

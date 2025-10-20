@@ -2,6 +2,7 @@ import { $requestWithoutToken, $requestWithToken } from "@/api/general";
 import { IFetchOptions, IMeta } from "@/interface/general";
 import { IProperty } from "@/interface/property";
 import { addParamsToUrl } from "@/lib/general";
+import { buildNextTags } from "@/lib/cacheTags";
 
 interface ISearchFilters {
   categories?: string[];
@@ -124,14 +125,7 @@ export const searchProperties = async (
     const url = `/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["properties", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["properties"] };
+    const nextConfig = buildNextTags(["properties"], options);
 
     const response = await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
       url,
@@ -164,14 +158,7 @@ export const fetchMyProperties = async (
   }
 
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["my-properties", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["my-properties"] };
+    const nextConfig = buildNextTags(["my-properties"], options);
 
     const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
       addParamsToUrl(`/properties/me`, query || {}),
@@ -212,14 +199,7 @@ export const fetchPropertyById = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([`property-${propertyId}`, ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: [`property-${propertyId}`] };
+    const nextConfig = buildNextTags([`property-${propertyId}`], options);
 
     if (!token) {
       return $requestWithoutToken.get<IProperty>(

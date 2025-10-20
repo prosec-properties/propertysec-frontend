@@ -1,5 +1,6 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
-import { IMeta } from "@/interface/general";
+import { IMeta, IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import {
   IProduct,
   IProductCondition,
@@ -93,32 +94,12 @@ export const fetchMyProducts = async (token: string) => {
   }
 };
 
-type FetchNextConfig = {
-  revalidate?: number;
-  tags?: string[];
-};
-
-type FetchProductOptions = {
-  cache?: "default" | "force-cache" | "no-cache" | "reload" | "only-if-cached";
-  next?: FetchNextConfig;
-};
-
 export const fetchProductById = async (
   productId: string,
-  options?: FetchProductOptions
+  options?: IFetchOptions
 ) => {
   try {
-    const nextConfig: FetchNextConfig | undefined = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              `product-${productId}`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : { tags: [`product-${productId}`] };
+    const nextConfig = buildNextTags([`product-${productId}`], options);
 
     const response = await $requestWithoutToken.get<IProduct>(
       `/products/${productId}`,

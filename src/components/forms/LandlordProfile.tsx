@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 
 import { useUser } from "@/hooks/useUser";
+import { revalidateCurrentUser } from "@/actions/user";
 import { updateUserProfile } from "@/services/user.service";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import { LandlordProfileSchema } from "@/store/schema/landlordProfileSchema";
@@ -88,7 +89,10 @@ const LandlordProfileForm: React.FC<LandlordProfileFormProps> = ({
   // Mutation for profile update
   const mutation = useMutation({
     mutationFn: updateUserProfile,
-    onSuccess: (data) => {
+    onSuccess: () => {
+      revalidateCurrentUser().catch((error) => {
+        console.error("Failed to revalidate user-info tag:", error);
+      });
       refetchUser(token);
       showToaster("Profile updated successfully", "success");
     },

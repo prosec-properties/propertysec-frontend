@@ -6,6 +6,7 @@ import { deleteFile } from "@/services/user.service";
 import { IProfileFileInterface } from "@/interface/file";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import { IUser } from "@/interface/user";
+import { revalidateCurrentUser } from "@/actions/user";
 
 interface UploadedDocDisplayProps {
   uploadedFiles: IProfileFileInterface[];
@@ -32,6 +33,9 @@ const UploadedDocDisplay: React.FC<UploadedDocDisplayProps> = ({
       };
       showToaster("File deleted successfully", "success");
       updateUser(userInfo as IUser, token);
+      revalidateCurrentUser().catch((error) => {
+        console.error("Failed to revalidate user-info tag:", error);
+      });
       refetchUser(token);
     },
     onError: (error) => {

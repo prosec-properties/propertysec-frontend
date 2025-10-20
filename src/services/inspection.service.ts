@@ -1,5 +1,6 @@
 import { $requestWithToken } from "@/api/general";
 import { IMeta, IApiResponse, IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { InspectionDetail } from "@/interface/user";
 
 interface IInspectionStatistics {
@@ -74,14 +75,7 @@ export const fetchInspectionPayments = async (
     const url = `/inspections${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["inspections", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["inspections"] };
+    const nextConfig = buildNextTags(["inspections"], options);
 
     const response =
       await $requestWithToken.get<IFetchInspectionPaymentsResponse>(
@@ -102,17 +96,7 @@ export const fetchInspectionPaymentById = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([
-              `inspection-${inspectionId}`,
-              ...(options.next.tags ?? []),
-            ])
-          ),
-        }
-      : { tags: [`inspection-${inspectionId}`] };
+    const nextConfig = buildNextTags([`inspection-${inspectionId}`], options);
 
     const response = await $requestWithToken.get<InspectionPaymentDetail>(
       `/inspections/${inspectionId}`,

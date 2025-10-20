@@ -1,5 +1,6 @@
 import { $requestWithToken } from "@/api/general";
 import { IApiResponse, IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { IBankInfo, IGuarantorInfo, ILandlordInfo, ILoanDetails, IOfficeInfo, IPersonalInfo } from "@/store/state/loanStore";
 import { ILoan } from "@/interface/loan";
 
@@ -68,12 +69,7 @@ export const getUserLoans = async (
 ): Promise<IApiResponse<IUserLoansResponse> | null> => {
   try {
     const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["user-loans", ...(options.next.tags ?? [])])
-          ),
-        }
+      ? buildNextTags(["user-loans"], options)
       : undefined;
 
     const response = await $requestWithToken.get<IUserLoansResponse>(
@@ -117,12 +113,7 @@ export const getLoanById = async (
 ): Promise<IApiResponse<ILoan> | null> => {
   try {
     const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set([`loan-${loanId}`, ...(options.next.tags ?? [])])
-          ),
-        }
+      ? buildNextTags([`loan-${loanId}`], options)
       : undefined;
 
     const response = await $requestWithToken.get<ILoan>(

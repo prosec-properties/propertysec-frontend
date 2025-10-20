@@ -1,5 +1,6 @@
 import { $requestWithToken } from "@/api/general";
 import { IFetchOptions } from "@/interface/general";
+import { buildNextTags } from "@/lib/cacheTags";
 import { IProduct } from "@/interface/product";
 import { IProperty } from "@/interface/property";
 
@@ -13,14 +14,7 @@ export const fetchAffiliateShop = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["affiliate-shop", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["affiliate-shop"] };
+    const nextConfig = buildNextTags(["affiliate-shop"], options);
 
     const response = await $requestWithToken.get<IAffiliateShop>(
       `/affiliates/myshop`,
@@ -56,14 +50,7 @@ export const fetchAffiliateStats = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["affiliate-stats", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["affiliate-stats"] };
+    const nextConfig = buildNextTags(["affiliate-stats"], options);
 
     const response = await $requestWithToken.get(
       `/affiliates/stats`,
@@ -82,14 +69,7 @@ export const fetchAffiliateTransactions = async (
   options?: IFetchOptions
 ) => {
   try {
-    const nextConfig = options?.next
-      ? {
-          ...options.next,
-          tags: Array.from(
-            new Set(["affiliate-transactions", ...(options.next.tags ?? [])])
-          ),
-        }
-      : { tags: ["affiliate-transactions"] };
+    const nextConfig = buildNextTags(["affiliate-transactions"], options);
 
     const response = await $requestWithToken.get(
       `/transactions?type=property_purchase`,

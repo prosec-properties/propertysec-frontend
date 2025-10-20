@@ -22,6 +22,7 @@ import { useMutation } from "@tanstack/react-query";
 import { updateUserProfile } from "@/services/user.service";
 import { appendFiles } from "@/lib/files";
 import { ICountry } from "@/interface/location";
+import { revalidateCurrentUser } from "@/actions/user";
 
 interface Props {
   countries: ICountry[];
@@ -93,7 +94,10 @@ const BuyerProfileForm = ({ countries }: Props) => {
 
   const mutation = useMutation({
     mutationFn: updateUserProfile,
-    onSuccess: (data) => {
+    onSuccess: () => {
+      revalidateCurrentUser().catch((error) => {
+        console.error("Failed to revalidate user-info tag:", error);
+      });
       refetchUser(token);
       showToaster("Profile updated successfully", "success");
     },
