@@ -10,20 +10,22 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-type SearchParams = {
-  page?: string | string[];
-  per_page?: string | string[];
-  sort_by?: string | string[];
-  order?: string | string[];
+
+type ISearchParams = Promise<{
+  page?: string;
+  per_page?: string;
+  sort_by?: string;
+  order?: string;
   [key: string]: string | string[] | undefined;
-};
+}>;
 
 export const metadata = {
   title: "My Inspection Payments",
 };
 
-async function Page({ searchParams }: { searchParams: SearchParams }) {
+async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const session = await getServerSession(authConfig);
+  const queries = await searchParams;
 
   if (!session) {
     redirect(SIGN_IN_ROUTE);
@@ -45,10 +47,10 @@ async function Page({ searchParams }: { searchParams: SearchParams }) {
   };
 
   try {
-    const page = getParamValue(searchParams.page) ?? "1";
-    const per_page = getParamValue(searchParams.per_page) ?? "20";
-    const sort_by = getParamValue(searchParams.sort_by) ?? "created_at";
-    const order = getParamValue(searchParams.order) ?? "desc";
+    const page = getParamValue(queries.page) ?? "1";
+    const per_page = getParamValue(queries.per_page) ?? "20";
+    const sort_by = getParamValue(queries.sort_by) ?? "created_at";
+    const order = getParamValue(queries.order) ?? "desc";
 
     const response = await fetchMyInspectedProperties(
       session.user.token,
