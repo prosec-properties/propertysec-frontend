@@ -1,4 +1,5 @@
 import { apiBaseUrl } from "@/constants/env";
+import { triggerClientLogout } from "@/lib/logout";
 import type { IApiResponse, ICachedRequest } from "@/interface/general";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -26,11 +27,17 @@ class BaseRequest {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await this.parseErrorResponse(response);
+
+          if (response.status === 401) {
+            await triggerClientLogout();
+            throw errorData;
+          }
+
           if (response.status >= 500 || attempt === retries) {
             throw errorData;
           }
-          // Retry on client errors like 401, but not on 500+
+
           continue;
         }
         return response;
@@ -48,6 +55,35 @@ class BaseRequest {
       }
     }
     throw new Error("Request failed after retries");
+  }
+
+  protected async parseErrorResponse(
+    response: Response
+  ): Promise<Record<string, any>> {
+    try {
+      const bodyText = await response.text();
+      if (bodyText) {
+        try {
+          const parsed = JSON.parse(bodyText);
+          if (parsed && typeof parsed === "object") {
+            return { ...parsed, status: response.status };
+          }
+          return { status: response.status, message: parsed };
+        } catch {
+          return {
+            status: response.status,
+            message: bodyText,
+          };
+        }
+      }
+    } catch (parseError) {
+      console.error("Failed to parse error response", parseError);
+    }
+
+    return {
+      status: response.status,
+      message: response.statusText || "Request failed",
+    };
   }
 }
 
@@ -229,7 +265,12 @@ class AuthenticatedRequest extends BaseRequest {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await this.parseErrorResponse(response);
+
+        if (response.status === 401) {
+          await triggerClientLogout();
+        }
+
         throw errorData;
       }
       return response;
