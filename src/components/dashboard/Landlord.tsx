@@ -2,9 +2,7 @@
 
 import ProductCard from "../property/PropertyCard";
 import { IProperty } from "@/interface/property";
-import React from "react";
 import TabbedListingView from "../misc/TabbedListingView";
-import { useQueryString } from "@/hooks/useQueryString";
 import { IMeta } from "@/interface/general";
 
 interface Props {
@@ -12,15 +10,6 @@ interface Props {
   meta?: IMeta;
 }
 const Landlord = ({ properties, meta }: Props) => {
-  const { getQueryParam, setQueryParam } = useQueryString();
-
-  React.useEffect(() => {
-    const currentStatus = getQueryParam("status");
-    if (!currentStatus) {
-      setQueryParam("status", "all");
-    }
-  }, [getQueryParam, setQueryParam]);
-
   return (
     <TabbedListingView
       items={properties}

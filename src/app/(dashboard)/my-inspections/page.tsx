@@ -8,6 +8,7 @@ import { IPropertyInspection } from "@/interface/property";
 import { fetchMyInspectedProperties } from "@/services/user.service";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { ensureAuthenticatedSession, withServerAuth } from "@/lib/serverAuthGuard";
 import React from "react";
 
 
@@ -23,19 +24,18 @@ export const metadata = {
   title: "My Inspection Payments",
 };
 
+const isNextRedirectError = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "digest" in error &&
+  (error as any).digest === "NEXT_REDIRECT";
+
 async function Page({ searchParams }: { searchParams: ISearchParams }) {
-  const session = await getServerSession(authConfig);
+  const session = ensureAuthenticatedSession(await getServerSession(authConfig));
+  const token = session.user?.token || session.accessToken || "";
   const queries = await searchParams;
 
-  if (!session) {
-    redirect(SIGN_IN_ROUTE);
-  }
-
   if (session.user.role === USER_ROLE.ADMIN) {
-    redirect(SIGN_IN_ROUTE);
-  }
-
-  if (!session.user?.token) {
     redirect(SIGN_IN_ROUTE);
   }
 
@@ -52,24 +52,28 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     const sort_by = getParamValue(queries.sort_by) ?? "created_at";
     const order = getParamValue(queries.order) ?? "desc";
 
-    const response = await fetchMyInspectedProperties(
-      session.user.token,
-      {
-        page,
-        per_page,
-        sort_by,
-        order,
-      },
-      {
-        cache: "force-cache",
-        next: {
-          revalidate: 300,
-          tags: [
-            "my-inspections",
-            session.user?.id ? `my-inspections-${session.user.id}` : undefined,
-          ].filter(Boolean) as string[],
+    const response = await withServerAuth(() =>
+      fetchMyInspectedProperties(
+        token,
+        {
+          page,
+          per_page,
+          sort_by,
+          order,
         },
-      }
+        {
+          cache: "force-cache",
+          next: {
+            revalidate: 300,
+            tags: [
+              "my-inspections",
+              session.user?.id
+                ? `my-inspections-${session.user.id}`
+                : undefined,
+            ].filter(Boolean) as string[],
+          },
+        }
+      )
     );
 
     const inspections = response?.data?.inspections ?? [];
@@ -77,6 +81,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
 
     return <MyInspectionsClient inspections={inspections} meta={meta} />;
   } catch (error) {
+    if (isNextRedirectError(error)) throw error;
     return <ErrorDisplay message="Failed to fetch inspection payments" />;
   }
 }

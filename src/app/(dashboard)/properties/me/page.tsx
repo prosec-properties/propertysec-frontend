@@ -9,6 +9,7 @@ import Landlord from "@/components/dashboard/Landlord";
 import AffiliateDashboard from "@/components/dashboard/AffiliateDashboard";
 import Spinner from "@/components/misc/Spinner";
 import { fetchAffiliateShop } from "@/services/affiliate.service";
+import { ensureAuthenticatedSession, withServerAuth } from "@/lib/serverAuthGuard";
 
 type ISearchParams = Promise<{
   categories?: string;
@@ -23,24 +24,20 @@ type ISearchParams = Promise<{
 
 async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const queries = await searchParams;
-  const session = await getServerSession(authConfig);
-
-  if (!session) {
-    redirect(SIGN_IN_ROUTE);
-  }
-
+  const session = ensureAuthenticatedSession(await getServerSession(authConfig));
+  const token = session.user?.token || session.accessToken || "";
   if (session.user.role === USER_ROLE.BUYER) {
     redirect(HOME_ROUTE);
   }
 
-  if (!session.user?.token) {
-    redirect(SIGN_IN_ROUTE);
-  }
-
   const user = session.user;
 
+  const statusQuery = (Array.isArray(queries?.status)
+    ? queries?.status[0]
+    : queries?.status) ?? "all";
+
   const filterParams = {
-    status: queries?.status === "all" ? undefined : queries?.status || "draft",
+    status: statusQuery === "all" ? undefined : statusQuery,
     search: queries?.search,
     page: queries?.page ? parseInt(queries.page) : 1,
     limit: queries?.limit ? parseInt(queries.limit) : 10,
@@ -51,19 +48,21 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     user.role === USER_ROLE.DEVELOPER ||
     user.role === USER_ROLE.LAWYER
   ) {
-    const myProperties = await fetchMyProperties(
-      session.user?.token,
-      filterParams,
-      {
-        cache: "force-cache",
-        next: {
-          revalidate: 300,
-          tags: [
-            "my-properties",
-            session.user?.id ? `my-properties-${session.user.id}` : undefined,
-          ].filter(Boolean) as string[],
-        },
-      }
+    const myProperties = await withServerAuth(() =>
+      fetchMyProperties(
+        token,
+        filterParams,
+        {
+          cache: "force-cache",
+          next: {
+            revalidate: 300,
+            tags: [
+              "my-properties",
+              session.user?.id ? `my-properties-${session.user.id}` : undefined,
+            ].filter(Boolean) as string[],
+          },
+        }
+      )
     );
 
     return (
@@ -76,16 +75,18 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     );
   }
   if (user.role === USER_ROLE.AFFILIATE) {
-    const shop = await fetchAffiliateShop(session.user?.token, {
-      cache: "force-cache",
-      next: {
-        revalidate: 300,
-        tags: [
-          "affiliate-shop",
-          session.user?.id ? `affiliate-shop-${session.user.id}` : undefined,
-        ].filter(Boolean) as string[],
-      },
-    });
+    const shop = await withServerAuth(() =>
+  fetchAffiliateShop(token, {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "affiliate-shop",
+            session.user?.id ? `affiliate-shop-${session.user.id}` : undefined,
+          ].filter(Boolean) as string[],
+        },
+      })
+    );
     return (
       <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading shop..." />}>
         <AffiliateDashboard properties={shop?.data?.properties || []} />

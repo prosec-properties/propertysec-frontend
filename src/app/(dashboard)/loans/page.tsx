@@ -2,9 +2,9 @@ import { authConfig } from "@/authConfig";
 import LoanWrapper from "@/components/loans/LoanWrapper";
 import Spinner from "@/components/misc/Spinner";
 import { getUserLoans, IUserLoansResponse } from "@/services/loan.service";
+import { ensureAuthenticatedSession, withServerAuth } from "@/lib/serverAuthGuard";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -41,21 +41,21 @@ const defaultLoanData: IUserLoansResponse = {
 
 async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   const searchParams = await props.searchParams;
-  const session = await getServerSession(authConfig);
+  const session = ensureAuthenticatedSession(await getServerSession(authConfig));
+  const token = session.user?.token || session.accessToken || "";
 
-  if (!session || !session.user || !session.user?.token) {
-    redirect("/");
-  }
-  const response = await getUserLoans(session.user?.token, {
-    cache: "force-cache",
-    next: {
-      revalidate: 300,
-      tags: [
-        "user-loans",
-        session.user?.id ? `user-loans-${session.user.id}` : undefined,
-      ].filter(Boolean) as string[],
-    },
-  });
+  const response = await withServerAuth(() =>
+    getUserLoans(token, {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+        tags: [
+          "user-loans",
+          session.user?.id ? `user-loans-${session.user.id}` : undefined,
+        ].filter(Boolean) as string[],
+      },
+    })
+  );
 
   return (
     <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading loans..." />}>

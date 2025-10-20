@@ -4,6 +4,44 @@ import type { IApiResponse, ICachedRequest } from "@/interface/general";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
+const unauthorizedMessageMatch = (message?: unknown) => {
+  if (!message || typeof message !== "string") {
+    return false;
+  }
+  return message.toLowerCase().includes("unauthorized");
+};
+
+export const isUnauthorizedResponse = (
+  status: number,
+  errorData: Record<string, any>
+) => {
+  if (status === 401) {
+    return true;
+  }
+
+  if (status === 400) {
+    return unauthorizedMessageMatch(errorData?.message);
+  }
+
+  return false;
+};
+
+export const isUnauthorizedError = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const maybeStatus = (error as any).status;
+  const status = typeof maybeStatus === "number" ? maybeStatus : undefined;
+  const message = (error as any)?.message;
+
+  if (typeof status === "number" && isUnauthorizedResponse(status, { message })) {
+    return true;
+  }
+
+  return unauthorizedMessageMatch(message);
+};
+
 export function getApiUrl(path: string): string {
   return `${apiBaseUrl}${path}`;
 }
@@ -29,7 +67,7 @@ class BaseRequest {
         if (!response.ok) {
           const errorData = await this.parseErrorResponse(response);
 
-          if (response.status === 401) {
+          if (isUnauthorizedResponse(response.status, errorData)) {
             await triggerClientLogout();
             throw errorData;
           }
@@ -267,7 +305,7 @@ class AuthenticatedRequest extends BaseRequest {
       if (!response.ok) {
         const errorData = await this.parseErrorResponse(response);
 
-        if (response.status === 401) {
+        if (isUnauthorizedResponse(response.status, errorData)) {
           await triggerClientLogout();
         }
 

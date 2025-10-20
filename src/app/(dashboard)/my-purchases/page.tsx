@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import ErrorDisplay from "@/components/misc/ErrorDisplay";
 import MyPurchases from "@/components/dashboard/MyPurchases";
+import { ensureAuthenticatedSession, withServerAuth } from "@/lib/serverAuthGuard";
 
 type ISearchParams = Promise<{
   page?: string;
@@ -21,43 +22,44 @@ export const metadata = {
   title: "My Purchased Properties",
 };
 
+const isNextRedirectError = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "digest" in error &&
+  (error as any).digest === "NEXT_REDIRECT";
+
 async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const queries = await searchParams;
-  const session = await getServerSession(authConfig);
-
-  if (!session) {
-    redirect(SIGN_IN_ROUTE);
-  }
+  const session = ensureAuthenticatedSession(await getServerSession(authConfig));
+  const token = session.user?.token || session.accessToken || "";
 
   if (session.user.role !== USER_ROLE.BUYER) {
-    redirect(SIGN_IN_ROUTE);
-  }
-
-  if (!session.user?.token) {
     redirect(SIGN_IN_ROUTE);
   }
 
   const user = session.user;
 
   try {
-    const purchases = await fetchMyPurchasedProperties(
-      user?.token!,
-      {
-        page: queries?.page || "1",
-        per_page: queries?.per_page || "20",
-        sort_by: queries?.sort_by || "created_at",
-        order: queries?.order || "desc",
-      },
-      {
-        cache: "force-cache",
-        next: {
-          revalidate: 300,
-          tags: [
-            "my-purchases",
-            user?.id ? `my-purchases-${user.id}` : undefined,
-          ].filter(Boolean) as string[],
+    const purchases = await withServerAuth(() =>
+      fetchMyPurchasedProperties(
+        token,
+        {
+          page: queries?.page || "1",
+          per_page: queries?.per_page || "20",
+          sort_by: queries?.sort_by || "created_at",
+          order: queries?.order || "desc",
         },
-      }
+        {
+          cache: "force-cache",
+          next: {
+            revalidate: 300,
+            tags: [
+              "my-purchases",
+              user?.id ? `my-purchases-${user.id}` : undefined,
+            ].filter(Boolean) as string[],
+          },
+        }
+      )
     );
 
     if (!purchases?.success) {
@@ -75,6 +77,7 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
       />
     );
   } catch (error) {
+    if (isNextRedirectError(error)) throw error;
     return <ErrorDisplay message="Failed to fetch purchased properties" />;
   }
 }
