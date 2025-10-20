@@ -16,6 +16,7 @@ import { IGuarantorInfo } from "@/store/state/loanStore";
 import { extractServerErrorMessage, showToaster, validateNigerianPhoneNumber } from "@/lib/general";
 import { useRouter } from "next/navigation";
 import { DASHBOARD_LOAN_ROUTE } from "@/constants/routes";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const GuarantorInfoSchema = z.object({
   guarantorName: z.string().min(1, { message: "Name is required" }),
@@ -68,6 +69,9 @@ const GuarantorInfoForm = ({ token, disabled }: Props) => {
       setGuarantorOfficeAddress(stepData?.guarantorOfficeAddress);
       setGuarantorPhoneNumber(stepData?.guarantorPhoneNumber);
       addCompletedStep(6);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       showToaster("Guarantor information saved successfully", "success");
       resetAllForms();
       router.push(DASHBOARD_LOAN_ROUTE);

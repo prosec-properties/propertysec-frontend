@@ -20,6 +20,7 @@ import { takeLoanApi } from "@/services/loan.service";
 import { useMutation } from "@tanstack/react-query";
 import { LOANSTEPS_ENUM } from "@/constants/general";
 import { useLoanRequestStore, IPersonalInfo } from "@/store/state/loanStore";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const LoanInfoSchema = z
   .object({
@@ -83,6 +84,9 @@ const LoanInfoForm = (props: Props) => {
       setAmount(stepData?.amount);
       setDuration(stepData?.duration);
       addCompletedStep(1);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       setQueryParam("step", LOANSTEPS_ENUM.BANK_STEP_2);
     },
     onError: (error) => {

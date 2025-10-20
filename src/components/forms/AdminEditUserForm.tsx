@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { adminUpdateUser } from "@/services/user.service";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import type { IUser } from "@/interface/user";
+import { revalidateCacheTags } from "@/actions/cache";
 
 import CustomInput from "../inputs/CustomInput";
 import CustomButton from "../buttons/CustomButton";
@@ -72,6 +73,13 @@ const AdminEditUserForm: React.FC<Props> = ({ user, token, onSuccess, onCancel }
     mutationFn: adminUpdateUser,
     onSuccess: (data) => {
       if (data?.success) {
+        revalidateCacheTags([
+          "admin-users",
+          "admin-subscribed-users",
+          "fetchUserById",
+        ]).catch((error) => {
+          console.error("Failed to revalidate admin user tags:", error);
+        });
         showToaster("User updated successfully", "success");
         onSuccess();
       } else {

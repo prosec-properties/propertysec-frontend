@@ -41,6 +41,7 @@ import {
   ChevronUp,
   Eye,
 } from "lucide-react";
+import { revalidateCacheTags } from "@/actions/cache";
 
 interface Props {
   loan: ILoanWithDetails;
@@ -76,6 +77,18 @@ const LoanDetail = ({ loan }: Props) => {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+
+  const revalidateLoanData = () => {
+    revalidateCacheTags([
+      "admin-loan-requests",
+      "admin-loan-stats",
+      `admin-loan-${loan.id}`,
+      `loan-${loan.id}`,
+      "user-loans",
+    ]).catch((error) => {
+      console.error("Failed to revalidate loan tags:", error);
+    });
+  };
 
   const applicationFiles = useMemo<ILoanFile[]>(() => {
     const requestFiles = loan.loanRequest?.files ?? [];
@@ -150,6 +163,8 @@ const LoanDetail = ({ loan }: Props) => {
           variant: "default",
         });
 
+        revalidateLoanData();
+
         setTimeout(() => {
           router.push(ADMIN_LOANS_ROUTE);
         }, 2000);
@@ -217,6 +232,8 @@ const LoanDetail = ({ loan }: Props) => {
           variant: "default",
         });
 
+        revalidateLoanData();
+
         setTimeout(() => {
           router.push(ADMIN_LOANS_ROUTE);
         }, 2000);
@@ -270,6 +287,8 @@ const LoanDetail = ({ loan }: Props) => {
             "The loan has been successfully disbursed to the applicant.",
           variant: "default",
         });
+
+        revalidateLoanData();
 
         setTimeout(() => {
           router.push(ADMIN_LOANS_ROUTE);

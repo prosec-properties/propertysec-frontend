@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { ADMIN_USERS_ROUTE } from "@/constants/routes";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { revalidateCacheTags } from "@/actions/cache";
 
 interface Props {
   user: IUser;
@@ -83,6 +84,13 @@ const ProfileWrapper = ({ user }: Props) => {
     try {
       setIsDeleting(true);
       await deleteAccount(token, user.id);
+      revalidateCacheTags([
+        "admin-users",
+        "admin-subscribed-users",
+        "fetchUserById",
+      ]).catch((error) => {
+        console.error("Failed to revalidate admin user tags:", error);
+      });
       showToaster("Account deleted successfully", "success");
       router.push(ADMIN_USERS_ROUTE);
     } catch (error) {

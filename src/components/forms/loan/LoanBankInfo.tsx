@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { LOANSTEPS_ENUM } from "@/constants/general";
 import NewImagePreview from "@/components/files/NewImagePreview";
 import type { SelectedImagePreview } from "@/interface/image";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const LoanBankInfoSchema = z.object({
   averageSalary: z.string().min(1, { message: "Salary is required" }),
@@ -79,6 +80,9 @@ const LoanBankInfo = (props: Props) => {
       setNin(stepData?.nin);
       setBvn(stepData?.bvn);
       addCompletedStep(2);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       setQueryParam("step", LOANSTEPS_ENUM.OFFICE_STEP_3);
       showToaster("Bank information saved successfully", "success");
     },

@@ -27,6 +27,7 @@ import { ICategory } from "@/interface/category";
 import { IProduct } from "@/interface/product";
 import { ICountry } from "@/interface/location";
 import { createProduct, updateProduct } from "@/services/product.service";
+import { revalidateProductData } from "@/actions/product";
 
 const PRODUCT_CONDITIONS = [
   { label: "New", value: "new" },
@@ -116,6 +117,11 @@ const ProductForm = (props: Props) => {
     );
 
     const productId = props.mode === "edit" ? props.product?.id : data?.id;
+    if (productId) {
+      revalidateProductData(productId).catch((error) => {
+        console.error("Failed to revalidate product tags:", error);
+      });
+    }
     if (productId) {
       router.push(`/products/${productId}`);
     }

@@ -12,6 +12,7 @@ import { extractServerErrorMessage } from "@/lib/general";
 import { toast } from "../ui/use-toast";
 import { deleteProperty } from "@/services/properties.service";
 import { useMutation } from "@tanstack/react-query";
+import { revalidatePropertyData } from "@/actions/property";
 
 interface SellerButtonsProps {
   property: IProperty;
@@ -35,6 +36,10 @@ const SellerButtons: React.FC<SellerButtonsProps> = ({
         variant: "success",
       });
       setShowDeleteModal(false);
+      revalidatePropertyData({ propertyId: property.id })
+        .catch((error) => {
+          console.error("Failed to revalidate property tags:", error);
+        });
       router.back();
     },
     onError: (error) => {

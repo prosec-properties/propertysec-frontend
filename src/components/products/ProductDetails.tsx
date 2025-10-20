@@ -10,6 +10,8 @@ import CustomModal from "../modal/CustomModal";
 import { formatPrice } from "@/lib/payment";
 import { useMutation } from "@tanstack/react-query";
 import { deleteProperty } from "@/services/properties.service";
+import { revalidatePropertyData } from "@/actions/property";
+import { revalidateProductData } from "@/actions/product";
 import { useToast } from "../ui/use-toast";
 import { extractServerErrorMessage } from "@/lib/general";
 
@@ -31,6 +33,13 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
         variant: "success",
       });
       setShowDeleteModal(false);
+      revalidatePropertyData({ propertyId: product.id })
+        .catch((error) => {
+          console.error("Failed to revalidate property tags:", error);
+        });
+      revalidateProductData(product.id).catch((error) => {
+        console.error("Failed to revalidate product tags:", error);
+      });
       router.back();
     },
     onError: (error) => {

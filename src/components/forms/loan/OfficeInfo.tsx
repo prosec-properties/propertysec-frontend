@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { takeLoanApi } from "@/services/loan.service";
 import { LOANSTEPS_ENUM } from "@/constants/general";
 import { useLoanRequestStore, IOfficeInfo } from "@/store/state/loanStore";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const OfficeInfoSchema = z.object({
   officeName: z.string().min(1, { message: "Office name is required" }),
@@ -58,6 +59,9 @@ const OfficeInfoForm = (props: Props) => {
       setOfficeContact(stepData?.officeContact);
       setOfficeAddress(stepData?.officeAddress);
       addCompletedStep(3);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       setQueryParam("step", LOANSTEPS_ENUM.OTHER_STEP_4);
       showToaster("Office information saved successfully", "success");
     },

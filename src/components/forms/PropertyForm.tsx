@@ -26,6 +26,7 @@ import { SelectedImagePreview } from "@/interface/image";
 import { ICity, ICountry } from "@/interface/location";
 import { useMutation } from "@tanstack/react-query";
 import { createProperty, updateProperty } from "@/services/properties.service";
+import { revalidatePropertyData } from "@/actions/property";
 import { useRouter } from "next/navigation";
 import { IProperty } from "@/interface/property";
 
@@ -79,7 +80,17 @@ const PropertyForm = (props: Props) => {
 
   const createMutation = useMutation({
     mutationFn: createProperty,
-    onSuccess: (data) => handleSuccess(data?.data as IProperty),
+    onSuccess: (data) => {
+      const propertyData = data?.data as IProperty | undefined;
+      const propertyId = propertyData?.id;
+
+      revalidatePropertyData({ propertyId })
+        .catch((error) => {
+          console.error("Failed to revalidate property tags:", error);
+        });
+
+      handleSuccess(propertyData as IProperty);
+    },
     onError: (error: any) => {
       console.error("Create property error:", error);
       let errorMessage = "Failed to create property";
@@ -105,7 +116,17 @@ const PropertyForm = (props: Props) => {
 
   const updateMutation = useMutation({
     mutationFn: updateProperty,
-    onSuccess: (data) => handleSuccess(data?.data as IProperty),
+    onSuccess: (data) => {
+      const propertyData = data?.data as IProperty | undefined;
+      const propertyId = props.property?.id ?? propertyData?.id;
+
+      revalidatePropertyData({ propertyId })
+        .catch((error) => {
+          console.error("Failed to revalidate property tags:", error);
+        });
+
+      handleSuccess(propertyData as IProperty);
+    },
     onError: (error: any) => {
       console.error("Update property error:", error);
       let errorMessage = "Failed to update property";

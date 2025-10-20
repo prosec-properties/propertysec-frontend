@@ -16,6 +16,7 @@ import { useLoanRequestStore, ILoanDetails } from "@/store/state/loanStore";
 import { LOANSTEPS_ENUM } from "@/constants/general";
 import { extractServerErrorMessage, showToaster } from "@/lib/general";
 import { cn } from "@/lib/utils";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const OtherInfoSchema = z.object({
   noOfRooms: z.string().min(1, { message: "Number of rooms is required" }),
@@ -49,6 +50,9 @@ const OtherInfoForm = ({ token, disabled }: { token: string; disabled?: boolean 
       setNoOfYears(stepData?.noOfYears);
       setReasonForLoanRequest(stepData?.reasonForLoanRequest);
       addCompletedStep(4);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       setQueryParam("step", LOANSTEPS_ENUM.LANDLORD_STEP_5);
       showToaster("Other information saved successfully", "success");
     },

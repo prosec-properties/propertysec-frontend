@@ -21,6 +21,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { showToaster } from "@/lib/general";
 import { LOANSTEPS_ENUM } from "@/constants/general";
+import { revalidateCacheTags } from "@/actions/cache";
 
 const LandlordInfoSchema = z.object({
   landlordName: z.string().min(1, { message: "Landlord name is required" }),
@@ -71,6 +72,9 @@ const LandlordInfoForm = ({ token, disabled }: Props) => {
       setLandlordAddress(stepData?.landlordAddress);
       setLandlordPhoneNumber(stepData?.landlordPhoneNumber);
       addCompletedStep(5);
+      revalidateCacheTags(["user-loans"]).catch((error) => {
+        console.error("Failed to revalidate user loan tags:", error);
+      });
       setQueryParam("step", LOANSTEPS_ENUM.GUARANTOR_STEP_6);
       showToaster("Landlord information saved successfully", "success");
     },

@@ -13,6 +13,7 @@ import { ArrowLeft, ChevronDown, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { showToaster } from "@/lib/general";
+import { revalidateCacheTags } from "@/actions/cache";
 
 interface Props {
   inspection: InspectionPaymentDetail;
@@ -57,6 +58,12 @@ const InspectionDetails = ({ inspection, onUpdate, token }: Props) => {
         showToaster("Inspection marked as completed successfully!", "success");
         setCurrentInspectionStatus("COMPLETED");
         setCurrentStatus("completed");
+        revalidateCacheTags([
+          "inspections",
+          `inspection-${inspection.id}`,
+        ]).catch((error) => {
+          console.error("Failed to revalidate inspection tags:", error);
+        });
         if (onUpdate) {
           onUpdate({
             ...inspection,

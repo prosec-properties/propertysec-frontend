@@ -40,6 +40,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
+import { revalidateCacheTags } from "@/actions/cache";
 
 interface Props {
   loan: ILoanWithDetails;
@@ -65,6 +66,18 @@ const LoanDetail = ({ loan }: Props) => {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+
+  const revalidateLoanData = () => {
+    revalidateCacheTags([
+      "admin-loan-requests",
+      "admin-loan-stats",
+      `admin-loan-${loan.id}`,
+      `loan-${loan.id}`,
+      "user-loans",
+    ]).catch((error) => {
+      console.error("Failed to revalidate loan tags:", error);
+    });
+  };
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -100,6 +113,8 @@ const LoanDetail = ({ loan }: Props) => {
           description: "The loan application has been approved successfully.",
           variant: "default",
         });
+
+        revalidateLoanData();
         
         setTimeout(() => {
           router.push(ADMIN_LOANS_ROUTE);
@@ -159,6 +174,8 @@ const LoanDetail = ({ loan }: Props) => {
           description: "The loan application has been rejected and the applicant has been notified.",
           variant: "default",
         });
+
+        revalidateLoanData();
         
         setTimeout(() => {
           router.push(ADMIN_LOANS_ROUTE);

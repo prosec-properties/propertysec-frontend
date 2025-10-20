@@ -88,11 +88,12 @@ export const fetchAllProperties = async (
     const url = `/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = buildNextTags(["properties"], options);
     const response =
       await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
         url,
-        options?.cache,
-        options?.next
+        options?.cache ?? "force-cache",
+        nextConfig
       );
     return response;
   } catch (error) {
