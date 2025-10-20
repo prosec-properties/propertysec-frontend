@@ -45,8 +45,18 @@ const NewImagePreview = (props: Props) => {
     setSelected(props.selectedPhoto);
   }, [props.selectedPhoto]);
 
-  const isImage = selected?.image?.file.type.startsWith("image");
-  const isVideo = selected?.image?.file.type.startsWith("video");
+  const fileType = selected?.image?.file?.type ?? "";
+  const isImage = fileType.startsWith("image");
+  const isVideo = fileType.startsWith("video");
+
+  const previewWrapperClasses = cn(
+    "relative mx-auto w-full overflow-hidden rounded-lg bg-neutral-100 sm:mx-0",
+    "max-w-[240px] h-[200px]",
+    "sm:max-w-[320px] sm:h-[240px]",
+    "md:max-w-[360px] md:h-[260px]",
+    "lg:max-w-[420px] lg:h-[300px]",
+    "xl:max-w-[480px] xl:h-[340px]"
+  );
 
   return (
     <div
@@ -64,20 +74,18 @@ const NewImagePreview = (props: Props) => {
       {selected && (
         <>
           {isImage ? (
-            <div className="sm:basis-[50%] h-[300px] w-[300px] max-w-full overflow-hidden rounded-lg">
+            <div className={cn("sm:basis-[50%]", previewWrapperClasses)}>
               <Image
                 src={selected.image.url}
                 alt={selected.fileName}
-                width={300}
-                height={300}
-                className="h-full w-full object-contain"
+                fill
+                sizes="(min-width: 1280px) 480px, (min-width: 1024px) 420px, (min-width: 768px) 360px, (min-width: 640px) 320px, 240px"
+                className="object-contain"
               />
             </div>
           ) : isVideo ? (
-            <div className="sm:basis-[50%] h-[300px] w-[300px] max-w-full overflow-hidden rounded-lg">
+            <div className={cn("sm:basis-[50%]", previewWrapperClasses)}>
               <video
-                width={300}
-                height={300}
                 controls
                 src={selected.image.url}
                 className="h-full w-full object-contain"
@@ -88,7 +96,7 @@ const NewImagePreview = (props: Props) => {
           ) : null}
         </>
       )}
-      <div className="sm:basis-[50%]">
+      <div className="sm:basis-[50%] w-full">
         <UploadWithImageDisplay
           format="multiple"
           files={props.files}
