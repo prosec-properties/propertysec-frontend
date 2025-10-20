@@ -166,9 +166,9 @@ const PrivacyPolicyWrapper = () => {
               practices, please contact us at{" "}
               <a
                 className="text-primary underline"
-                href="mailto:support@propertysec.com"
+                href="mailto:propertyseconline@gmail.com"
               >
-                support@propertysec.com
+                propertyseconline@gmail.com
               </a>
               .
             </p>

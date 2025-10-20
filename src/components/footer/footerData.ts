@@ -26,10 +26,10 @@ export const footerData = [
         name: "Loan to Rent",
         url: DASHBOARD_TAKE_LOAN_ROUTE,
       },
-      {
-        name: "Other Products",
-        url: PRODUCTS_ROUTE,
-      },
+      // {
+      //   name: "Other Products",
+      //   url: PROPERTIES_ROUTE,
+      // },
     ],
   },
   {
