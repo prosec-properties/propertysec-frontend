@@ -55,13 +55,21 @@ const AffiliateDashboard = () => {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["affiliate-stats"],
-    queryFn: () => fetchAffiliateStats(token),
+    queryFn: () =>
+      fetchAffiliateStats(token, {
+        cache: "force-cache",
+        next: { revalidate: 300, tags: ["affiliate-stats"] },
+      }),
     enabled: !!token,
   });
 
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
     queryKey: ["affiliate-transactions"],
-    queryFn: () => fetchAffiliateTransactions(token),
+    queryFn: () =>
+      fetchAffiliateTransactions(token, {
+        cache: "force-cache",
+        next: { revalidate: 300, tags: ["affiliate-transactions"] },
+      }),
     enabled: !!token,
   });
 

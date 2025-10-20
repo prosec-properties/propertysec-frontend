@@ -17,12 +17,22 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const { token } = await adminGuard();
   
   const [loans, loanStat] = await Promise.all([
-    loanRequests(token, {
-      search: queries.search,
-      page: queries.page ? parseInt(queries.page) : 1,
-      limit: queries.limit ? parseInt(queries.limit) : 50,
+    loanRequests(
+      token,
+      {
+        search: queries.search,
+        page: queries.page ? parseInt(queries.page) : 1,
+        limit: queries.limit ? parseInt(queries.limit) : 50,
+      },
+      {
+        cache: "force-cache",
+        next: { revalidate: 300, tags: ["admin-loan-requests"] },
+      }
+    ),
+    loanStats(token, {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["admin-loan-stats"] },
     }),
-    loanStats(token),
   ]);
 
   if (!loans?.success || !loanStat?.success) {

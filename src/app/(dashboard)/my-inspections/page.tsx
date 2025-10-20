@@ -50,12 +50,25 @@ async function Page({ searchParams }: { searchParams: SearchParams }) {
     const sort_by = getParamValue(searchParams.sort_by) ?? "created_at";
     const order = getParamValue(searchParams.order) ?? "desc";
 
-    const response = await fetchMyInspectedProperties(session.user.token, {
-      page,
-      per_page,
-      sort_by,
-      order,
-    });
+    const response = await fetchMyInspectedProperties(
+      session.user.token,
+      {
+        page,
+        per_page,
+        sort_by,
+        order,
+      },
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "my-inspections",
+            session.user?.id ? `my-inspections-${session.user.id}` : undefined,
+          ].filter(Boolean) as string[],
+        },
+      }
+    );
 
     const inspections = response?.data?.inspections ?? [];
     const meta = response?.data?.meta;

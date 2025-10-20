@@ -16,7 +16,21 @@ const InspectionDetailsPage = async ({ params }: Props) => {
   try {
     const { id } = await params;
 
-    const inspectionResponse = await fetchInspectionPaymentById(token, id);
+    const inspectionResponse = await fetchInspectionPaymentById(
+      token,
+      id,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "inspections",
+            "admin-inspections",
+            `inspection-${id}`,
+          ],
+        },
+      }
+    );
 
     if (!inspectionResponse?.success || !inspectionResponse.data) {
       notFound();

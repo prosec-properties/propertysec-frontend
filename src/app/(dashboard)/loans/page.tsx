@@ -46,7 +46,16 @@ async function Page(props: { searchParams?: Promise<ISearchParams> }) {
   if (!session || !session.user || !session.user?.token) {
     redirect("/");
   }
-  const response = await getUserLoans(session.user?.token);
+  const response = await getUserLoans(session.user?.token, {
+    cache: "force-cache",
+    next: {
+      revalidate: 300,
+      tags: [
+        "user-loans",
+        session.user?.id ? `user-loans-${session.user.id}` : undefined,
+      ].filter(Boolean) as string[],
+    },
+  });
 
   return (
     <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading loans..." />}>

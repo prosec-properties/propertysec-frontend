@@ -93,14 +93,37 @@ export const fetchMyProducts = async (token: string) => {
   }
 };
 
-export const fetchProductById = async (productId: string) => {
+type FetchNextConfig = {
+  revalidate?: number;
+  tags?: string[];
+};
+
+type FetchProductOptions = {
+  cache?: "default" | "force-cache" | "no-cache" | "reload" | "only-if-cached";
+  next?: FetchNextConfig;
+};
+
+export const fetchProductById = async (
+  productId: string,
+  options?: FetchProductOptions
+) => {
   try {
+    const nextConfig: FetchNextConfig | undefined = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              `product-${productId}`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : { tags: [`product-${productId}`] };
+
     const response = await $requestWithoutToken.get<IProduct>(
       `/products/${productId}`,
-      'no-cache',
-      {
-        tags: ['fetchProductById'],
-      }
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

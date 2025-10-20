@@ -20,7 +20,21 @@ const Page = async ({ params }: Props) => {
   }
 
   try {
-    const subscriptionResponse = await getSubscriptionDetails(user?.token || "", id);
+    const subscriptionResponse = await getSubscriptionDetails(
+      user?.token || "",
+      id,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "subscriptions",
+            "admin-subscriptions",
+            `subscription-${id}`,
+          ],
+        },
+      }
+    );
 
     console.log("Subscription details:", subscriptionResponse?.data);
     

@@ -1,13 +1,7 @@
 import { apiBaseUrl } from "@/constants/env";
-import { IApiResponse } from "@/interface/general";
+import type { IApiResponse, ICachedRequest } from "@/interface/general";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type ICachedRequest =
-  | "no-cache"
-  | "default"
-  | "reload"
-  | "force-cache"
-  | "only-if-cached";
 
 export function getApiUrl(path: string): string {
   return `${apiBaseUrl}${path}`;

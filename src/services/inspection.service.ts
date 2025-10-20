@@ -1,5 +1,5 @@
 import { $requestWithToken } from "@/api/general";
-import { IMeta, IApiResponse } from "@/interface/general";
+import { IMeta, IApiResponse, IFetchOptions } from "@/interface/general";
 import { InspectionDetail } from "@/interface/user";
 
 interface IInspectionStatistics {
@@ -52,7 +52,8 @@ export const fetchInspectionPayments = async (
     search?: string;
     page?: number;
     limit?: number;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -73,14 +74,21 @@ export const fetchInspectionPayments = async (
     const url = `/inspections${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["inspections", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["inspections"] };
+
     const response =
       await $requestWithToken.get<IFetchInspectionPaymentsResponse>(
         url,
         token,
-        "default",
-        {
-          tags: ["inspections"],
-        }
+        options?.cache ?? "force-cache",
+        nextConfig
       );
     return response;
   } catch (error) {
@@ -90,12 +98,27 @@ export const fetchInspectionPayments = async (
 
 export const fetchInspectionPaymentById = async (
   token: string,
-  inspectionId: string
+  inspectionId: string,
+  options?: IFetchOptions
 ) => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              `inspection-${inspectionId}`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : { tags: [`inspection-${inspectionId}`] };
+
     const response = await $requestWithToken.get<InspectionPaymentDetail>(
       `/inspections/${inspectionId}`,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

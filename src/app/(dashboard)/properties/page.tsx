@@ -37,7 +37,10 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   };
 
   const [properties, country, categories] = await Promise.all([
-    fetchAllProperties(filterParams),
+    fetchAllProperties(filterParams, {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["properties"] },
+    }),
     fetchACountry("161"),
     fetchCategories("property"),
   ]);

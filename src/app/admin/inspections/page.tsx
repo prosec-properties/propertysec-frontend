@@ -19,12 +19,19 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const token = await getAuthUserToken();
 
   try {
-    const inspectionPaymentsResponse = await fetchInspectionPayments(token, {
-      status: queries.status,
-      search: queries.search,
-      page: queries.page ? parseInt(queries.page) : undefined,
-      limit: queries.limit ? parseInt(queries.limit) : undefined,
-    });
+    const inspectionPaymentsResponse = await fetchInspectionPayments(
+      token,
+      {
+        status: queries.status,
+        search: queries.search,
+        page: queries.page ? parseInt(queries.page) : undefined,
+        limit: queries.limit ? parseInt(queries.limit) : undefined,
+      },
+      {
+        cache: "force-cache",
+        next: { revalidate: 300, tags: ["inspections", "admin-inspections"] },
+      }
+    );
 
     if (!inspectionPaymentsResponse?.success) {
       return <ErrorDisplay message="Failed to fetch inspection payments" />;

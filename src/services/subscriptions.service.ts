@@ -1,5 +1,5 @@
 import { $requestWithToken } from "@/api/general";
-import { IMeta } from "@/interface/general";
+import { IFetchOptions, IMeta } from "@/interface/general";
 import { Plan, Subscription } from "@/interface/payment";
 import { IUser } from "@/interface/user";
 
@@ -58,7 +58,8 @@ export const fetchAllSubscriptions = async (
     page?: number;
     limit?: number;
     status?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -79,9 +80,20 @@ export const fetchAllSubscriptions = async (
     const url = `/subscriptions/subscribed-users${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["subscriptions", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["subscriptions"] };
+
     const response = await $requestWithToken.get<ISubscriptionsResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -91,13 +103,27 @@ export const fetchAllSubscriptions = async (
 
 export const getSubscriptionDetails = async (
   token: string,
-  subscriptionId: string
+  subscriptionId: string,
+  options?: IFetchOptions
 ) => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              `subscription-${subscriptionId}`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : { tags: [`subscription-${subscriptionId}`] };
+
     const response = await $requestWithToken.get<ISubscriptionWithUser>(
       `/subscriptions/${subscriptionId}`,
       token,
-      "force-cache"
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -111,7 +137,8 @@ export const fetchSubscriptions = async (
     search?: string;
     page?: number;
     limit?: number;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -129,6 +156,15 @@ export const fetchSubscriptions = async (
     const url = `/subscriptions${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["subscriptions", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["subscriptions"] };
+
     const response = await $requestWithToken.get<{
       success: boolean;
       message: string;
@@ -147,7 +183,9 @@ export const fetchSubscriptions = async (
       };
     }>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

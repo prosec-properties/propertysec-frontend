@@ -22,12 +22,26 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const queries = await searchParams;
   const { token } = await adminGuard();
 
-  const properties = await fetchAffiliateProperties(token || "", affiliateId, {
-    page: queries.page ? parseInt(queries.page) : 1,
-    per_page: queries.per_page ? parseInt(queries.per_page) : 20,
-    sort_by: queries.sort_by,
-    order: queries.order,
-  });
+  const properties = await fetchAffiliateProperties(
+    token || "",
+    affiliateId,
+    {
+      page: queries.page ? parseInt(queries.page) : 1,
+      per_page: queries.per_page ? parseInt(queries.per_page) : 20,
+      sort_by: queries.sort_by,
+      order: queries.order,
+    },
+    {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+        tags: [
+          "admin-affiliate-properties",
+          `admin-affiliate-${affiliateId}-properties`,
+        ],
+      },
+    }
+  );
 
   if (!properties?.success) {
     return <ErrorDisplay message="Failed to fetch affiliate properties" />;

@@ -53,7 +53,17 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   ) {
     const myProperties = await fetchMyProperties(
       session.user?.token,
-      filterParams
+      filterParams,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "my-properties",
+            session.user?.id ? `my-properties-${session.user.id}` : undefined,
+          ].filter(Boolean) as string[],
+        },
+      }
     );
 
     return (
@@ -66,7 +76,16 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
     );
   }
   if (user.role === USER_ROLE.AFFILIATE) {
-    const shop = await fetchAffiliateShop(session.user?.token);
+    const shop = await fetchAffiliateShop(session.user?.token, {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+        tags: [
+          "affiliate-shop",
+          session.user?.id ? `affiliate-shop-${session.user.id}` : undefined,
+        ].filter(Boolean) as string[],
+      },
+    });
     return (
       <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading shop..." />}>
         <AffiliateDashboard properties={shop?.data?.properties || []} />

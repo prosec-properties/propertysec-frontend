@@ -22,11 +22,24 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
     redirect(SIGN_IN_ROUTE);
   }
 
-  const subscriptions = await fetchSubscriptions(session.user?.token, {
-    search: queries.search,
-    page: queries.page ? parseInt(queries.page) : 1,
-    limit: queries.limit ? parseInt(queries.limit) : 10,
-  });
+  const subscriptions = await fetchSubscriptions(
+    session.user?.token,
+    {
+      search: queries.search,
+      page: queries.page ? parseInt(queries.page) : 1,
+      limit: queries.limit ? parseInt(queries.limit) : 10,
+    },
+    {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+        tags: [
+          "subscriptions",
+          session.user?.id ? `subscriptions-${session.user.id}` : undefined,
+        ].filter(Boolean) as string[],
+      },
+    }
+  );
   
   if (!subscriptions?.success) {
     return <ErrorDisplay message="An error occurred while fetching your subscriptions" />;

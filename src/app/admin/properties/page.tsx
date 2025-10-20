@@ -17,11 +17,18 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   const status = queries.status || "all";
 
-  const properties = await fetchAllPropertiesAdmin(token, {
-    status,
-    page: queries.page ? parseInt(queries.page) : 1,
-    limit: queries.limit ? parseInt(queries.limit) : 20,
-  });
+  const properties = await fetchAllPropertiesAdmin(
+    token,
+    {
+      status,
+      page: queries.page ? parseInt(queries.page) : 1,
+      limit: queries.limit ? parseInt(queries.limit) : 20,
+    },
+    {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["admin-properties"] },
+    }
+  );
   if (!properties?.success) {
     return <ErrorDisplay message="Failed to fetch listings" />;
   }

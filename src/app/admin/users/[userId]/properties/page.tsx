@@ -24,13 +24,27 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const status = queries.status as string | undefined;
 
-  const properties = await fetchUserProperties(token || "", userId, {
-    page: queries.page ? parseInt(queries.page) : 1,
-    per_page: queries.per_page ? parseInt(queries.per_page) : 20,
-    sort_by: queries.sort_by,
-    order: queries.order,
-    status: status,
-  });
+  const properties = await fetchUserProperties(
+    token || "",
+    userId,
+    {
+      page: queries.page ? parseInt(queries.page) : 1,
+      per_page: queries.per_page ? parseInt(queries.per_page) : 20,
+      sort_by: queries.sort_by,
+      order: queries.order,
+      status: status,
+    },
+    {
+      cache: "force-cache",
+      next: {
+        revalidate: 300,
+        tags: [
+          "admin-user-properties",
+          `admin-user-${userId}-properties`,
+        ],
+      },
+    }
+  );
 
   if (!properties?.success) {
     return <ErrorDisplay message="Failed to fetch user properties" />;

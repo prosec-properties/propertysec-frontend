@@ -17,7 +17,9 @@ export const updatePropertyStatus = async (
       token,
       { status, reason }
     );
-    revalidateTag("fetchProductById");
+  revalidateTag(`product-${propertyId}`);
+  revalidateTag("properties");
+  revalidateTag("my-properties");
     return cleanServerData(response);
   } catch (error) {
     return formatServerError(error);

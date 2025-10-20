@@ -16,12 +16,19 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
   const queries = await searchParams;
   const { user } = await adminGuard();
 
-  const subscriptions = await fetchAllSubscriptions(user?.token || "", {
-    search: queries.search,
-    page: queries.page ? parseInt(queries.page) : 1,
-    limit: queries.limit ? parseInt(queries.limit) : 50,
-    status: queries.status,
-  });
+  const subscriptions = await fetchAllSubscriptions(
+    user?.token || "",
+    {
+      search: queries.search,
+      page: queries.page ? parseInt(queries.page) : 1,
+      limit: queries.limit ? parseInt(queries.limit) : 50,
+      status: queries.status,
+    },
+    {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["subscriptions", "admin-subscriptions"] },
+    }
+  );
   
   if (!subscriptions?.success) {
     return <ErrorDisplay message="An error occurred while fetching subscriptions" />;

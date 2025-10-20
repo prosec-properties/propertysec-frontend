@@ -20,7 +20,18 @@ export default async function page(props: IParams) {
 
   const token = session?.user. token;
 
-  const property = await fetchPropertyById(params.id, token);
+  const property = await fetchPropertyById(params.id, token, {
+    cache: "force-cache",
+    next: { revalidate: 300, tags: [`property-${params.id}`] },
+  });
+
+  if (!property?.success || !property?.data) {
+    return (
+      <div className="container mx-auto py-10">
+        <p className="text-center text-lg">Property not found</p>
+      </div>
+    );
+  }
 
   let isInAffiliateShop = false;
 
@@ -31,7 +42,7 @@ export default async function page(props: IParams) {
 
   return (
     <PropertyWrapper
-      property={property.data}
+  property={property.data}
       role={session?.user.role}
       isInAffiliateShop={isInAffiliateShop}
     />

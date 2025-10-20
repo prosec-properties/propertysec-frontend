@@ -1,4 +1,5 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
+import { IFetchOptions } from "@/interface/general";
 import { IUser } from "@/interface/user";
 
 export const updateUserProfile = async ({
@@ -81,16 +82,28 @@ interface IPurchasedPropertiesResponse {
 
 export const fetchMyPurchasedProperties = async (
   token: string,
-  params?: Record<string, string>
+  params?: Record<string, string>,
+  options?: IFetchOptions
 ) => {
   try {
     const urlParams = new URLSearchParams(params);
     const url = `/users/me/purchased-properties${
       urlParams.toString() ? `?${urlParams.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["my-purchases", ...(options.next.tags ?? [])])
+          ),
+        }
+      : undefined;
+
     const response = await $requestWithToken.get<IPurchasedPropertiesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "no-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -105,16 +118,28 @@ interface IInspectedPropertiesResponse {
 
 export const fetchMyInspectedProperties = async (
   token: string,
-  params?: Record<string, string>
+  params?: Record<string, string>,
+  options?: IFetchOptions
 ) => {
   try {
     const urlParams = new URLSearchParams(params);
     const url = `/users/me/inspected-properties${
       urlParams.toString() ? `?${urlParams.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["my-inspections", ...(options.next.tags ?? [])])
+          ),
+        }
+      : undefined;
+
     const response = await $requestWithToken.get<IInspectedPropertiesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "no-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

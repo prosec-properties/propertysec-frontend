@@ -13,7 +13,10 @@ interface Props {
 const Page = async ({ params }: Props) => {
   const { token } = await adminGuard();
   const { id } = await params;
-  const loanResponse = await getLoanDetails(token, id);
+  const loanResponse = await getLoanDetails(token, id, {
+    cache: "force-cache",
+    next: { revalidate: 300, tags: [`admin-loan-${id}`] },
+  });
 
   if (!loanResponse?.success) {
     return (

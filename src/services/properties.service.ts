@@ -1,5 +1,5 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
-import { IMeta } from "@/interface/general";
+import { IFetchOptions, IMeta } from "@/interface/general";
 import { IProperty } from "@/interface/property";
 import { addParamsToUrl } from "@/lib/general";
 
@@ -38,28 +38,37 @@ export interface IFetchAllPropertiesResponse {
   meta: IMeta;
 }
 
-export const fetchAllProperties = async (filters?: {
-  categories?: string[] | string;
-  locations?: string[] | string;
-  pricing?: string[] | string;
-  status?: string;
-  search?: string;
-  page?: number;
-  limit?: number;
-}) => {
+export const fetchAllProperties = async (
+  filters?: {
+    categories?: string[] | string;
+    locations?: string[] | string;
+    pricing?: string[] | string;
+    status?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  },
+  options?: IFetchOptions
+) => {
   try {
     const params = new URLSearchParams();
 
     if (filters?.categories) {
-      const categories = Array.isArray(filters.categories) ? filters.categories : JSON.parse(filters.categories);
+      const categories = Array.isArray(filters.categories)
+        ? filters.categories
+        : JSON.parse(filters.categories);
       params.append("categories", JSON.stringify(categories));
     }
     if (filters?.locations) {
-      const locations = Array.isArray(filters.locations) ? filters.locations : JSON.parse(filters.locations);
+      const locations = Array.isArray(filters.locations)
+        ? filters.locations
+        : JSON.parse(filters.locations);
       params.append("locations", JSON.stringify(locations));
     }
     if (filters?.pricing) {
-      const pricing = Array.isArray(filters.pricing) ? filters.pricing : JSON.parse(filters.pricing);
+      const pricing = Array.isArray(filters.pricing)
+        ? filters.pricing
+        : JSON.parse(filters.pricing);
       params.append("pricing", JSON.stringify(pricing));
     }
     if (filters?.status) {
@@ -79,13 +88,20 @@ export const fetchAllProperties = async (filters?: {
       params.toString() ? `?${params.toString()}` : ""
     }`;
     const response =
-      await $requestWithoutToken.get<IFetchAllPropertiesResponse>(url);
+      await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
+        url,
+        options?.cache,
+        options?.next
+      );
     return response;
   } catch (error) {
     throw error;
   }
 };
-export const searchProperties = async (filters: ISearchFilters) => {
+export const searchProperties = async (
+  filters: ISearchFilters,
+  options?: IFetchOptions
+) => {
   try {
     const params = new URLSearchParams();
 
@@ -108,8 +124,20 @@ export const searchProperties = async (filters: ISearchFilters) => {
     const url = `/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const response =
-      await $requestWithoutToken.get<IFetchAllPropertiesResponse>(url);
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["properties", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["properties"] };
+
+    const response = await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
+      url,
+      options?.cache ?? "force-cache",
+      nextConfig
+    );
     return response;
   } catch (error) {
     throw error;
@@ -126,7 +154,8 @@ export const fetchMyProperties = async (
     search?: string;
     page?: number;
     limit?: number;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   const params = new URLSearchParams();
 
@@ -135,9 +164,20 @@ export const fetchMyProperties = async (
   }
 
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["my-properties", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["my-properties"] };
+
     const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
       addParamsToUrl(`/properties/me`, query || {}),
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -166,21 +206,35 @@ export const updateProperty = async ({
   }
 };
 
-export const fetchPropertyById = async (propertyId: string, token?: string) => {
+export const fetchPropertyById = async (
+  propertyId: string,
+  token?: string,
+  options?: IFetchOptions
+) => {
   try {
-    let response;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([`property-${propertyId}`, ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: [`property-${propertyId}`] };
 
     if (!token) {
-      response = await $requestWithoutToken.get<IProperty>(
-        `/properties/${propertyId}`
-      );
-    } else {
-      response = await $requestWithToken.get<IProperty>(
+      return $requestWithoutToken.get<IProperty>(
         `/properties/${propertyId}`,
-        token
+        options?.cache ?? "force-cache",
+        nextConfig
       );
     }
-    return response;
+
+    return $requestWithToken.get<IProperty>(
+      `/properties/${propertyId}`,
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
+    );
   } catch (error) {
     throw error;
   }

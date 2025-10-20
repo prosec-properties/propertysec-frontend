@@ -1,5 +1,5 @@
 import { $requestWithToken } from "@/api/general";
-import { IApiResponse } from "@/interface/general";
+import { IApiResponse, IFetchOptions } from "@/interface/general";
 import { IBankInfo, IGuarantorInfo, ILandlordInfo, ILoanDetails, IOfficeInfo, IPersonalInfo } from "@/store/state/loanStore";
 import { ILoan } from "@/interface/loan";
 
@@ -62,12 +62,25 @@ export interface IUserLoansResponse {
   };
 }
 
-export const getUserLoans = async (token: string): Promise<IApiResponse<IUserLoansResponse> | null> => {
+export const getUserLoans = async (
+  token: string,
+  options?: IFetchOptions
+): Promise<IApiResponse<IUserLoansResponse> | null> => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["user-loans", ...(options.next.tags ?? [])])
+          ),
+        }
+      : undefined;
+
     const response = await $requestWithToken.get<IUserLoansResponse>(
       `/loans/me`,
       token,
-      "no-cache"
+      options?.cache ?? "no-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -91,19 +104,32 @@ export const takeLoanApi = async ({
       formData
     );
 
-    console.log("response", response);
-
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const getLoanById = async (loanId: string, token: string): Promise<IApiResponse<ILoan> | null> => {
+export const getLoanById = async (
+  loanId: string,
+  token: string,
+  options?: IFetchOptions
+): Promise<IApiResponse<ILoan> | null> => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([`loan-${loanId}`, ...(options.next.tags ?? [])])
+          ),
+        }
+      : undefined;
+
     const response = await $requestWithToken.get<ILoan>(
       `/loans/${loanId}`,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

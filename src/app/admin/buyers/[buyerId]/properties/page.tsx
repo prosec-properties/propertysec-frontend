@@ -29,19 +29,47 @@ const Page = async ({ params, searchParams }: PageProps) => {
   let purchasedProperties: any = null;
 
   if (tab === 'inspected') {
-    inspectedProperties = await fetchBuyerInspectedProperties(token || "", buyerId, {
-      page: queries.page ? parseInt(queries.page) : 1,
-      per_page: queries.per_page ? parseInt(queries.per_page) : 20,
-      sort_by: queries.sort_by,
-      order: queries.order,
-    });
+    inspectedProperties = await fetchBuyerInspectedProperties(
+      token || "",
+      buyerId,
+      {
+        page: queries.page ? parseInt(queries.page) : 1,
+        per_page: queries.per_page ? parseInt(queries.per_page) : 20,
+        sort_by: queries.sort_by,
+        order: queries.order,
+      },
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "admin-buyer-inspections",
+            `admin-buyer-${buyerId}-inspections`,
+          ],
+        },
+      }
+    );
   } else if (tab === 'purchased') {
-    purchasedProperties = await fetchBuyerPurchasedProperties(token || "", buyerId, {
-      page: queries.page ? parseInt(queries.page) : 1,
-      per_page: queries.per_page ? parseInt(queries.per_page) : 20,
-      sort_by: queries.sort_by,
-      order: queries.order,
-    });
+    purchasedProperties = await fetchBuyerPurchasedProperties(
+      token || "",
+      buyerId,
+      {
+        page: queries.page ? parseInt(queries.page) : 1,
+        per_page: queries.per_page ? parseInt(queries.per_page) : 20,
+        sort_by: queries.sort_by,
+        order: queries.order,
+      },
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "admin-buyer-purchases",
+            `admin-buyer-${buyerId}-purchases`,
+          ],
+        },
+      }
+    );
   }
 
   if ((tab === 'inspected' && !inspectedProperties?.success) ||

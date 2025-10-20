@@ -1,5 +1,5 @@
 import { $requestWithToken } from "@/api/general";
-import { IMeta } from "@/interface/general";
+import { IFetchOptions, IMeta } from "@/interface/general";
 import { ILoan, ILoanSummary } from "@/interface/loan";
 import { IUser, IUserRole } from "@/interface/user";
 import { IFetchAllPropertiesResponse } from "./properties.service";
@@ -17,7 +17,8 @@ export const fetchAllUsers = async (
     page?: number;
     per_page?: number;
     role?: IUserRole | "all";
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -38,7 +39,21 @@ export const fetchAllUsers = async (
     const url = `/admin/users${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const response = await $requestWithToken.get<IResponse>(url, token);
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["admin-users", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["admin-users"] };
+
+    const response = await $requestWithToken.get<IResponse>(
+      url,
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
+    );
     return response;
   } catch (error) {
     throw error;
@@ -54,11 +69,25 @@ interface ILoanRequestsResponse {
     completedLoans: number;
   };
 }
-export const fetchSubscribedUsers = async (token: string) => {
+export const fetchSubscribedUsers = async (
+  token: string,
+  options?: IFetchOptions
+) => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["admin-subscribed-users", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["admin-subscribed-users"] };
+
     const response = await $requestWithToken.get<IUser>(
       "/subscribed-users",
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -68,7 +97,8 @@ export const fetchSubscribedUsers = async (token: string) => {
 
 export const loanRequests = async (
   token: string,
-  searchParams?: { search?: string; page?: number; limit?: number }
+  searchParams?: { search?: string; page?: number; limit?: number },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -86,10 +116,20 @@ export const loanRequests = async (
     const url = `/loans/loan-requests${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["admin-loan-requests", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["admin-loan-requests"] };
+
     const response = await $requestWithToken.get<ILoanRequestsResponse>(
       url,
       token,
-      "no-cache"
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -97,12 +137,22 @@ export const loanRequests = async (
   }
 };
 
-export const loanStats = async (token: string) => {
+export const loanStats = async (token: string, options?: IFetchOptions) => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["admin-loan-stats", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["admin-loan-stats"] };
+
     const response = await $requestWithToken.get<ILoanSummary>(
       "/loans/loan-stats",
       token,
-      "no-cache"
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -119,11 +169,29 @@ export const deleteAccount = async (token: string, userId: string) => {
   }
 };
 
-export const getLoanDetails = async (token: string, loanId: string) => {
+export const getLoanDetails = async (
+  token: string,
+  loanId: string,
+  options?: IFetchOptions
+) => {
   try {
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              `admin-loan-${loanId}`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : { tags: [`admin-loan-${loanId}`] };
+
     const response = await $requestWithToken.get<ILoan>(
       `/loans/${loanId}`,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -202,7 +270,8 @@ export const fetchUserProperties = async (
     sort_by?: string;
     order?: string;
     status?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -227,9 +296,26 @@ export const fetchUserProperties = async (
     const url = `/admin/users/${userId}/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              "admin-user-properties",
+              `admin-user-${userId}-properties`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : {
+          tags: ["admin-user-properties", `admin-user-${userId}-properties`],
+        };
+
     const response = await $requestWithToken.get<IUserPropertiesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -269,7 +355,8 @@ export const fetchAffiliateProperties = async (
     per_page?: number;
     sort_by?: string;
     order?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -290,9 +377,29 @@ export const fetchAffiliateProperties = async (
     const url = `/admin/affiliates/${affiliateId}/properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              "admin-affiliate-properties",
+              `admin-affiliate-${affiliateId}-properties`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : {
+          tags: [
+            "admin-affiliate-properties",
+            `admin-affiliate-${affiliateId}-properties`,
+          ],
+        };
+
     const response = await $requestWithToken.get<IAffiliatePropertiesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -314,7 +421,8 @@ export const fetchBuyerInspectedProperties = async (
     per_page?: number;
     sort_by?: string;
     order?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -335,10 +443,30 @@ export const fetchBuyerInspectedProperties = async (
     const url = `/admin/buyers/${buyerId}/inspected-properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              "admin-buyer-inspections",
+              `admin-buyer-${buyerId}-inspections`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : {
+          tags: [
+            "admin-buyer-inspections",
+            `admin-buyer-${buyerId}-inspections`,
+          ],
+        };
+
     const response =
       await $requestWithToken.get<IBuyerInspectedPropertiesResponse>(
         url,
-        token
+        token,
+        options?.cache ?? "force-cache",
+        nextConfig
       );
     return response;
   } catch (error) {
@@ -360,7 +488,8 @@ export const fetchBuyerPurchasedProperties = async (
     per_page?: number;
     sort_by?: string;
     order?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -381,10 +510,30 @@ export const fetchBuyerPurchasedProperties = async (
     const url = `/admin/buyers/${buyerId}/purchased-properties${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              "admin-buyer-purchases",
+              `admin-buyer-${buyerId}-purchases`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : {
+          tags: [
+            "admin-buyer-purchases",
+            `admin-buyer-${buyerId}-purchases`,
+          ],
+        };
+
     const response =
       await $requestWithToken.get<IBuyerPurchasedPropertiesResponse>(
         url,
-        token
+        token,
+        options?.cache ?? "force-cache",
+        nextConfig
       );
     return response;
   } catch (error) {
@@ -406,7 +555,8 @@ export const fetchPropertyPurchases = async (
     sort_by?: string;
     order?: string;
     status?: string;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -430,9 +580,29 @@ export const fetchPropertyPurchases = async (
     const url = `/admin/properties/${propertyId}/purchases${
       params.toString() ? `?${params.toString()}` : ""
     }`;
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set([
+              "admin-property-purchases",
+              `admin-property-${propertyId}-purchases`,
+              ...(options.next.tags ?? []),
+            ])
+          ),
+        }
+      : {
+          tags: [
+            "admin-property-purchases",
+            `admin-property-${propertyId}-purchases`,
+          ],
+        };
+
     const response = await $requestWithToken.get<IPropertyPurchasesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {
@@ -450,7 +620,8 @@ export const fetchAllPropertiesAdmin = async (
     search?: string;
     page?: number;
     limit?: number;
-  }
+  },
+  options?: IFetchOptions
 ) => {
   try {
     const params = new URLSearchParams();
@@ -490,9 +661,20 @@ export const fetchAllPropertiesAdmin = async (
       params.toString() ? `?${params.toString()}` : ""
     }`;
 
+    const nextConfig = options?.next
+      ? {
+          ...options.next,
+          tags: Array.from(
+            new Set(["admin-properties", ...(options.next.tags ?? [])])
+          ),
+        }
+      : { tags: ["admin-properties"] };
+
     const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
       url,
-      token
+      token,
+      options?.cache ?? "force-cache",
+      nextConfig
     );
     return response;
   } catch (error) {

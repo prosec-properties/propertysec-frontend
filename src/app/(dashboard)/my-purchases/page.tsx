@@ -40,12 +40,25 @@ async function Page({ searchParams }: { searchParams: ISearchParams }) {
   const user = session.user;
 
   try {
-    const purchases = await fetchMyPurchasedProperties(user?.token!, {
-      page: queries?.page || "1",
-      per_page: queries?.per_page || "20",
-      sort_by: queries?.sort_by || "created_at",
-      order: queries?.order || "desc",
-    });
+    const purchases = await fetchMyPurchasedProperties(
+      user?.token!,
+      {
+        page: queries?.page || "1",
+        per_page: queries?.per_page || "20",
+        sort_by: queries?.sort_by || "created_at",
+        order: queries?.order || "desc",
+      },
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 300,
+          tags: [
+            "my-purchases",
+            user?.id ? `my-purchases-${user.id}` : undefined,
+          ].filter(Boolean) as string[],
+        },
+      }
+    );
 
     if (!purchases?.success) {
       return <ErrorDisplay message="Failed to fetch purchased properties" />;

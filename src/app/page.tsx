@@ -39,7 +39,10 @@ export default async function Home() {
 
   let properties;
   try {
-    properties = await fetchAllProperties();
+    properties = await fetchAllProperties(undefined, {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["properties"] },
+    });
   } catch (error) {
     console.error('Failed to fetch properties:', error);
     // Continue rendering the page without properties

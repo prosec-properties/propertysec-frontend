@@ -19,12 +19,19 @@ const Page = async ({ searchParams }: { searchParams: ISearchParams }) => {
 
   const role = typeof queries.role === "string" ? queries.role : undefined;
 
-  const users = await fetchAllUsers(user?.token || "", {
-    search: queries.search,
-    page: queries.page ? parseInt(queries.page) : 1,
-    per_page: queries.per_page ? parseInt(queries.per_page) : 50,
-    role: role as IUserRole,
-  });
+  const users = await fetchAllUsers(
+    user?.token || "",
+    {
+      search: queries.search,
+      page: queries.page ? parseInt(queries.page) : 1,
+      per_page: queries.per_page ? parseInt(queries.per_page) : 50,
+      role: role as IUserRole,
+    },
+    {
+      cache: "force-cache",
+      next: { revalidate: 300, tags: ["admin-users"] },
+    }
+  );
   
   if (!users?.success) {
     return <ErrorDisplay message="An error occured while fetching users" />;

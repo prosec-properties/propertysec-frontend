@@ -14,7 +14,10 @@ export default async function Page(props: IParams) {
   const params = await props.params;
   const session = await getServerSession(authConfig);
 
-  const product = await fetchProductById(params.id);
+  const product = await fetchProductById(params.id, {
+    cache: "force-cache",
+    next: { revalidate: 300 },
+  });
 
   if (!product?.success || !product?.data) {
     return (
