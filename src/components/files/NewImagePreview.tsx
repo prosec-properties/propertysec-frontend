@@ -72,7 +72,7 @@ const NewImagePreview = (props: Props) => {
       `)}
     >
       {selected && (
-        <>
+        <div>
           {isImage ? (
             <div className={cn("sm:basis-[50%]", previewWrapperClasses)}>
               <Image
@@ -94,7 +94,7 @@ const NewImagePreview = (props: Props) => {
               </video>
             </div>
           ) : null}
-        </>
+        </div>
       )}
       <div className="sm:basis-[50%] w-full">
         <UploadWithImageDisplay

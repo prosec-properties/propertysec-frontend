@@ -14,8 +14,8 @@ export default function UploadImageArea(props: Props) {
       className={cn(
         `
         flex 
-        h-[70px] 
-        w-[70px] 
+        h-[96px] 
+        w-[96px] 
         shrink-0 
         cursor-pointer 
         items-center 
@@ -26,7 +26,7 @@ export default function UploadImageArea(props: Props) {
       `,
         {
           "rounded-full ": props.format === "single",
-          "h-[61px] rounded-[7px] sm:h-[120px] sm:w-[130px]":
+          "h-[96px] w-[96px] rounded-[7px] sm:h-[120px] sm:w-[130px]":
             props.format === "multiple",
         },
         props.className

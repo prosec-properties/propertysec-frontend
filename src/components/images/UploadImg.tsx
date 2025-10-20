@@ -124,42 +124,27 @@ export default function UploadImg({
     }
   };
 
-  const fileStyle = {
-    style: {
-      width: format === "single" ? "100%" : isSm ? 130 : 70,
-      height: format === "single" ? "100%" : isSm ? 120 : 61,
-    },
-    class: cn(
-      `
-        h-full 
-        w-full 
-        cursor-pointer
+  const isMultiple = format === "multiple";
+  const thumbnailWidth = isMultiple ? (isSm ? 130 : 96) : isSm ? 380 : 280;
+  const thumbnailHeight = isMultiple ? (isSm ? 120 : 90) : isSm ? 280 : 220;
+
+  const previewWrapperClass = cn(
+    `
+        relative
         flex
+        cursor-pointer
         items-center
         justify-center
-        bg-gray-900
+        overflow-hidden
         rounded-[7px]
+        bg-gray-900
       `,
-      {
-        [`
-          max-h-[61px] 
-          max-w-[70px] 
-          sm:max-h-[120px]
-          sm:max-w-[130px]
-        `]: format === "multiple",
-        [`
-          object-cover
-        `]: format === "single",
-        [`
-          border-[1px]
-          border-white
-          outline
-          outline-[3px]
-          outline-primary
-        `]: selected?.image?.url === preview.url,
-      }
-    ),
-  };
+    {
+      "border-[1px] border-white outline outline-[3px] outline-primary":
+        selected?.image?.url === preview.url,
+      "aspect-[13/12]": isMultiple,
+    }
+  );
 
   return (
     <div
@@ -221,14 +206,19 @@ export default function UploadImg({
       </div>
 
       {preview.file.type.startsWith("image/") ? (
-        <div className={fileStyle.class} onClick={handleImgClick}>
+        <div
+          className={previewWrapperClass}
+          style={{ width: thumbnailWidth, height: thumbnailHeight }}
+          onClick={handleImgClick}
+        >
           <Image
             src={preview.url}
             alt={preview.name}
             title={preview.name}
-            width={format === "single" ? 400 : isSm ? 130 : 70}
-            height={format === "single" ? 300 : isSm ? 120 : 61}
-            className="w-full h-full object-cover rounded-[7px]"
+            width={thumbnailWidth}
+            height={thumbnailHeight}
+            sizes={isMultiple ? "(min-width: 640px) 130px, 96px" : "(min-width: 640px) 380px, 280px"}
+            className="h-full w-full object-cover"
             aria-label={
               "You are trying to upload this file named: " + preview.name
             }
@@ -237,15 +227,15 @@ export default function UploadImg({
         </div>
       ) : preview.file.type.startsWith("video/") ? (
         <div
-          style={fileStyle.style}
-          className={fileStyle.class}
+          style={{ width: thumbnailWidth, height: thumbnailHeight }}
+          className={previewWrapperClass}
           onClick={handleImgClick}
         >
           <video
             src={preview.url}
             title={preview.name}
-            style={fileStyle.style}
-            className="size-full"
+            style={{ width: thumbnailWidth, height: thumbnailHeight }}
+            className="h-full w-full object-cover"
             aria-label={
               "You are trying to upload this file named: " + preview.name
             }
