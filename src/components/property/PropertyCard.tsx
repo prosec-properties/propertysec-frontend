@@ -35,7 +35,7 @@ const PropertyCard = (props: Props) => {
       )}
       {props.property.defaultImageUrl && (
         <Image
-          alt="property image"
+          alt={props.property.title || "Property image"}
           width={400}
           height={224}
           src={props.property.defaultImageUrl}

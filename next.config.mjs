@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    optimizePackageImports: ["lucide-react", "lodash", "recharts", "date-fns", "@radix-ui/react-dialog", "@radix-ui/react-slot", "@radix-ui/react-label"],
+  },
   images: {
     remotePatterns: [
       {

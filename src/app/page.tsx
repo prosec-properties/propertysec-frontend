@@ -3,14 +3,15 @@ import GoogleOneTapLogin from "@/components/auth/GoogleOneTapLogin";
 import FooterMenu from "@/components/footer/FooterMenu";
 import HeaderMenu from "@/components/header/HeaderMenu";
 import ImageSliderWrapper from "@/components/images/ImageSlider";
-import ProductCard from "@/components/property/PropertyCard";
 import ServicesCard from "@/components/services/ServicesCard";
 import { ourServices } from "@/components/services/services";
 import { PROPERTIES_ROUTE, MY_LISTING_ROUTE, ADMIN_PROPERTIES_ROUTE } from "@/constants/routes";
 import { USER_ROLE } from "@/constants/user";
-import { fetchAllProperties } from "@/services/properties.service";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import FeaturedProperties from "@/components/home/FeaturedProperties";
+import Spinner from "@/components/misc/Spinner";
 
 export default async function Home() {
   const session = await getServerSession(authConfig);
@@ -19,7 +20,7 @@ export default async function Home() {
     const user = session.user;
 
     console.log('User session:', user);
-    
+
     switch (user.role) {
       case USER_ROLE.LANDLORD:
       case USER_ROLE.DEVELOPER:
@@ -36,20 +37,6 @@ export default async function Home() {
         break;
     }
   }
-
-  let properties;
-  try {
-    properties = await fetchAllProperties(undefined, {
-      cache: "force-cache",
-      next: { revalidate: 300, tags: ["properties"] },
-    });
-  } catch (error) {
-    console.error('Failed to fetch properties:', error);
-    // Continue rendering the page without properties
-  }
-
-  const publishedProperties = properties?.data?.data?.filter(property => property.status === 'published') || [];
-  const hasPublishedProperties = publishedProperties.length > 0;
 
   return (
     <main className="relative">
@@ -77,23 +64,9 @@ export default async function Home() {
           <h2 className="font-medium text-2xl text-grey8 md:text-3xl lg:text-4xl mb-6">
             Featured Properties
           </h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-            {!properties && (
-              <p className="col-span-full text-center text-gray-500">
-                Unable to load properties. Please try again later.
-              </p>
-            )}
-            {properties && !hasPublishedProperties && (
-              <p className="col-span-full text-center text-gray-500">
-                No published properties available at the moment.
-              </p>
-            )}
-            {hasPublishedProperties && 
-              publishedProperties.map((property, index) => (
-                <ProductCard key={index} property={property} />
-              ))
-            }
-          </div>
+          <Suspense fallback={<Spinner fullScreen={false} size="md" message="Loading properties..." />}>
+            <FeaturedProperties />
+          </Suspense>
         </section>
       </div>
       <FooterMenu />
