@@ -3,6 +3,7 @@ import { IFetchOptions } from "@/interface/general";
 import { buildNextTags } from "@/lib/cacheTags";
 import { IProduct } from "@/interface/product";
 import { IProperty } from "@/interface/property";
+import { safeServiceCall } from "@/lib/safeService";
 
 export interface IAffiliateShop {
   properties: IProperty[];
@@ -13,7 +14,7 @@ export const fetchAffiliateShop = async (
   token: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags(["affiliate-shop"], options);
 
     const response = await $requestWithToken.get<IAffiliateShop>(
@@ -23,9 +24,7 @@ export const fetchAffiliateShop = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const addToAffiliateShop = async (token: string, propertyId: string) => {
@@ -49,7 +48,7 @@ export const fetchAffiliateStats = async (
   token: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags(["affiliate-stats"], options);
 
     const response = await $requestWithToken.get(
@@ -59,16 +58,14 @@ export const fetchAffiliateStats = async (
       nextConfig
     );
     return response?.data;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchAffiliateTransactions = async (
   token: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags(["affiliate-transactions"], options);
 
     const response = await $requestWithToken.get(
@@ -78,7 +75,5 @@ export const fetchAffiliateTransactions = async (
       nextConfig
     );
     return response?.data || [];
-  } catch (error) {
-    throw error;
-  }
+  });
 };

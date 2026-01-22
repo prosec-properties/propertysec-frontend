@@ -3,6 +3,7 @@ import { IApiResponse, IFetchOptions } from "@/interface/general";
 import { buildNextTags } from "@/lib/cacheTags";
 import { IBankInfo, IGuarantorInfo, ILandlordInfo, ILoanDetails, IOfficeInfo, IPersonalInfo } from "@/store/state/loanStore";
 import { ILoan } from "@/interface/loan";
+import { safeServiceCall } from "@/lib/safeService";
 
 // export interface ILoanStep1Data {
 //   loanId: string | number;
@@ -32,7 +33,7 @@ export interface ILoanStep3Data {
 
 export type LoanStepResponse = {
   "1": IPersonalInfo;
-  "2": IBankInfo;    
+  "2": IBankInfo;
   "3": IOfficeInfo;
   "4": ILoanDetails;
   "5": ILandlordInfo;
@@ -67,7 +68,7 @@ export const getUserLoans = async (
   token: string,
   options?: IFetchOptions
 ): Promise<IApiResponse<IUserLoansResponse> | null> => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = options?.next
       ? buildNextTags(["user-loans"], options)
       : undefined;
@@ -79,9 +80,7 @@ export const getUserLoans = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const takeLoanApi = async ({
@@ -111,7 +110,7 @@ export const getLoanById = async (
   token: string,
   options?: IFetchOptions
 ): Promise<IApiResponse<ILoan> | null> => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = options?.next
       ? buildNextTags([`loan-${loanId}`], options)
       : undefined;
@@ -123,7 +122,5 @@ export const getLoanById = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };

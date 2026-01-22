@@ -6,7 +6,7 @@ export const showToaster = (
   variant: "destructive" | "success" | "warning" | "default"
 ) => {
   let cleanMessage: string;
-  
+
   if (typeof message === "string") {
     cleanMessage = message;
   } else if (message && typeof message === "object") {
@@ -14,7 +14,7 @@ export const showToaster = (
   } else {
     cleanMessage = "Something went wrong. Please try again.";
   }
-  
+
   console.log("showToaster", cleanMessage, variant);
   toast({
     title: cleanMessage,
@@ -169,6 +169,20 @@ export const extractNumFromString = (str: string): number => {
   return parseInt(str.replace(/\D/g, ""));
 };
 
+/**
+ * Safely parse JSON string without throwing errors.
+ * Returns the fallback value if parsing fails or the string is empty.
+ */
+export const safeJsonParse = <T>(str: string | undefined | null, fallback: T): T => {
+  if (!str) return fallback;
+  try {
+    const parsed = JSON.parse(str);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const validateNigerianPhoneNumber = (phoneNumber: string): boolean => {
   // Remove all non-digit characters
   const cleaned = phoneNumber.replace(/\D/g, "");
@@ -214,7 +228,7 @@ export const cleanServerData = (data: any) => {
 
 export const formatServerError = (error: any) => {
   const errorMessage = extractServerErrorMessage(error);
-  
+
   return cleanServerData({
     hasError: true,
     message: errorMessage,
@@ -235,7 +249,7 @@ export const verifyServerResponse = ({ hasError, ...rest }: ServerResponse) => {
 
 export const handleServerError = (error: any) => {
   const message = extractServerErrorMessage(error);
-  
+
   return {
     hasError: true,
     success: false,

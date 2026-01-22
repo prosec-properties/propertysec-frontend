@@ -5,6 +5,7 @@ import {
   ILoanRepaymentDetailsResponseData,
   IUserLoanRepaymentsResponseData,
 } from "@/interface/loan";
+import { safeServiceCall } from "@/lib/safeService";
 
 interface IRepaymentLoanPayload {
   repaymentAmount: number;
@@ -21,7 +22,7 @@ export const getLoanRepaymentDetails = async (
   loanId: string,
   token: string
 ): Promise<ILoanRepaymentDetailsResponse | null> => {
-  try {
+  return safeServiceCall(async () => {
     const response =
       await $requestWithToken.get<ILoanRepaymentDetailsResponseData>(
         `/loans/${loanId}/repayment-details`,
@@ -29,9 +30,7 @@ export const getLoanRepaymentDetails = async (
       );
 
     return response;
-  } catch (error: any) {
-    throw error;
-  }
+  });
 };
 
 export const getUserLoanRepayments = async (
@@ -42,7 +41,7 @@ export const getUserLoanRepayments = async (
     loanId?: string;
   }
 ): Promise<IUserLoanRepaymentsResponse | null> => {
-  try {
+  return safeServiceCall(async () => {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append("page", params.page.toString());
     if (params?.limit) searchParams.append("limit", params.limit.toString());
@@ -55,7 +54,5 @@ export const getUserLoanRepayments = async (
       );
 
     return response;
-  } catch (error: any) {
-    throw error;
-  }
+  });
 };

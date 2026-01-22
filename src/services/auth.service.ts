@@ -3,6 +3,7 @@ import { AccessToken } from "@/interface/auth";
 import { IFetchOptions } from "@/interface/general";
 import { buildNextTags } from "@/lib/cacheTags";
 import { IUser, IUserRole, IUserRoleEnum } from "@/interface/user";
+import { safeServiceCall } from "@/lib/safeService";
 
 interface IRegisterPayload {
   email: string;
@@ -21,7 +22,7 @@ export const register = async (payload: IRegisterPayload) => {
 };
 
 export const fetchUserInfo = async (token: string, options?: IFetchOptions) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = options?.next
       ? buildNextTags(["user-info"], options)
       : undefined;
@@ -32,9 +33,7 @@ export const fetchUserInfo = async (token: string, options?: IFetchOptions) => {
       options?.cache ?? "no-cache",
       nextConfig
     );
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 interface ICompleteRegPayload {
@@ -164,13 +163,11 @@ export const resendOtpApi = async (payload: { email: string }) => {
 };
 
 export const googleAuthCallbackApi = async (params: string) => {
-  try {
+  return safeServiceCall(async () => {
     const response =
       await $requestWithoutToken.get<IGoogleAuthCallbackResponse>(
         `/auth/google/callback?${params}`
       );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };

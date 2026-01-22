@@ -6,6 +6,7 @@ import {
   IProductCondition,
   IProductStatus,
 } from "@/interface/product";
+import { safeServiceCall } from "@/lib/safeService";
 
 interface ICreateProductPayload {
   title: string;
@@ -62,7 +63,7 @@ interface IProductFilters {
 }
 
 export const fetchAllProducts = async (filters?: IProductFilters) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (filters) {
@@ -77,28 +78,24 @@ export const fetchAllProducts = async (filters?: IProductFilters) => {
       `/products?${params.toString()}`
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchMyProducts = async (token: string) => {
-  try {
+  return safeServiceCall(async () => {
     const response = await $requestWithToken.get<IFetchAllProductsResponse>(
       "/products/me",
       token
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchProductById = async (
   productId: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags([`product-${productId}`], options);
 
     const response = await $requestWithoutToken.get<IProduct>(
@@ -107,9 +104,7 @@ export const fetchProductById = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const updateProduct = async ({

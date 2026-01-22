@@ -3,6 +3,7 @@ import { IFetchOptions, IMeta } from "@/interface/general";
 import { Plan, Subscription } from "@/interface/payment";
 import { IUser } from "@/interface/user";
 import { buildNextTags } from "@/lib/cacheTags";
+import { safeServiceCall } from "@/lib/safeService";
 
 export interface ISubscriptionWithUser {
   id: string;
@@ -62,7 +63,7 @@ export const fetchAllSubscriptions = async (
   },
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (searchParams?.search) {
@@ -78,9 +79,8 @@ export const fetchAllSubscriptions = async (
       params.append("status", searchParams.status);
     }
 
-    const url = `/subscriptions/subscribed-users${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
+    const url = `/subscriptions/subscribed-users${params.toString() ? `?${params.toString()}` : ""
+      }`;
     const nextConfig = buildNextTags(["subscriptions"], options);
 
     const response = await $requestWithToken.get<ISubscriptionsResponse>(
@@ -90,9 +90,7 @@ export const fetchAllSubscriptions = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const getSubscriptionDetails = async (
@@ -100,7 +98,7 @@ export const getSubscriptionDetails = async (
   subscriptionId: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags([`subscription-${subscriptionId}`], options);
 
     const response = await $requestWithToken.get<ISubscriptionWithUser>(
@@ -110,9 +108,7 @@ export const getSubscriptionDetails = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchSubscriptions = async (
@@ -124,7 +120,7 @@ export const fetchSubscriptions = async (
   },
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (searchParams?.search) {
@@ -137,9 +133,8 @@ export const fetchSubscriptions = async (
       params.append("limit", searchParams.limit.toString());
     }
 
-    const url = `/subscriptions${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
+    const url = `/subscriptions${params.toString() ? `?${params.toString()}` : ""
+      }`;
     const nextConfig = buildNextTags(["subscriptions"], options);
 
     const response = await $requestWithToken.get<{
@@ -165,9 +160,7 @@ export const fetchSubscriptions = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 

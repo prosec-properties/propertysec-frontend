@@ -2,6 +2,7 @@ import { $requestWithToken } from "@/api/general";
 import { IMeta, IApiResponse, IFetchOptions } from "@/interface/general";
 import { buildNextTags } from "@/lib/cacheTags";
 import { InspectionDetail } from "@/interface/user";
+import { safeServiceCall } from "@/lib/safeService";
 
 interface IInspectionStatistics {
   totalInspections: number;
@@ -56,7 +57,7 @@ export const fetchInspectionPayments = async (
   },
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (filters?.status) {
@@ -72,9 +73,8 @@ export const fetchInspectionPayments = async (
       params.append("limit", filters.limit.toString());
     }
 
-    const url = `/inspections${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
+    const url = `/inspections${params.toString() ? `?${params.toString()}` : ""
+      }`;
     const nextConfig = buildNextTags(["inspections"], options);
 
     const response =
@@ -85,9 +85,7 @@ export const fetchInspectionPayments = async (
         nextConfig
       );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchInspectionPaymentById = async (
@@ -95,7 +93,7 @@ export const fetchInspectionPaymentById = async (
   inspectionId: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags([`inspection-${inspectionId}`], options);
 
     const response = await $requestWithToken.get<InspectionPaymentDetail>(
@@ -105,9 +103,7 @@ export const fetchInspectionPaymentById = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const updateInspectionApprovalStatus = async (

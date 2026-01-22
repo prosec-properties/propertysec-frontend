@@ -2,6 +2,7 @@ import { $requestWithoutToken, $requestWithToken } from "@/api/general";
 import { IFetchOptions } from "@/interface/general";
 import { buildNextTags } from "@/lib/cacheTags";
 import { IUser } from "@/interface/user";
+import { safeServiceCall } from "@/lib/safeService";
 
 export const updateUserProfile = async ({
   token,
@@ -41,7 +42,7 @@ export const deleteFile = async ({
 };
 
 export const fetchUserById = async (id: string) => {
-  try {
+  return safeServiceCall(async () => {
     const response = await $requestWithoutToken.get<IUser>(
       "/users/" + id,
       "no-cache",
@@ -50,9 +51,7 @@ export const fetchUserById = async (id: string) => {
       }
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const adminUpdateUser = async ({
@@ -86,11 +85,10 @@ export const fetchMyPurchasedProperties = async (
   params?: Record<string, string>,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const urlParams = new URLSearchParams(params);
-    const url = `/users/me/purchased-properties${
-      urlParams.toString() ? `?${urlParams.toString()}` : ""
-    }`;
+    const url = `/users/me/purchased-properties${urlParams.toString() ? `?${urlParams.toString()}` : ""
+      }`;
     const nextConfig = options?.next
       ? buildNextTags(["my-purchases"], options)
       : undefined;
@@ -102,9 +100,7 @@ export const fetchMyPurchasedProperties = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 interface IInspectedPropertiesResponse {
@@ -117,11 +113,10 @@ export const fetchMyInspectedProperties = async (
   params?: Record<string, string>,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const urlParams = new URLSearchParams(params);
-    const url = `/users/me/inspected-properties${
-      urlParams.toString() ? `?${urlParams.toString()}` : ""
-    }`;
+    const url = `/users/me/inspected-properties${urlParams.toString() ? `?${urlParams.toString()}` : ""
+      }`;
     const nextConfig = options?.next
       ? buildNextTags(["my-inspections"], options)
       : undefined;
@@ -133,9 +128,7 @@ export const fetchMyInspectedProperties = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 // export const downloadPurchaseReceipt = async (

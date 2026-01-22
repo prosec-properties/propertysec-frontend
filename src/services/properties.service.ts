@@ -1,8 +1,9 @@
 import { $requestWithoutToken, $requestWithToken } from "@/api/general";
 import { IFetchOptions, IMeta } from "@/interface/general";
 import { IProperty } from "@/interface/property";
-import { addParamsToUrl } from "@/lib/general";
+import { addParamsToUrl, safeJsonParse } from "@/lib/general";
 import { buildNextTags } from "@/lib/cacheTags";
+import { safeServiceCall } from "@/lib/safeService";
 
 interface ISearchFilters {
   categories?: string[];
@@ -51,26 +52,32 @@ export const fetchAllProperties = async (
   },
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (filters?.categories) {
       const categories = Array.isArray(filters.categories)
         ? filters.categories
-        : JSON.parse(filters.categories);
-      params.append("categories", JSON.stringify(categories));
+        : safeJsonParse(filters.categories, []);
+      if (categories.length > 0) {
+        params.append("categories", JSON.stringify(categories));
+      }
     }
     if (filters?.locations) {
       const locations = Array.isArray(filters.locations)
         ? filters.locations
-        : JSON.parse(filters.locations);
-      params.append("locations", JSON.stringify(locations));
+        : safeJsonParse(filters.locations, []);
+      if (locations.length > 0) {
+        params.append("locations", JSON.stringify(locations));
+      }
     }
     if (filters?.pricing) {
       const pricing = Array.isArray(filters.pricing)
         ? filters.pricing
-        : JSON.parse(filters.pricing);
-      params.append("pricing", JSON.stringify(pricing));
+        : safeJsonParse(filters.pricing, []);
+      if (pricing.length > 0) {
+        params.append("pricing", JSON.stringify(pricing));
+      }
     }
     if (filters?.status) {
       params.append("status", filters.status);
@@ -85,9 +92,8 @@ export const fetchAllProperties = async (
       params.append("limit", filters.limit.toString());
     }
 
-    const url = `/properties${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
+    const url = `/properties${params.toString() ? `?${params.toString()}` : ""
+      }`;
     const nextConfig = buildNextTags(["properties"], options);
     const response =
       await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
@@ -96,15 +102,13 @@ export const fetchAllProperties = async (
         nextConfig
       );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 export const searchProperties = async (
   filters: ISearchFilters,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const params = new URLSearchParams();
 
     if (filters.categories?.length) {
@@ -123,9 +127,8 @@ export const searchProperties = async (
       params.append("limit", filters.limit.toString());
     }
 
-    const url = `/properties${
-      params.toString() ? `?${params.toString()}` : ""
-    }`;
+    const url = `/properties${params.toString() ? `?${params.toString()}` : ""
+      }`;
     const nextConfig = buildNextTags(["properties"], options);
 
     const response = await $requestWithoutToken.get<IFetchAllPropertiesResponse>(
@@ -134,9 +137,7 @@ export const searchProperties = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const fetchMyProperties = async (
@@ -152,13 +153,13 @@ export const fetchMyProperties = async (
   },
   options?: IFetchOptions
 ) => {
-  const params = new URLSearchParams();
+  return safeServiceCall(async () => {
+    const params = new URLSearchParams();
 
-  if (query?.status?.length) {
-    params.append("status", query.status);
-  }
+    if (query?.status?.length) {
+      params.append("status", query.status);
+    }
 
-  try {
     const nextConfig = buildNextTags(["my-properties"], options);
 
     const response = await $requestWithToken.get<IFetchAllPropertiesResponse>(
@@ -168,9 +169,7 @@ export const fetchMyProperties = async (
       nextConfig
     );
     return response;
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const updateProperty = async ({
@@ -199,7 +198,7 @@ export const fetchPropertyById = async (
   token?: string,
   options?: IFetchOptions
 ) => {
-  try {
+  return safeServiceCall(async () => {
     const nextConfig = buildNextTags([`property-${propertyId}`], options);
 
     if (!token) {
@@ -216,9 +215,7 @@ export const fetchPropertyById = async (
       options?.cache ?? "force-cache",
       nextConfig
     );
-  } catch (error) {
-    throw error;
-  }
+  });
 };
 
 export const deleteProperty = async ({
