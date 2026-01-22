@@ -13,8 +13,7 @@ export default async function FeaturedProperties() {
         console.error('Failed to fetch properties:', error);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const publishedProperties = properties?.data?.data?.filter((property: any) => property.status === 'published') || [];
+    const publishedProperties = properties?.data?.data?.filter((property: IProperty) => property.status === 'published') || [];
     const hasPublishedProperties = publishedProperties.length > 0;
 
     return (

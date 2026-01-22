@@ -11,15 +11,16 @@ interface Props {
 }
 
 const RegisterUserModal = (props: Props) => {
+  const { setIsShown } = props;
   const { getSearchParams, deleteSearchParams } = useLocalSearchParams();
   const addedByAdmin = getSearchParams("addedByAdmin"); // Replace 'addedByAdmin' with the actual query parameter name you want to check for
 
   useEffect(() => {
     if (addedByAdmin && addedByAdmin === "true") {
-      props.setIsShown(false);
+      setIsShown(false);
       deleteSearchParams("addedByAdmin");
     }
-  }, [addedByAdmin]);
+  }, [addedByAdmin, deleteSearchParams, setIsShown]);
 
   return (
     <CustomModal

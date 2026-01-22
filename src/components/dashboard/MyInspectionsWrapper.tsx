@@ -13,8 +13,7 @@ const isNextRedirectError = (error: unknown) =>
     typeof error === "object" &&
     error !== null &&
     "digest" in error &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (error as any).digest === "NEXT_REDIRECT";
+    (error as { digest: string }).digest === "NEXT_REDIRECT";
 
 interface IProps {
     searchParams: {

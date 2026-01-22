@@ -38,21 +38,21 @@ const LoanFormWrapper = (props: Props) => {
     addCompletedStep,
   } = useLoanRequestStore();
 
+  const urlStep = getQueryParam("step");
+
   React.useEffect(() => {
     // Redirect to saved step if no step in URL
-    if (!getQueryParam("step") && currentStep) {
+    if (!urlStep && currentStep) {
       setQueryParam("step", currentStep);
     }
-  }, []);
+  }, [urlStep, currentStep, setQueryParam]);
 
   React.useEffect(() => {
-    const step = getQueryParam("step");
-
-    if (step) {
-      setCurrentStep(step as IFormStep);
-      addVisitedStep(parseInt(step));
+    if (urlStep) {
+      setCurrentStep(urlStep as IFormStep);
+      addVisitedStep(parseInt(urlStep));
     }
-  }, [getQueryParam("step")]);
+  }, [urlStep, setCurrentStep, addVisitedStep]);
 
   const formStep = () => {
     const step = getQueryParam("step");

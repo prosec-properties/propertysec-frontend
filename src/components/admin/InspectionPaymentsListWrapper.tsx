@@ -42,15 +42,14 @@ export default async function InspectionPaymentsListWrapper({ searchParams }: IP
             ? inspectionPaymentsResponse.data
             : [];
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const statistics = (inspectionPaymentsResponse as any).statistics;
+        const statistics = (inspectionPaymentsResponse as unknown as { statistics?: { totalInspections?: number; completedInspections?: number; approvedInspections?: number } }).statistics;
 
         return (
             <InspectionPaymentsList
                 initialInspectionPayments={inspectionPayments}
-                totalInspections={statistics?.totalInspections || 0}
-                completedInspections={statistics?.completedInspections || 0}
-                approvedInspections={statistics?.approvedInspections || 0}
+                totalInspections={statistics?.totalInspections ?? 0}
+                completedInspections={statistics?.completedInspections ?? 0}
+                approvedInspections={statistics?.approvedInspections ?? 0}
             />
         );
     } catch (error) {

@@ -49,7 +49,7 @@ const FilterProperty = ({
     setSelectedCategories(categoryIds);
     setSelectedLocations(locationIds);
     setSelectedPricing(pricingIds);
-  }, [searchParams, categories, country?.states]);
+  }, [searchParams, categories, country?.states, getQueryParam]);
 
   // console.log(selectedCategories);
 
@@ -232,10 +232,9 @@ const FilterItem = <T extends Item>(props: FilterItemProps<T>) => {
             onClick={() => toggleItem(item)}
             className={`
               flex items-center gap-3 text-[0.95rem] transition-all duration-200 cursor-pointer group
-              ${
-                isSelected(item)
-                  ? "text-primary font-medium"
-                  : "text-gray-600 hover:text-gray-900"
+              ${isSelected(item)
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-gray-900"
               }
             `}
           >
