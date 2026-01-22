@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@/hooks/useUser";
 import { USER_ROLE } from "@/constants/user";
@@ -12,15 +13,25 @@ import BathIcon from "../icons/Bath";
 import BedIcon from "../icons/Bed";
 import ToiletIcon from "../icons/Toilet";
 import PropertyFeature from "./PropertyFeature";
-import BuyerButtons from "./BuyerButtons";
-import SellerButtons from "./SellerButtons";
-import AdminButtons from "./AdminButtons";
-import AffiliateButtons from "./AffiliateButtons";
-import PreviewButtons from "./PreviewButtons";
-import GuestButtons from "./GuestButtons";
 import CustomButton from "../buttons/CustomButton";
-import ReceiptDownloader, { ReceiptDownloaderRef } from "../receipts/PropertyPurchase";
 import { getInitials } from "@/lib/user";
+
+// Dynamic imports for role-specific components (loaded on demand)
+const BuyerButtons = dynamic(() => import("./BuyerButtons"), { ssr: false });
+const SellerButtons = dynamic(() => import("./SellerButtons"), { ssr: false });
+const AdminButtons = dynamic(() => import("./AdminButtons"), { ssr: false });
+const AffiliateButtons = dynamic(() => import("./AffiliateButtons"), { ssr: false });
+const PreviewButtons = dynamic(() => import("./PreviewButtons"), { ssr: false });
+const GuestButtons = dynamic(() => import("./GuestButtons"), { ssr: false });
+
+// Heavy component - only loaded when downloading receipts
+const ReceiptDownloader = dynamic(
+  () => import("../receipts/PropertyPurchase"),
+  { ssr: false }
+);
+
+// Import the ref type for typing
+import type { ReceiptDownloaderRef } from "../receipts/PropertyPurchase";
 
 interface Props {
   property: IProperty;
@@ -171,8 +182,6 @@ const PropertyDetails: React.FC<Props> = ({
 }) => {
   const receiptDownloaderRef = useRef<ReceiptDownloaderRef>(null);
   const { user, token } = useUser();
-  console.log('property details file loaded', property);
-
 
   // Derived state
   const canViewPurchases =
@@ -191,8 +200,6 @@ const PropertyDetails: React.FC<Props> = ({
     queryFn: () => fetchPropertyPurchases(token || "", property.id),
     enabled: !!token && canViewPurchases && property.availability === "sold",
   });
-
-  console.log('purchasesData', purchasesData);
 
   const purchases = purchasesData?.data?.purchases || [];
 

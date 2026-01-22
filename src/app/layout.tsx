@@ -35,7 +35,11 @@ export default async function RootLayout({
         </ErrorBoundary>
         <Toaster />
       </body>
-      <Script src={"https://js.paystack.co/v2/inline.js"}></Script>
+      <Script
+        src="https://js.paystack.co/v2/inline.js"
+        strategy="lazyOnload"
+      />
     </html>
   );
 }
+

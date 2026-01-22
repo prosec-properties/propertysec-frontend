@@ -1,7 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizePackageImports: ["lucide-react", "lodash", "recharts", "date-fns", "@radix-ui/react-dialog", "@radix-ui/react-slot", "@radix-ui/react-label"],
+    optimizePackageImports: [
+      "lucide-react",
+      "lodash",
+      "recharts",
+      "date-fns",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-label",
+      "@radix-ui/react-select",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-checkbox",
+      "@radix-ui/react-radio-group",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-scroll-area",
+      "@tanstack/react-query",
+    ],
   },
   images: {
     remotePatterns: [
